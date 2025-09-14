@@ -129,17 +129,38 @@
             outline: none !important;
         }
         /* Loading overlay minimal resets live here to avoid touching global CSS */
-        #loading-overlay{position:fixed;inset:0;background:#0b0d10;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:5000;color:#fff}
-        #loading-overlay .content{position:relative;text-align:center;padding:24px 16px}
-        #loading-overlay .title{font-size:44px;font-weight:900;letter-spacing:2px;opacity:0;transform:translateY(8px);animation:fadeUp .8s ease .05s forwards;text-shadow:0 2px 14px rgba(255,255,255,0.35), 0 0 2px rgba(255,255,255,0.75)}
-        #loading-overlay .tagline{margin-top:8px;opacity:0;font-size:15px;font-weight:600;animation:fadeUp 1s ease .2s forwards;text-shadow:0 1px 10px rgba(255,255,255,0.25)}
-        #loading-overlay .percent{margin-top:18px;font-size:18px;font-weight:700;opacity:0;transform:translateY(8px);animation:fadeUp 1.2s ease .6s forwards}
-        #loading-overlay .start-btn{display:none;margin-top:18px;padding:8px 22px;border:none;border-radius:999px;background:#ffffff;color:#0b0d10;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 8px 28px rgba(255,255,255,0.12);opacity:0;transform:translateY(10px) scale(.98);filter:blur(3px)}
+        #loading-overlay{position:fixed;inset:0;background:#90908D;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:5000;color:#fff}
+        #loading-overlay .content{position:relative;text-align:center;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%}
+        #loading-overlay .loading-svg-container{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:1}
+        #loading-overlay .loading-svg{width:100vw;height:100vh;object-fit:cover;min-width:100%;min-height:100%}
+        #loading-overlay .loading-text{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:15px;z-index:2}
+        #loading-overlay .progress-container{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;transform:translateY(8px);animation:fadeUp 1.2s ease 1.5s forwards}
+        #loading-overlay .progress-bar{width:250px;height:24px;background:rgba(255,255,255,0.2);border-radius:12px;overflow:hidden;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center}
+        #loading-overlay .progress-fill{height:100%;background:linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);border-radius:12px;width:0%;transition:width 0.3s ease;position:absolute;top:0;left:0;overflow:hidden}
+        #loading-overlay .progress-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);animation:progressShine 2s infinite}
+        #loading-overlay .progress-text{font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.8);z-index:2;position:relative;white-space:nowrap;pointer-events:none}
+        #loading-overlay .start-btn{display:none;padding:12px 28px;border:none;border-radius:999px;background:#ffffff;color:#0b0d10;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 8px 28px rgba(255,255,255,0.12);opacity:0;transform:translateY(10px) scale(.98);filter:blur(3px);transition:all 0.3s ease}
         #loading-overlay .start-btn.revealed{animation:btnReveal 1.1s cubic-bezier(.2,.8,.2,1) forwards}
-        #loading-overlay .start-btn:hover{box-shadow:0 10px 34px rgba(255,255,255,0.18)}
+        #loading-overlay .start-btn:hover{box-shadow:0 10px 34px rgba(255,255,255,0.18);transform:translateY(-2px)}
         @keyframes btnReveal{0%{opacity:0;transform:translateY(10px) scale(.98);filter:blur(3px)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-        #veil-canvas{position:absolute;inset:-12% -15% 38% -15%;width:130%;height:70%;pointer-events:none;opacity:.95;mix-blend-mode:screen;filter:blur(26px)}
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes progressShine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+        
+        /* Мобильная адаптивность */
+        @media (max-width: 768px) {
+            #loading-overlay .loading-svg{object-fit:cover;width:100vw;height:100vh}
+            #loading-overlay .loading-text{bottom:40px}
+            #loading-overlay .progress-bar{width:220px;height:20px}
+            #loading-overlay .progress-text{font-size:12px}
+            #loading-overlay .start-btn{padding:10px 24px;font-size:14px}
+        }
+        
+        @media (max-width: 480px) {
+            #loading-overlay .loading-text{bottom:30px;gap:12px}
+            #loading-overlay .progress-bar{width:200px;height:18px}
+            #loading-overlay .progress-text{font-size:11px}
+            #loading-overlay .start-btn{padding:8px 20px;font-size:13px}
+        }
         
         /* Отключаем стандартное выделение браузера */
         .building-zone {
@@ -577,11 +598,18 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <div class="content">
-            <canvas id="veil-canvas"></canvas>
-            <div class="title">BOOKE</div>
-            <div class="tagline">A world of books, business and creativity</div>
-            <div class="percent" id="loading-percent">0%</div>
-            <button class="start-btn" id="start-button">Начать</button>
+            <div class="loading-svg-container">
+                <img src="assets/svg/loading/Group 2363.svg" alt="Loading" class="loading-svg">
+            </div>
+            <div class="loading-text">
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-text" id="progress-text">0%</div>
+                    </div>
+                </div>
+                <button class="start-btn" id="start-button">Начать</button>
+            </div>
         </div>
     </div>
     <div id="ui-root">

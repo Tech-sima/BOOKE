@@ -934,10 +934,25 @@ function animate() {
         top2.project(camera);
         const sx2=(top2.x*0.5+0.5)*window.innerWidth;
         const sy2=(-top2.y*0.5+0.5)*window.innerHeight;
+        // Push factory circles below the left info panel if overlapping
+        let minTop = 0;
+        const infoBg = document.querySelector('.info-panel-bg');
+        if (infoBg) {
+            try {
+                const rect = infoBg.getBoundingClientRect();
+                minTop = rect.bottom + 8; // margin under the panel
+            } catch (_) {}
+        }
+        const circleSize = 70; // px
+        const gapBetweenCircles = 12; // px
+        const desiredProgTop = sy2 - 85;
+        const desiredBankTop = sy2 - 160;
+        const progTop = Math.max(desiredProgTop, minTop);
+        const bankTop = Math.max(desiredBankTop, progTop + circleSize + gapBetweenCircles);
         factoryProgressDiv.style.left=(sx2-35)+'px';
-        factoryProgressDiv.style.top =(sy2-85)+'px';
+        factoryProgressDiv.style.top = progTop + 'px';
         factoryBankDiv.style.left=(sx2-35)+'px';
-        factoryBankDiv.style.top =(sy2-160)+'px';
+        factoryBankDiv.style.top = bankTop + 'px';
     }
 
     // позиционируем кружок над хранилищем

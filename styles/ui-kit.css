@@ -54,12 +54,13 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 #money-panel,#credits-panel{display:none!important;}
 
 /* Side bar update */
-.side-bar{position:fixed;margin-right:-16px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:56px;height:auto;background:#4D4D4D;border-top-left-radius:28px;border-bottom-left-radius:28px;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
-.side-btn{width:56px;height:56px;background:#4D4D4D;border:none;border-radius:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
-.side-btn img{width:24px;height:24px;}
+.side-bar{position:fixed;margin-right:-21px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:73px;height:auto;background:#4D4D4D;border-top-left-radius:36px;border-bottom-left-radius:36px;padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
+.side-btn{width:73px;height:73px;background:#4D4D4D;border:none;border-radius:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
+.side-btn.invisible-btn{background:transparent;border:none;cursor:pointer;z-index:10;}
+.side-btn img{width:31px;height:31px;}
 .side-btn.active{background:#fff;color:#4D4D4D;}
 .side-btn.panel-active{background:#fff;color:#4D4D4D;}
-.side-sep{width:24px;height:1px;background:#6d6d6d;margin:8px 0;}
+.side-sep{width:31px;height:1px;background:#6d6d6d;margin:10px 0;}
 
 /* Info panel with PNG background */
 .info-stack{position:fixed;top:calc(5px + env(safe-area-inset-top, 0px));left:2px;width:auto;z-index:20;}
@@ -151,25 +152,74 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 /* Адаптивность для правой панели */
+
+/* Для больших экранов (более 1200px) */
+@media (min-width: 1200px) {
+    .side-bar{width:80px;margin-right:-24px;border-top-left-radius:40px;border-bottom-left-radius:40px;padding:18px 0;}
+    .side-btn{width:80px;height:80px;border-radius:45px;}
+    .side-btn img{width:34px;height:34px;}
+    .side-sep{width:34px;margin:12px 0;}
+    
+    #btn-sound{top:18px;left:6px;}
+    #btn-tasks{top:110px;left:6px;}
+    #btn-phone{top:202px;left:6px;}
+    #btn-news{top:294px;left:6px;}
+    #btn-settings{top:386px;left:6px;}
+}
+
+/* Для средних экранов (768px - 1199px) */
+@media (min-width: 769px) and (max-width: 1199px) {
+    .side-bar{width:73px;margin-right:-21px;border-top-left-radius:36px;border-bottom-left-radius:36px;padding:16px 0;}
+    .side-btn{width:73px;height:73px;border-radius:42px;}
+    .side-btn img{width:31px;height:31px;}
+    .side-sep{width:31px;margin:10px 0;}
+    
+    #btn-sound{top:16px;left:5px;}
+    #btn-tasks{top:99px;left:5px;}
+    #btn-phone{top:182px;left:5px;}
+    #btn-news{top:265px;left:5px;}
+    #btn-settings{top:348px;left:5px;}
+}
 @media (max-width: 768px) {
-    .side-bar{margin-top:calc(70px + env(safe-area-inset-top, 0px));padding:8px 0;}
-    .side-btn{width:48px;height:48px;border-radius:24px;}
-    .side-btn img{width:20px;height:20px;}
-    .side-sep{margin:6px 0;}
+    .side-bar{margin-right:-16px;margin-top:calc(70px + env(safe-area-inset-top, 0px));padding:10px 0;width:62px;border-top-left-radius:31px;border-bottom-left-radius:31px;}
+    .side-btn{width:62px;height:62px;border-radius:31px;}
+    .side-btn img{width:26px;height:26px;}
+    .side-sep{width:26px;margin:8px 0;}
+    
+    /* Адаптивные позиции кнопок для планшетов */
+    #btn-sound{top:13px;left:4px;}
+    #btn-tasks{top:84px;left:4px;}
+    #btn-phone{top:155px;left:4px;}
+    #btn-news{top:226px;left:4px;}
+    #btn-settings{top:297px;left:4px;}
 }
 
 @media (max-width: 480px) {
-    .side-bar{margin-top:calc(60px + env(safe-area-inset-top, 0px));padding:6px 0;}
-    .side-btn{width:40px;height:40px;border-radius:20px;}
-    .side-btn img{width:18px;height:18px;}
-    .side-sep{margin:4px 0;}
+    .side-bar{margin-right:-13px;margin-top:calc(60px + env(safe-area-inset-top, 0px));padding:8px 0;width:52px;border-top-left-radius:26px;border-bottom-left-radius:26px;}
+    .side-btn{width:52px;height:52px;border-radius:26px;}
+    .side-btn img{width:23px;height:23px;}
+    .side-sep{width:23px;margin:6px 0;}
+    
+    /* Адаптивные позиции кнопок для мобильных */
+    #btn-sound{top:11px;left:3px;}
+    #btn-tasks{top:71px;left:3px;}
+    #btn-phone{top:131px;left:3px;}
+    #btn-news{top:191px;left:3px;}
+    #btn-settings{top:251px;left:3px;}
 }
 
 @media (max-width: 360px) {
-    .side-bar{margin-top:calc(50px + env(safe-area-inset-top, 0px));padding:4px 0;}
-    .side-btn{width:36px;height:36px;border-radius:18px;}
-    .side-btn img{width:16px;height:16px;}
-    .side-sep{margin:2px 0;}
+    .side-bar{margin-right:-10px;margin-top:calc(50px + env(safe-area-inset-top, 0px));padding:5px 0;width:47px;border-top-left-radius:24px;border-bottom-left-radius:24px;}
+    .side-btn{width:47px;height:47px;border-radius:24px;}
+    .side-btn img{width:21px;height:21px;}
+    .side-sep{width:21px;margin:4px 0;}
+    
+    /* Адаптивные позиции кнопок для маленьких экранов */
+    #btn-sound{top:9px;left:2px;}
+    #btn-tasks{top:64px;left:2px;}
+    #btn-phone{top:119px;left:2px;}
+    #btn-news{top:174px;left:2px;}
+    #btn-settings{top:229px;left:2px;}
 }
 .info-ic{width:14px;height:14px;opacity:0.5;}
 

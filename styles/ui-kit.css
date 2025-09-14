@@ -54,26 +54,36 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 #money-panel,#credits-panel{display:none!important;}
 
 /* Side bar update */
-.side-bar{position:fixed;margin-right:-21px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:73px;height:auto;background:#4D4D4D;border-top-left-radius:36px;border-bottom-left-radius:36px;padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
-.side-btn{width:73px;height:73px;background:#4D4D4D;border:none;border-radius:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
+.side-bar{position:fixed;margin-right:-24px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:calc(0px + env(safe-area-inset-right, 0px));width:84px;height:auto;background:#4D4D4D;border-top-left-radius:42px;border-bottom-left-radius:42px;padding:18px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
+.right-menu-bg{width:100%;height:auto;display:block;pointer-events:none;}
+.side-btn{width:84px;height:84px;background:#4D4D4D;border:none;border-radius:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
 .side-btn.invisible-btn{background:transparent;border:none;cursor:pointer;z-index:10;}
-.side-btn img{width:31px;height:31px;}
+.side-btn img{width:36px;height:36px;}
 .side-btn.active{background:#fff;color:#4D4D4D;}
 .side-btn.panel-active{background:#fff;color:#4D4D4D;}
-.side-sep{width:31px;height:1px;background:#6d6d6d;margin:10px 0;}
+.side-sep{width:36px;height:1px;background:#6d6d6d;margin:12px 0;}
+
+/* Базовые позиции кликабельных зон для правой панели */
+#btn-sound{top:18px;left:6px;}
+#btn-tasks{top:114px;left:6px;}
+#btn-phone{top:210px;left:6px;}
+#btn-news{top:306px;left:6px;}
+#btn-settings{top:402px;left:6px;}
 
 /* Info panel with PNG background */
-.info-stack{position:fixed;top:calc(5px + env(safe-area-inset-top, 0px));left:2px;width:auto;z-index:20;}
+.info-stack{position:fixed;top:calc(5px + env(safe-area-inset-top, 0px));left:calc(2px + env(safe-area-inset-left, 0px));width:auto;z-index:20;}
 .info-panel-bg{
-  width:105px;
-  height:150px;
+  width:137px;
+  height:195px;
   background:transparent;
   background-size:contain;
   background-repeat:no-repeat;
   background-position:top left;
   position:relative;
-  border-radius:12px;
+  border-radius:16px;
   overflow:hidden;
+  transform-origin: top left;
+  transform: scale(1.28);
 }
 .info-value{
   font-family:'Segoe UI',Arial,sans-serif;
@@ -155,80 +165,89 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Для больших экранов (более 1200px) */
 @media (min-width: 1200px) {
-    .side-bar{width:80px;margin-right:-24px;border-top-left-radius:40px;border-bottom-left-radius:40px;padding:18px 0;}
-    .side-btn{width:80px;height:80px;border-radius:45px;}
-    .side-btn img{width:34px;height:34px;}
-    .side-sep{width:34px;margin:12px 0;}
+    .side-bar{width:96px;margin-right:-26px;border-top-left-radius:48px;border-bottom-left-radius:48px;padding:20px 0;}
+    .side-btn{width:96px;height:96px;border-radius:52px;}
+    .side-btn img{width:40px;height:40px;}
+    .side-sep{width:40px;margin:14px 0;}
     
-    #btn-sound{top:18px;left:6px;}
-    #btn-tasks{top:110px;left:6px;}
-    #btn-phone{top:202px;left:6px;}
-    #btn-news{top:294px;left:6px;}
-    #btn-settings{top:386px;left:6px;}
+    #btn-sound{top:20px;left:6px;}
+    #btn-tasks{top:128px;left:6px;}
+    #btn-phone{top:236px;left:6px;}
+    #btn-news{top:344px;left:6px;}
+    #btn-settings{top:452px;left:6px;}
 }
 
 /* Для средних экранов (768px - 1199px) */
 @media (min-width: 769px) and (max-width: 1199px) {
-    .side-bar{width:73px;margin-right:-21px;border-top-left-radius:36px;border-bottom-left-radius:36px;padding:16px 0;}
-    .side-btn{width:73px;height:73px;border-radius:42px;}
-    .side-btn img{width:31px;height:31px;}
-    .side-sep{width:31px;margin:10px 0;}
+    .side-bar{width:88px;margin-right:-24px;border-top-left-radius:44px;border-bottom-left-radius:44px;padding:18px 0;}
+    .side-btn{width:88px;height:88px;border-radius:50px;}
+    .side-btn img{width:38px;height:38px;}
+    .side-sep{width:38px;margin:12px 0;}
     
-    #btn-sound{top:16px;left:5px;}
-    #btn-tasks{top:99px;left:5px;}
-    #btn-phone{top:182px;left:5px;}
-    #btn-news{top:265px;left:5px;}
-    #btn-settings{top:348px;left:5px;}
+    #btn-sound{top:18px;left:6px;}
+    #btn-tasks{top:118px;left:6px;}
+    #btn-phone{top:218px;left:6px;}
+    #btn-news{top:318px;left:6px;}
+    #btn-settings{top:418px;left:6px;}
 }
 @media (max-width: 768px) {
-    .side-bar{margin-right:-16px;margin-top:calc(70px + env(safe-area-inset-top, 0px));padding:10px 0;width:62px;border-top-left-radius:31px;border-bottom-left-radius:31px;}
-    .side-btn{width:62px;height:62px;border-radius:31px;}
-    .side-btn img{width:26px;height:26px;}
-    .side-sep{width:26px;margin:8px 0;}
+    .side-bar{margin-right:-18px;margin-top:calc(70px + env(safe-area-inset-top, 0px));padding:12px 0;width:72px;border-top-left-radius:36px;border-bottom-left-radius:36px;}
+    .side-btn{width:72px;height:72px;border-radius:36px;}
+    .side-btn img{width:30px;height:30px;}
+    .side-sep{width:30px;margin:10px 0;}
     
     /* Адаптивные позиции кнопок для планшетов */
-    #btn-sound{top:13px;left:4px;}
-    #btn-tasks{top:84px;left:4px;}
-    #btn-phone{top:155px;left:4px;}
-    #btn-news{top:226px;left:4px;}
-    #btn-settings{top:297px;left:4px;}
+    #btn-sound{top:14px;left:5px;}
+    #btn-tasks{top:98px;left:5px;}
+    #btn-phone{top:182px;left:5px;}
+    #btn-news{top:266px;left:5px;}
+    #btn-settings{top:350px;left:5px;}
 }
 
 @media (max-width: 480px) {
-    .side-bar{margin-right:-13px;margin-top:calc(60px + env(safe-area-inset-top, 0px));padding:8px 0;width:52px;border-top-left-radius:26px;border-bottom-left-radius:26px;}
-    .side-btn{width:52px;height:52px;border-radius:26px;}
-    .side-btn img{width:23px;height:23px;}
-    .side-sep{width:23px;margin:6px 0;}
+    .side-bar{margin-right:-16px;margin-top:calc(60px + env(safe-area-inset-top, 0px));padding:10px 0;width:64px;border-top-left-radius:32px;border-bottom-left-radius:32px;}
+    .side-btn{width:64px;height:64px;border-radius:32px;}
+    .side-btn img{width:28px;height:28px;}
+    .side-sep{width:28px;margin:8px 0;}
     
     /* Адаптивные позиции кнопок для мобильных */
-    #btn-sound{top:11px;left:3px;}
-    #btn-tasks{top:71px;left:3px;}
-    #btn-phone{top:131px;left:3px;}
-    #btn-news{top:191px;left:3px;}
-    #btn-settings{top:251px;left:3px;}
+    #btn-sound{top:12px;left:4px;}
+    #btn-tasks{top:88px;left:4px;}
+    #btn-phone{top:164px;left:4px;}
+    #btn-news{top:240px;left:4px;}
+    #btn-settings{top:316px;left:4px;}
 }
 
 @media (max-width: 360px) {
-    .side-bar{margin-right:-10px;margin-top:calc(50px + env(safe-area-inset-top, 0px));padding:5px 0;width:47px;border-top-left-radius:24px;border-bottom-left-radius:24px;}
-    .side-btn{width:47px;height:47px;border-radius:24px;}
-    .side-btn img{width:21px;height:21px;}
-    .side-sep{width:21px;margin:4px 0;}
+    .side-bar{margin-right:-12px;margin-top:calc(50px + env(safe-area-inset-top, 0px));padding:6px 0;width:56px;border-top-left-radius:28px;border-bottom-left-radius:28px;}
+    .side-btn{width:56px;height:56px;border-radius:28px;}
+    .side-btn img{width:24px;height:24px;}
+    .side-sep{width:24px;margin:6px 0;}
     
     /* Адаптивные позиции кнопок для маленьких экранов */
-    #btn-sound{top:9px;left:2px;}
-    #btn-tasks{top:64px;left:2px;}
-    #btn-phone{top:119px;left:2px;}
-    #btn-news{top:174px;left:2px;}
-    #btn-settings{top:229px;left:2px;}
+    #btn-sound{top:10px;left:3px;}
+    #btn-tasks{top:78px;left:3px;}
+    #btn-phone{top:146px;left:3px;}
+    #btn-news{top:214px;left:3px;}
+    #btn-settings{top:282px;left:3px;}
 }
 .info-ic{width:14px;height:14px;opacity:0.5;}
 
 /* push body down below header */
 #three-canvas{margin-top:var(--header-h);}
 
+/* Адаптивность для левой панели: чтобы не обрезалась на узких экранах */
+@media (max-width: 480px) {
+  .info-panel-bg{ transform: scale(1.15); }
+}
+
+@media (max-width: 360px) {
+  .info-panel-bg{ transform: scale(1.05); }
+}
+
 /* Telegram Mini App specific styles */
 .telegram-mini-app .info-stack {
-    top: 75px !important; /* 5px + 70px Telegram offset */
+    top: 95px !important; /* 5px + 70px + 20px Telegram offset */
 }
 
 /* Динамические панели зданий для Telegram Mini App */
@@ -304,7 +323,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптивные стили для Telegram Mini App */
 @media (max-width: 360px) {
-    .telegram-mini-app .info-stack { top: 65px !important; }
+    .telegram-mini-app .info-stack { top: 85px !important; }
     .telegram-mini-app .side-bar { margin-top: 140px !important; right: 8px !important; left: auto !important; }
     .telegram-mini-app .news-corner { top: 70px !important; }
     .telegram-mini-app .app-header { height: 156px !important; padding-top: 72px !important; }
@@ -314,7 +333,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 @media (max-width: 480px) {
-    .telegram-mini-app .info-stack { top: 75px !important; }
+    .telegram-mini-app .info-stack { top: 95px !important; }
     .telegram-mini-app .side-bar { margin-top: 150px !important; right: 8px !important; left: auto !important; }
     .telegram-mini-app .news-corner { top: 80px !important; }
     .telegram-mini-app .app-header { height: 166px !important; padding-top: 82px !important; }
@@ -324,7 +343,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 @media (max-width: 768px) {
-    .telegram-mini-app .info-stack { top: 85px !important; }
+    .telegram-mini-app .info-stack { top: 105px !important; }
     .telegram-mini-app .side-bar { margin-top: 160px !important; right: 8px !important; left: auto !important; }
     .telegram-mini-app .news-corner { top: 90px !important; }
     .telegram-mini-app .app-header { height: 176px !important; padding-top: 92px !important; }
@@ -366,7 +385,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .modal{position:fixed!important;z-index:130!important;}
 
 /* Notification red dot */
-.red-dot{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:5px;background:#ff1744;display:none;}
+.red-dot{position:absolute;top:6px;right:6px;width:12px;height:12px;border-radius:6px;background:#ff1744;display:none;}
 
 /* Explicit z-index for each modal panel */
 #phone-panel,

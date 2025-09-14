@@ -1652,6 +1652,13 @@ if(phonePanel){
         toggleCircles(false);
         setActiveSideButton('btn-phone');
     });
+    // Открытие магазина по кнопке "+" на левой панели
+    safeAddEventListener('btn-add-rbc', 'click', () => {
+        showPanelWithAnimation('shop-panel');
+        if (typeof setActiveNavButton === 'function') {
+            setActiveNavButton(1);
+        }
+    });
     safeAddEventListener('phone-close', 'click', () => {
         hidePanelWithAnimation('phone-panel', () => {
             toggleCircles(true);

@@ -64,8 +64,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Info panel with PNG background */
 .info-stack{position:fixed;top:calc(5px + env(safe-area-inset-top, 0px));left:2px;width:auto;z-index:20;}
 .info-panel-bg{
-  width:140px;
-  height:180px;
+  width:160px;
+  height:210px;
   background:transparent;
   background-size:contain;
   background-repeat:no-repeat;

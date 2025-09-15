@@ -54,18 +54,18 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 #money-panel,#credits-panel{display:none!important;}
 
 /* Side bar update */
-.side-bar{position:fixed;margin-right:-16px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:56px;height:auto;background:#4D4D4D;border-top-left-radius:28px;border-bottom-left-radius:28px;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
-.side-btn{width:56px;height:56px;background:#4D4D4D;border:none;border-radius:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
-.side-btn img{width:24px;height:24px;}
+.side-bar{position:fixed!important;margin-right:-21px!important;margin-top:calc(80px + env(safe-area-inset-top, 0px))!important;right:0!important;width:73px!important;height:auto!important;background:#4D4D4D!important;border-top-left-radius:36px!important;border-bottom-left-radius:36px!important;padding:16px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:0!important;}
+.side-btn{width:73px!important;height:73px!important;background:#4D4D4D!important;border:none!important;border-radius:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;transition:background-color 0.2s ease!important;}
+.side-btn img{width:31px!important;height:31px!important;}
 .side-btn.active{background:#fff;color:#4D4D4D;}
 .side-btn.panel-active{background:#fff;color:#4D4D4D;}
-.side-sep{width:24px;height:1px;background:#6d6d6d;margin:8px 0;}
+.side-sep{width:31px!important;height:1px!important;background:#6d6d6d!important;margin:10px 0!important;}
 
 /* Info panel with PNG background */
 .info-stack{position:fixed;top:calc(5px + env(safe-area-inset-top, 0px));left:2px;width:auto;z-index:20;}
 .info-panel-bg{
   width:160px;
-  height:210px;
+  height:140px;
   background:transparent;
   background-size:contain;
   background-repeat:no-repeat;
@@ -76,10 +76,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   cursor:pointer;
   transition:all 0.3s ease;
   padding:4px;
-}
-.info-panel-bg:hover{
-  transform:scale(1.02);
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
 }
 .info-value{
   font-family:'Segoe UI',Arial,sans-serif;
@@ -96,10 +92,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .info-item-bg{
   transition:all 0.2s ease;
   cursor:pointer;
-}
-.info-item-bg:hover{
-  transform:scale(1.02);
-  box-shadow:0 4px 12px rgba(0,0,0,0.4) !important;
 }
 .rbc-bg{
   border:1px solid #ffd700 !important;
@@ -164,24 +156,24 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптивность для правой панели */
 @media (max-width: 768px) {
-    .side-bar{margin-top:calc(70px + env(safe-area-inset-top, 0px));padding:8px 0;}
-    .side-btn{width:48px;height:48px;border-radius:24px;}
-    .side-btn img{width:20px;height:20px;}
-    .side-sep{margin:6px 0;}
+    .side-bar{margin-top:calc(70px + env(safe-area-inset-top, 0px))!important;padding:10px 0!important;width:62px!important;margin-right:-18px!important;}
+    .side-btn{width:62px!important;height:62px!important;border-radius:31px!important;}
+    .side-btn img{width:26px!important;height:26px!important;}
+    .side-sep{margin:8px 0!important;width:26px!important;}
 }
 
 @media (max-width: 480px) {
-    .side-bar{margin-top:calc(60px + env(safe-area-inset-top, 0px));padding:6px 0;}
-    .side-btn{width:40px;height:40px;border-radius:20px;}
-    .side-btn img{width:18px;height:18px;}
-    .side-sep{margin:4px 0;}
+    .side-bar{margin-top:calc(60px + env(safe-area-inset-top, 0px))!important;padding:8px 0!important;width:52px!important;margin-right:-15px!important;}
+    .side-btn{width:52px!important;height:52px!important;border-radius:26px!important;}
+    .side-btn img{width:22px!important;height:22px!important;}
+    .side-sep{margin:6px 0!important;width:22px!important;}
 }
 
 @media (max-width: 360px) {
-    .side-bar{margin-top:calc(50px + env(safe-area-inset-top, 0px));padding:4px 0;}
-    .side-btn{width:36px;height:36px;border-radius:18px;}
-    .side-btn img{width:16px;height:16px;}
-    .side-sep{margin:2px 0;}
+    .side-bar{margin-top:calc(50px + env(safe-area-inset-top, 0px))!important;padding:6px 0!important;width:47px!important;margin-right:-13px!important;}
+    .side-btn{width:47px!important;height:47px!important;border-radius:24px!important;}
+    .side-btn img{width:20px!important;height:20px!important;}
+    .side-sep{margin:4px 0!important;width:20px!important;}
 }
 .info-ic{width:14px;height:14px;opacity:0.5;}
 
@@ -240,6 +232,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     margin-top: 150px !important; /* 80px + 70px Telegram offset */
     right: 8px !important;
     left: auto !important;
+    width: 73px !important;
+    margin-right: -21px !important;
 }
 
 .telegram-mini-app .news-corner {
@@ -267,7 +261,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Адаптивные стили для Telegram Mini App */
 @media (max-width: 360px) {
     .telegram-mini-app .info-stack { top: 80px !important; /* Увеличен отступ для маленьких экранов */ }
-    .telegram-mini-app .side-bar { margin-top: 140px !important; right: 8px !important; left: auto !important; }
+    .telegram-mini-app .side-bar { margin-top: 140px !important; right: 8px !important; left: auto !important; width: 47px !important; margin-right: -13px !important; }
     .telegram-mini-app .news-corner { top: 70px !important; }
     .telegram-mini-app .app-header { height: 156px !important; padding-top: 72px !important; }
     .telegram-mini-app #three-canvas { margin-top: 156px !important; }
@@ -277,7 +271,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 @media (max-width: 480px) {
     .telegram-mini-app .info-stack { top: 90px !important; /* Увеличен отступ для средних экранов */ }
-    .telegram-mini-app .side-bar { margin-top: 150px !important; right: 8px !important; left: auto !important; }
+    .telegram-mini-app .side-bar { margin-top: 150px !important; right: 8px !important; left: auto !important; width: 52px !important; margin-right: -15px !important; }
     .telegram-mini-app .news-corner { top: 80px !important; }
     .telegram-mini-app .app-header { height: 166px !important; padding-top: 82px !important; }
     .telegram-mini-app #three-canvas { margin-top: 166px !important; }
@@ -287,7 +281,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 @media (max-width: 768px) {
     .telegram-mini-app .info-stack { top: 100px !important; /* Увеличен отступ для больших экранов */ }
-    .telegram-mini-app .side-bar { margin-top: 160px !important; right: 8px !important; left: auto !important; }
+    .telegram-mini-app .side-bar { margin-top: 160px !important; right: 8px !important; left: auto !important; width: 62px !important; margin-right: -18px !important; }
     .telegram-mini-app .news-corner { top: 90px !important; }
     .telegram-mini-app .app-header { height: 176px !important; padding-top: 92px !important; }
     .telegram-mini-app #three-canvas { margin-top: 176px !important; }

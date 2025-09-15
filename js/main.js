@@ -51,13 +51,13 @@ function adaptUIForTelegram() {
     
     if (screenWidth <= 360) {
         // Очень маленькие экраны (старые телефоны)
-        telegramTopOffset = 60;
+        telegramTopOffset = 75; // Увеличен с 60 до 75
     } else if (screenWidth <= 480) {
         // Маленькие экраны
-        telegramTopOffset = 70;
+        telegramTopOffset = 85; // Увеличен с 70 до 85
     } else if (screenWidth <= 768) {
         // Планшеты в портретной ориентации
-        telegramTopOffset = 80;
+        telegramTopOffset = 95; // Увеличен с 80 до 95
     } else {
         // Десктоп или планшет в альбомной ориентации
         telegramTopOffset = 0;
@@ -934,10 +934,50 @@ function animate() {
         top2.project(camera);
         const sx2=(top2.x*0.5+0.5)*window.innerWidth;
         const sy2=(-top2.y*0.5+0.5)*window.innerHeight;
-        factoryProgressDiv.style.left=(sx2-35)+'px';
-        factoryProgressDiv.style.top =(sy2-85)+'px';
-        factoryBankDiv.style.left=(sx2-35)+'px';
-        factoryBankDiv.style.top =(sy2-160)+'px';
+        
+        // Проверяем пересечение с левой панелью (ширина 140px + отступ 2px = 142px)
+        const leftPanelWidth = 142;
+        const leftPanelHeight = 180;
+        const topOffset = isTelegramApp ? 90 : 5; // Учитываем отступ для Telegram Mini App
+        
+        // Если круг завода пересекается с левой панелью, смещаем его вправо
+        let adjustedSx2 = sx2;
+        if (sx2 - 35 < leftPanelWidth) {
+            adjustedSx2 = leftPanelWidth + 35 + 10; // 10px дополнительный отступ
+        }
+        
+        // Если круг завода пересекается с верхней частью левой панели, смещаем его вниз
+        let adjustedSy2 = sy2;
+        const panelBottom = topOffset + leftPanelHeight;
+        const circleTop = sy2 - 85;
+        
+        // Отладочная информация
+        console.log('Factory circle positioning:', {
+            originalSy2: sy2,
+            circleTop: circleTop,
+            panelBottom: panelBottom,
+            topOffset: topOffset,
+            leftPanelHeight: leftPanelHeight,
+            isTelegramApp: isTelegramApp
+        });
+        
+        // Более агрессивное смещение - если круг находится в области левой панели
+        if (circleTop < panelBottom + 50) { // Добавляем буферную зону 50px
+            adjustedSy2 = panelBottom + 85 + 80; // Увеличиваем отступ до 80px
+            console.log('Factory circle moved down to:', adjustedSy2);
+        }
+        
+        // Дополнительная проверка: если круг завода находится в левой части экрана
+        // и может пересекаться с панелью, смещаем его вниз
+        if (sx2 < 200 && circleTop < 300) { // Если круг в левой части и в верхней части экрана
+            adjustedSy2 = Math.max(adjustedSy2, 300); // Минимум 300px от верха
+            console.log('Factory circle moved down due to left position:', adjustedSy2);
+        }
+        
+        factoryProgressDiv.style.left=(adjustedSx2-35)+'px';
+        factoryProgressDiv.style.top =(adjustedSy2-85)+'px';
+        factoryBankDiv.style.left=(adjustedSx2-35)+'px';
+        factoryBankDiv.style.top =(adjustedSy2-160)+'px';
     }
 
     // позиционируем кружок над хранилищем
@@ -3542,6 +3582,14 @@ function hidePanelWithAnimation(panelId, callback = null) {
 // Делаем функции анимации панелей глобально доступными
 window.showPanelWithAnimation = showPanelWithAnimation;
 window.hidePanelWithAnimation = hidePanelWithAnimation;
+
+// === КНОПКА ДОБАВЛЕНИЯ RBC В ЛЕВОЙ ПАНЕЛИ ===
+// Обработчик для кнопки "+" в левой панели - открывает магазин
+safeAddEventListener('btn-add-rbc', 'click', () => {
+    if (isAnyPanelOpen()) return; // Блокируем если открыта любая панель
+    setActiveNavButton(1); // Активируем кнопку магазина в нижней навигации
+    showPanelWithAnimation('shop-panel');
+});
 
 // Удаляем дублирующий обработчик для кнопки инвентаря
 

@@ -64,8 +64,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Info panel with PNG background */
 .info-stack{position:fixed;top:calc(5px + env(safe-area-inset-top, 0px));left:2px;width:auto;z-index:20;}
 .info-panel-bg{
-  width:105px;
-  height:150px;
+  width:140px;
+  height:180px;
   background:transparent;
   background-size:contain;
   background-repeat:no-repeat;
@@ -73,6 +73,13 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   position:relative;
   border-radius:12px;
   overflow:hidden;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  padding:4px;
+}
+.info-panel-bg:hover{
+  transform:scale(1.02);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
 }
 .info-value{
   font-family:'Segoe UI',Arial,sans-serif;
@@ -88,6 +95,11 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 .info-item-bg{
   transition:all 0.2s ease;
+  cursor:pointer;
+}
+.info-item-bg:hover{
+  transform:scale(1.02);
+  box-shadow:0 4px 12px rgba(0,0,0,0.4) !important;
 }
 .rbc-bg{
   border:1px solid #ffd700 !important;
@@ -178,7 +190,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Telegram Mini App specific styles */
 .telegram-mini-app .info-stack {
-    top: 75px !important; /* 5px + 70px Telegram offset */
+    top: 90px !important; /* 5px + 85px Telegram offset - увеличен для избежания пересечения с кнопкой закрыть */
 }
 
 /* Динамические панели зданий для Telegram Mini App */
@@ -254,7 +266,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптивные стили для Telegram Mini App */
 @media (max-width: 360px) {
-    .telegram-mini-app .info-stack { top: 65px !important; }
+    .telegram-mini-app .info-stack { top: 80px !important; /* Увеличен отступ для маленьких экранов */ }
     .telegram-mini-app .side-bar { margin-top: 140px !important; right: 8px !important; left: auto !important; }
     .telegram-mini-app .news-corner { top: 70px !important; }
     .telegram-mini-app .app-header { height: 156px !important; padding-top: 72px !important; }
@@ -264,7 +276,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 @media (max-width: 480px) {
-    .telegram-mini-app .info-stack { top: 75px !important; }
+    .telegram-mini-app .info-stack { top: 90px !important; /* Увеличен отступ для средних экранов */ }
     .telegram-mini-app .side-bar { margin-top: 150px !important; right: 8px !important; left: auto !important; }
     .telegram-mini-app .news-corner { top: 80px !important; }
     .telegram-mini-app .app-header { height: 166px !important; padding-top: 82px !important; }
@@ -274,13 +286,23 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 @media (max-width: 768px) {
-    .telegram-mini-app .info-stack { top: 85px !important; }
+    .telegram-mini-app .info-stack { top: 100px !important; /* Увеличен отступ для больших экранов */ }
     .telegram-mini-app .side-bar { margin-top: 160px !important; right: 8px !important; left: auto !important; }
     .telegram-mini-app .news-corner { top: 90px !important; }
     .telegram-mini-app .app-header { height: 176px !important; padding-top: 92px !important; }
     .telegram-mini-app #three-canvas { margin-top: 176px !important; }
     .telegram-mini-app #reset-data { top: 85px !important; }
     .telegram-mini-app #add-money-test { top: 115px !important; }
+}
+
+/* Дополнительные медиа-запросы для очень маленьких экранов */
+@media (max-width: 320px) {
+    .telegram-mini-app .info-stack { top: 75px !important; /* Еще больший отступ для очень маленьких экранов */ }
+}
+
+/* Для экранов с высоким разрешением */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .telegram-mini-app .info-stack { top: 110px !important; /* Отступ для планшетов */ }
 }
 
 /* bottom nav active dim others */

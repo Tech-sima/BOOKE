@@ -3564,9 +3564,9 @@ function hidePanelWithAnimation(panelId, callback = null) {
 window.showPanelWithAnimation = showPanelWithAnimation;
 window.hidePanelWithAnimation = hidePanelWithAnimation;
 
-// === КНОПКА ДОБАВЛЕНИЯ RBC В ЛЕВОЙ ПАНЕЛИ ===
-// Обработчик для кнопки "+" в левой панели - открывает магазин
-safeAddEventListener('btn-add-rbc', 'click', () => {
+// === ЯЧЕЙКА RBC В ЛЕВОЙ ПАНЕЛИ ===
+// Обработчик для ячейки RBC - открывает магазин
+safeAddEventListener('rbc-cell', 'click', () => {
     if (isAnyPanelOpen()) return; // Блокируем если открыта любая панель
     setActiveNavButton(1); // Активируем кнопку магазина в нижней навигации
     showPanelWithAnimation('shop-panel');

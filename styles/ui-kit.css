@@ -187,21 +187,21 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптивность для правой панели */
 @media (max-width: 768px) {
-    .side-bar{margin-top:calc(70px + env(safe-area-inset-top, 0px));padding:10px 0;}
+    .side-bar{margin-top:calc(80px + env(safe-area-inset-top, 0px));padding:10px 0;}
     .side-btn{width:75px;height:75px;border-radius:37px;}
     .side-btn img{width:32px;height:32px;}
     .side-sep{margin:8px 0;}
 }
 
 @media (max-width: 480px) {
-    .side-bar{margin-top:calc(60px + env(safe-area-inset-top, 0px));padding:8px 0;}
+    .side-bar{margin-top:calc(80px + env(safe-area-inset-top, 0px));padding:8px 0;}
     .side-btn{width:65px;height:65px;border-radius:32px;}
     .side-btn img{width:28px;height:28px;}
     .side-sep{margin:5px 0;}
 }
 
 @media (max-width: 360px) {
-    .side-bar{margin-top:calc(50px + env(safe-area-inset-top, 0px));padding:5px 0;}
+    .side-bar{margin-top:calc(80px + env(safe-area-inset-top, 0px));padding:5px 0;}
     .side-btn{width:60px;height:60px;border-radius:30px;}
     .side-btn img{width:25px;height:25px;}
     .side-sep{margin:3px 0;}

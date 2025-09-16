@@ -54,16 +54,16 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 #money-panel,#credits-panel{display:none!important;}
 
 /* Side bar update */
-.side-bar{position:fixed;margin-right:-16px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:73px;height:auto;background:#4D4D4D;border-top-left-radius:36px;border-bottom-left-radius:36px;padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
-.side-btn{width:73px;height:73px;background:#4D4D4D;border:none;border-radius:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
+.side-bar{position:fixed;margin-right:-16px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:73px;height:auto;background:transparent;border-top-left-radius:36px;border-bottom-left-radius:36px;padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
+.side-btn{width:73px;height:73px;background:transparent;border:none;border-radius:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
 .side-btn img{width:31px;height:31px;}
 .side-btn.active{background:#fff;color:#4D4D4D;}
 .side-btn.panel-active{background:#fff;color:#4D4D4D;}
 .side-sep{width:24px;height:1px;background:#6d6d6d;margin:8px 0;}
 
 /* Info panel with PNG background */
-.info-stack{position:fixed !important;top:calc(80px + env(safe-area-inset-top, 0px)) !important;left:-10px !important;width:auto;z-index:20;}
-#info-panel.info-stack{position:fixed !important;top:calc(80px + env(safe-area-inset-top, 0px)) !important;left:-10px !important;}
+.info-stack{position:fixed !important;top:calc(80px + env(safe-area-inset-top, 0px)) !important;left:10px !important;width:auto;z-index:20;}
+#info-panel.info-stack{position:fixed !important;top:calc(80px + env(safe-area-inset-top, 0px)) !important;left:10px !important;}
 .info-panel-bg{
   width:160px;
   height:140px;
@@ -84,6 +84,38 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 .info-icon{
   transition:filter 0.2s ease;
+  /* Улучшение качества SVG */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  /* Сглаживание для лучшего качества */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Улучшение четкости */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Принудительное использование GPU */
+  will-change: transform;
+  /* Дополнительные улучшения качества */
+  filter: contrast(1.1) brightness(1.05);
+  shape-rendering: geometricPrecision;
+}
+
+/* Дополнительные стили для всех SVG в левой панели */
+.info-panel-bg img {
+  /* Улучшение качества рендеринга */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  /* Сглаживание */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Принудительное использование GPU */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+  /* Улучшение четкости */
+  filter: contrast(1.1) brightness(1.05);
+  shape-rendering: geometricPrecision;
 }
 .p2p-icon{
   border-radius:50%;

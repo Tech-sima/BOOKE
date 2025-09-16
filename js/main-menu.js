@@ -2650,6 +2650,26 @@
             const zones = Array.from(container.querySelectorAll('.building-zone'));
             if (imageElement.parentElement === container) panLayer.appendChild(imageElement);
             zones.forEach(z => { if (z.parentElement === container) panLayer.appendChild(z); });
+            
+            // Создаем и добавляем сетку в pan-layer
+            const gridOverlay = document.createElement('div');
+            gridOverlay.id = 'grid-overlay';
+            gridOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 6;
+                background-image: 
+                    linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+                background-size: 100px 100px;
+                background-position: 0 0;
+                opacity: 0.6;
+            `;
+            panLayer.appendChild(gridOverlay);
         }
 
         // Состояние панорамирования

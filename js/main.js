@@ -452,7 +452,7 @@ function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-    renderer.domElement.style.zIndex = '5'; // Увеличиваем z-index чтобы canvas был поверх всех элементов
+    renderer.domElement.style.zIndex = '5'; // Canvas под сеткой, но над другими элементами
     document.body.appendChild(renderer.domElement);
 
     // Отключаем управление камерой для фиксированного вида

@@ -54,7 +54,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 #money-panel,#credits-panel{display:none!important;}
 
 /* Side bar update */
-.side-bar{position:fixed;margin-right:-16px;margin-top:calc(80px + env(safe-area-inset-top, 0px));right:0;width:90px;height:auto;background:transparent;border-top-left-radius:45px;border-bottom-left-radius:45px;padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
+.side-bar{position:fixed;margin-right:-16px;top:50%;right:0;transform:translateY(-50%);width:90px;height:auto;background:transparent;border-top-left-radius:45px;border-bottom-left-radius:45px;padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
 .side-btn{width:90px;height:90px;background:transparent;border:none;border-radius:45px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
 .side-btn img{width:38px;height:38px;}
 .side-btn.active{background:#fff;color:#4D4D4D;}
@@ -187,21 +187,21 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптивность для правой панели */
 @media (max-width: 768px) {
-    .side-bar{margin-top:calc(80px + env(safe-area-inset-top, 0px));padding:10px 0;}
+    .side-bar{padding:10px 0;}
     .side-btn{width:75px;height:75px;border-radius:37px;}
     .side-btn img{width:32px;height:32px;}
     .side-sep{margin:8px 0;}
 }
 
 @media (max-width: 480px) {
-    .side-bar{margin-top:calc(80px + env(safe-area-inset-top, 0px));padding:8px 0;}
+    .side-bar{padding:8px 0;}
     .side-btn{width:65px;height:65px;border-radius:32px;}
     .side-btn img{width:28px;height:28px;}
     .side-sep{margin:5px 0;}
 }
 
 @media (max-width: 360px) {
-    .side-bar{margin-top:calc(80px + env(safe-area-inset-top, 0px));padding:5px 0;}
+    .side-bar{padding:5px 0;}
     .side-btn{width:60px;height:60px;border-radius:30px;}
     .side-btn img{width:25px;height:25px;}
     .side-sep{margin:3px 0;}
@@ -260,7 +260,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 .telegram-mini-app .side-bar {
-    margin-top: 150px !important; /* 80px + 70px Telegram offset */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     right: 8px !important;
     left: auto !important;
     width: 90px !important;
@@ -291,7 +292,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Адаптивные стили для Telegram Mini App */
 @media (max-width: 360px) {
     .telegram-mini-app .info-stack { top: 155px !important; /* Увеличен отступ для маленьких экранов */ }
-    .telegram-mini-app .side-bar { margin-top: 140px !important; right: 8px !important; left: auto !important; width: 60px !important; }
+    .telegram-mini-app .side-bar { top: 50% !important; transform: translateY(-50%) !important; right: 8px !important; left: auto !important; width: 60px !important; }
     .telegram-mini-app .news-corner { top: 70px !important; }
     .telegram-mini-app .app-header { height: 156px !important; padding-top: 72px !important; }
     .telegram-mini-app #three-canvas { margin-top: 156px !important; }
@@ -301,7 +302,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 @media (max-width: 480px) {
     .telegram-mini-app .info-stack { top: 165px !important; /* Увеличен отступ для средних экранов */ }
-    .telegram-mini-app .side-bar { margin-top: 150px !important; right: 8px !important; left: auto !important; width: 65px !important; }
+    .telegram-mini-app .side-bar { top: 50% !important; transform: translateY(-50%) !important; right: 8px !important; left: auto !important; width: 65px !important; }
     .telegram-mini-app .news-corner { top: 80px !important; }
     .telegram-mini-app .app-header { height: 166px !important; padding-top: 82px !important; }
     .telegram-mini-app #three-canvas { margin-top: 166px !important; }
@@ -311,7 +312,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 @media (max-width: 768px) {
     .telegram-mini-app .info-stack { top: 175px !important; /* Увеличен отступ для больших экранов */ }
-    .telegram-mini-app .side-bar { margin-top: 160px !important; right: 8px !important; left: auto !important; width: 75px !important; }
+    .telegram-mini-app .side-bar { top: 50% !important; transform: translateY(-50%) !important; right: 8px !important; left: auto !important; width: 75px !important; }
     .telegram-mini-app .news-corner { top: 90px !important; }
     .telegram-mini-app .app-header { height: 176px !important; padding-top: 92px !important; }
     .telegram-mini-app #three-canvas { margin-top: 176px !important; }

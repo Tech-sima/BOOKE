@@ -11,6 +11,10 @@
         baseTileWidth: 90,
         minTileWidth: 60,
         maxTileWidth: 260,
+        // Keep grid appearance identical across resolutions by using a fixed
+        // number of tiles across the container width
+        uniformAcrossResolutions: true,
+        gridColsAcrossWidth: 12,
         strokeStyle: 'rgba(255,255,255,0.9)',
         lineWidth: 1.5,
         numberFillStyle: 'rgba(0,0,0,0.8)',
@@ -45,7 +49,8 @@
         keyToNumber: new Map(),         // `${r}:${c}` -> number
         numberToKey: new Map(),         // number -> `${r}:${c}`
         hiddenNumbers: new Set(),       // numbers to hide (deleted)
-        nextNumber: 1
+        nextNumber: 1,
+        mappingReady: false
     };
 
     function clamp(value, min, max){
@@ -110,8 +115,14 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         gridState.centerX = Math.floor(width / 2);
         gridState.centerY = Math.floor(height / 2);
-        // Keep fixed tile size; do not auto-adapt on resize
-        gridState.tileWidth = clamp(gridState.tileWidth, CONFIG.minTileWidth, CONFIG.maxTileWidth);
+        // Scale tile size to keep the same number of tiles across width
+        if (CONFIG.uniformAcrossResolutions && CONFIG.gridColsAcrossWidth > 0){
+            const proposed = Math.floor(width / CONFIG.gridColsAcrossWidth);
+            gridState.tileWidth = clamp(proposed, CONFIG.minTileWidth, CONFIG.maxTileWidth);
+        } else {
+            // Keep fixed tile size; do not auto-adapt on resize
+            gridState.tileWidth = clamp(gridState.tileWidth, CONFIG.minTileWidth, CONFIG.maxTileWidth);
+        }
         gridState.tileHeight = Math.floor(gridState.tileWidth / 2);
     }
 
@@ -154,6 +165,22 @@
         return num;
     }
 
+    function ensureNumberingAssigned(){
+        if (gridState.mappingReady) return;
+        const radius = CONFIG.maxGridRadius;
+        for (let r = -radius; r <= radius; r++){
+            for (let c = -radius; c <= radius; c++){
+                const key = `${r}:${c}`;
+                if (!gridState.keyToNumber.has(key)){
+                    const num = gridState.nextNumber++;
+                    gridState.keyToNumber.set(key, num);
+                    gridState.numberToKey.set(num, key);
+                }
+            }
+        }
+        gridState.mappingReady = true;
+    }
+
     function drawGrid(){
         if (!ctx || !canvas) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -183,7 +210,7 @@
                 }
 
                 const key = `${r}:${c}`;
-                const number = getOrAssignNumberForKey(key);
+                const number = gridState.keyToNumber.get(key) || getOrAssignNumberForKey(key);
                 if (gridState.hiddenNumbers.has(number)) {
                     continue; // skip drawing hidden tiles
                 }

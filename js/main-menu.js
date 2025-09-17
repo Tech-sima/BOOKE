@@ -2651,91 +2651,106 @@
             if (imageElement.parentElement === container) panLayer.appendChild(imageElement);
             zones.forEach(z => { if (z.parentElement === container) panLayer.appendChild(z); });
             
-            // Создаем и добавляем SVG-сетку с маской, которая исключает зоны зданий
-            const SVG_NS = 'http://www.w3.org/2000/svg';
-            const gridOverlay = document.createElementNS(SVG_NS, 'svg');
-            gridOverlay.setAttribute('id', 'grid-overlay');
-            gridOverlay.setAttribute('xmlns', SVG_NS);
-            gridOverlay.setAttribute('preserveAspectRatio', 'none');
-            gridOverlay.style.position = 'absolute';
-            gridOverlay.style.top = '0';
-            gridOverlay.style.left = '0';
-            gridOverlay.style.width = '100%';
-            gridOverlay.style.height = '100%';
-            gridOverlay.style.pointerEvents = 'none';
-            gridOverlay.style.zIndex = '6';
-            gridOverlay.style.opacity = '0.6';
+            // Создаем и добавляем SVG-сетку, которая не перекрывает зоны зданий
+            const buildGrid = () => {
+                const old = panLayer.querySelector('#grid-overlay');
+                if (old) old.remove();
 
-            const defs = document.createElementNS(SVG_NS, 'defs');
-            const mask = document.createElementNS(SVG_NS, 'mask');
-            mask.setAttribute('id', 'grid-mask');
-            const maskBg = document.createElementNS(SVG_NS, 'rect');
-            maskBg.setAttribute('x', '0');
-            maskBg.setAttribute('y', '0');
-            maskBg.setAttribute('width', '100%');
-            maskBg.setAttribute('height', '100%');
-            maskBg.setAttribute('fill', 'white');
-            mask.appendChild(maskBg);
-            defs.appendChild(mask);
-            gridOverlay.appendChild(defs);
+                const gridSize = 50;
+                const gridColor = 'rgba(255, 255, 255, 0.5)';
+                const gridThickness = 2;
 
-            const gridGroup = document.createElementNS(SVG_NS, 'g');
-            gridGroup.setAttribute('mask', 'url(#grid-mask)');
-            gridGroup.setAttribute('stroke', 'rgba(255, 255, 255, 0.3)');
-            gridGroup.setAttribute('stroke-width', '1');
-            gridOverlay.appendChild(gridGroup);
+                const width = panLayer.offsetWidth;
+                const height = panLayer.offsetHeight;
+                const svgNS = 'http://www.w3.org/2000/svg';
 
-            panLayer.appendChild(gridOverlay);
+                const svg = document.createElementNS(svgNS, 'svg');
+                svg.id = 'grid-overlay';
+                svg.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    z-index: 6;
+                    opacity: 0.8;
+                `;
+                svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
-            function buildGridLines() {
-                const width = panLayer.clientWidth || 0;
-                const height = panLayer.clientHeight || 0;
-                if (!width || !height) return;
-                gridOverlay.setAttribute('viewBox', `0 0 ${width} ${height}`);
-                // Очистить старые линии
-                while (gridGroup.firstChild) gridGroup.removeChild(gridGroup.firstChild);
-                const spacing = 50; // px
-                // Вертикальные линии
-                for (let x = 0.5; x <= width; x += spacing) {
-                    const line = document.createElementNS(SVG_NS, 'line');
+                const defs = document.createElementNS(svgNS, 'defs');
+                const mask = document.createElementNS(svgNS, 'mask');
+                mask.id = 'building-mask';
+
+                const maskRect = document.createElementNS(svgNS, 'rect');
+                maskRect.setAttribute('width', '100%');
+                maskRect.setAttribute('height', '100%');
+                maskRect.setAttribute('fill', 'white');
+                mask.appendChild(maskRect);
+
+                const panRect = panLayer.getBoundingClientRect();
+                const zoneElements = Array.from(panLayer.querySelectorAll('.building-zone'));
+                zoneElements.forEach(zone => {
+                    const zr = zone.getBoundingClientRect();
+                    const pad = 12; // внешний отступ от краев зоны
+                    let x = zr.left - panRect.left - pad;
+                    let y = zr.top - panRect.top - pad;
+                    let w = zr.width + pad * 2;
+                    let h = zr.height + pad * 2;
+
+                    // Клэмпим в пределах SVG
+                    if (w > 0 && h > 0) {
+                        x = Math.max(0, x);
+                        y = Math.max(0, y);
+                        w = Math.min(width - x, w);
+                        h = Math.min(height - y, h);
+
+                        if (w > 0 && h > 0) {
+                            const hole = document.createElementNS(svgNS, 'rect');
+                            hole.setAttribute('x', String(x));
+                            hole.setAttribute('y', String(y));
+                            hole.setAttribute('width', String(w));
+                            hole.setAttribute('height', String(h));
+                            hole.setAttribute('fill', 'black');
+                            mask.appendChild(hole);
+                        }
+                    }
+                });
+
+                defs.appendChild(mask);
+                svg.appendChild(defs);
+
+                const gridGroup = document.createElementNS(svgNS, 'g');
+                gridGroup.setAttribute('mask', 'url(#building-mask)');
+
+                for (let x = 0; x <= width; x += gridSize) {
+                    const line = document.createElementNS(svgNS, 'line');
                     line.setAttribute('x1', String(x));
                     line.setAttribute('y1', '0');
                     line.setAttribute('x2', String(x));
                     line.setAttribute('y2', String(height));
+                    line.setAttribute('stroke', gridColor);
+                    line.setAttribute('stroke-width', String(gridThickness));
                     gridGroup.appendChild(line);
                 }
-                // Горизонтальные линии
-                for (let y = 0.5; y <= height; y += spacing) {
-                    const line = document.createElementNS(SVG_NS, 'line');
+
+                for (let y = 0; y <= height; y += gridSize) {
+                    const line = document.createElementNS(svgNS, 'line');
                     line.setAttribute('x1', '0');
                     line.setAttribute('y1', String(y));
                     line.setAttribute('x2', String(width));
                     line.setAttribute('y2', String(y));
+                    line.setAttribute('stroke', gridColor);
+                    line.setAttribute('stroke-width', String(gridThickness));
                     gridGroup.appendChild(line);
                 }
-            }
 
-            function updateGridMaskForZones() {
-                // Удаляем все прямоугольники-заглушки, оставляя белый фон маски
-                while (mask.children.length > 1) mask.removeChild(mask.lastChild);
-                const panRect = panLayer.getBoundingClientRect();
-                // Используем текущий список зон
-                zones.forEach(z => {
-                    const zr = z.getBoundingClientRect();
-                    const rect = document.createElementNS(SVG_NS, 'rect');
-                    rect.setAttribute('x', String(zr.left - panRect.left));
-                    rect.setAttribute('y', String(zr.top - panRect.top));
-                    rect.setAttribute('width', String(zr.width));
-                    rect.setAttribute('height', String(zr.height));
-                    rect.setAttribute('fill', 'black'); // вычитаем зоны из маски
-                    mask.appendChild(rect);
-                });
-            }
+                svg.appendChild(gridGroup);
+                panLayer.appendChild(svg);
+            };
 
-            // Инициализация и обновление при ресайзе
-            const rebuild = () => { buildGridLines(); updateGridMaskForZones(); };
-            rebuild();
-            window.addEventListener('resize', rebuild);
+            buildGrid();
+            window.addEventListener('resize', buildGrid);
         }
 
         // Состояние панорамирования

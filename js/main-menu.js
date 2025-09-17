@@ -2660,8 +2660,10 @@
                 const gridColor = 'rgba(255, 255, 255, 0.5)';
                 const gridThickness = 2;
 
-                const width = panLayer.offsetWidth;
-                const height = panLayer.offsetHeight;
+                // Используем реальные CSS-пиксели контейнера для точного совпадения
+                const panRect = panLayer.getBoundingClientRect();
+                const width = Math.max(0, Math.round(panRect.width));
+                const height = Math.max(0, Math.round(panRect.height));
                 const svgNS = 'http://www.w3.org/2000/svg';
 
                 const svg = document.createElementNS(svgNS, 'svg');
@@ -2675,8 +2677,11 @@
                     pointer-events: none;
                     z-index: 6;
                     opacity: 0.8;
+                    shape-rendering: crispEdges;
                 `;
                 svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                svg.setAttribute('width', String(width));
+                svg.setAttribute('height', String(height));
 
                 const defs = document.createElementNS(svgNS, 'defs');
                 const mask = document.createElementNS(svgNS, 'mask');
@@ -2688,11 +2693,12 @@
                 maskRect.setAttribute('fill', 'white');
                 mask.appendChild(maskRect);
 
-                const panRect = panLayer.getBoundingClientRect();
+                // Вырезаем из маски области, занимаемые кликабельными зонами зданий
                 const zoneElements = Array.from(panLayer.querySelectorAll('.building-zone'));
                 zoneElements.forEach(zone => {
                     const zr = zone.getBoundingClientRect();
-                    const pad = 12; // внешний отступ от краев зоны
+                    const isFactory = zone.id === 'zone-factory' || zone.dataset.building === 'factory';
+                    const pad = isFactory ? -15 : 5; // завод: заход внутрь 15px, остальные: отступ 5px
                     let x = zr.left - panRect.left - pad;
                     let y = zr.top - panRect.top - pad;
                     let w = zr.width + pad * 2;
@@ -2731,6 +2737,7 @@
                     line.setAttribute('y2', String(height));
                     line.setAttribute('stroke', gridColor);
                     line.setAttribute('stroke-width', String(gridThickness));
+                    line.setAttribute('vector-effect', 'non-scaling-stroke');
                     gridGroup.appendChild(line);
                 }
 
@@ -2742,6 +2749,7 @@
                     line.setAttribute('y2', String(y));
                     line.setAttribute('stroke', gridColor);
                     line.setAttribute('stroke-width', String(gridThickness));
+                    line.setAttribute('vector-effect', 'non-scaling-stroke');
                     gridGroup.appendChild(line);
                 }
 
@@ -2750,7 +2758,37 @@
             };
 
             buildGrid();
-            window.addEventListener('resize', buildGrid);
+
+            // Дебаунс обновления, чтобы избежать дрожания на мобильных
+            const debounceRebuild = (() => {
+                let scheduled = false;
+                return () => {
+                    if (scheduled) return;
+                    scheduled = true;
+                    requestAnimationFrame(() => {
+                        scheduled = false;
+                        buildGrid();
+                    });
+                };
+            })();
+
+            // Обновляем при ресайзе окна и визуального вьюпорта (мобильные бары)
+            window.addEventListener('resize', debounceRebuild);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', debounceRebuild);
+            }
+
+            // Наблюдаем изменения размеров контейнера и зон
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(debounceRebuild);
+                ro.observe(panLayer);
+                const zonesForObserve = Array.from(panLayer.querySelectorAll('.building-zone'));
+                zonesForObserve.forEach(z => ro.observe(z));
+            }
+
+            // На случай динамических изменений DOM (перестановка/смена зон)
+            const mo = new MutationObserver(debounceRebuild);
+            mo.observe(panLayer, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
         }
 
         // Состояние панорамирования

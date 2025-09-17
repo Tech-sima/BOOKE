@@ -11,17 +11,18 @@
         baseTileWidth: 90,
         minTileWidth: 60,
         maxTileWidth: 260,
-        strokeStyle: 'rgba(0,0,0,0.25)',
+        strokeStyle: 'rgba(255,255,255,0.9)',
         lineWidth: 1,
         numberFillStyle: 'rgba(0,0,0,0.8)',
         numberFont: '12px Segoe UI, Arial, sans-serif',
         numberShadowColor: 'rgba(255,255,255,0.9)',
-        numberShadowBlur: 2
+        numberShadowBlur: 2,
+        showNumbers: false
     };
 
     // Default tiles to hide (removed) by number
     const DEFAULT_HIDDEN_NUMBERS = [
-        107, 94, 264, 265, 266, 267, 250, 251, 252, 253, 254, 237, 238, 239, 223, 224, 225, 226, 227, 212, 213, 214, 198, 199, 200, 201, 184, 185, 186, 187, 170, 171, 172, 173, 156, 157, 158, 159, 142, 143, 144, 145, 128, 129, 130, 131, 98, 112, 113, 126, 127, 125, 139, 140, 141, 153, 154, 155, 167, 168, 164, 151, 168, 124, 137, 150, 163, 136, 123, 110, 149, 135, 122, 109, 121, 108,
+        107, 94, 264, 265, 266, 267, 250, 251, 252, 253, 254, 237, 238, 239, 223, 224, 225, 226, 227, 212, 213, 214, 198, 199, 200, 201, 184, 185, 186, 187, 170, 171, 172, 173, 156, 157, 158, 159, 142, 143, 144, 145, 128, 129, 130, 131, 112, 113, 126, 127, 125, 139, 140, 141, 153, 154, 155, 167, 168, 164, 151, 168, 124, 137, 150, 163, 136, 123, 110, 149, 135, 122, 109, 121, 108,
         72, 73, 74, 86, 87, 88, 99, 100, 101, 114, 115, 75, 60, 61, 62, 46, 47, 48, 34, 35, 24, 111, 168, 79, 80, 66, 40, 27, 54, 68, 82, 17, 28, 41, 55, 69, 83, 17, 18, 29, 42, 56, 70, 84, 85, 71, 57, 43, 30, 19, 10, 11, 20, 31, 44, 58, 45, 32, 21, 12, 5
     ];
 
@@ -207,7 +208,7 @@
                 }
 
                 drawDiamond(cx, cy, tileW, tileH);
-                drawNumber(String(number), cx, cy);
+                if (CONFIG.showNumbers) drawNumber(String(number), cx, cy);
                 gridState.tiles.set(key, { number, r: v, c: u, cx, cy });
             }
         }
@@ -275,6 +276,10 @@
             },
             hide(){ canvas && (canvas.style.display = 'none'); },
             show(){ canvas && (canvas.style.display = 'block'); },
+            setShowNumbers(flag){
+                CONFIG.showNumbers = !!flag;
+                drawGrid();
+            },
             removeTileByNumber(n){
                 if (typeof n !== 'number') return false;
                 gridState.hiddenNumbers.add(n);

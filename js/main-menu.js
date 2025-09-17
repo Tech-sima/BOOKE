@@ -2651,25 +2651,91 @@
             if (imageElement.parentElement === container) panLayer.appendChild(imageElement);
             zones.forEach(z => { if (z.parentElement === container) panLayer.appendChild(z); });
             
-            // Создаем и добавляем сетку в pan-layer
-            const gridOverlay = document.createElement('div');
-            gridOverlay.id = 'grid-overlay';
-            gridOverlay.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 6;
-                background-image: 
-                    linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
-                background-size: 100px 100px;
-                background-position: 0 0;
-                opacity: 0.6;
-            `;
+            // Создаем и добавляем SVG-сетку с маской, которая исключает зоны зданий
+            const SVG_NS = 'http://www.w3.org/2000/svg';
+            const gridOverlay = document.createElementNS(SVG_NS, 'svg');
+            gridOverlay.setAttribute('id', 'grid-overlay');
+            gridOverlay.setAttribute('xmlns', SVG_NS);
+            gridOverlay.setAttribute('preserveAspectRatio', 'none');
+            gridOverlay.style.position = 'absolute';
+            gridOverlay.style.top = '0';
+            gridOverlay.style.left = '0';
+            gridOverlay.style.width = '100%';
+            gridOverlay.style.height = '100%';
+            gridOverlay.style.pointerEvents = 'none';
+            gridOverlay.style.zIndex = '6';
+            gridOverlay.style.opacity = '0.6';
+
+            const defs = document.createElementNS(SVG_NS, 'defs');
+            const mask = document.createElementNS(SVG_NS, 'mask');
+            mask.setAttribute('id', 'grid-mask');
+            const maskBg = document.createElementNS(SVG_NS, 'rect');
+            maskBg.setAttribute('x', '0');
+            maskBg.setAttribute('y', '0');
+            maskBg.setAttribute('width', '100%');
+            maskBg.setAttribute('height', '100%');
+            maskBg.setAttribute('fill', 'white');
+            mask.appendChild(maskBg);
+            defs.appendChild(mask);
+            gridOverlay.appendChild(defs);
+
+            const gridGroup = document.createElementNS(SVG_NS, 'g');
+            gridGroup.setAttribute('mask', 'url(#grid-mask)');
+            gridGroup.setAttribute('stroke', 'rgba(255, 255, 255, 0.3)');
+            gridGroup.setAttribute('stroke-width', '1');
+            gridOverlay.appendChild(gridGroup);
+
             panLayer.appendChild(gridOverlay);
+
+            function buildGridLines() {
+                const width = panLayer.clientWidth || 0;
+                const height = panLayer.clientHeight || 0;
+                if (!width || !height) return;
+                gridOverlay.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                // Очистить старые линии
+                while (gridGroup.firstChild) gridGroup.removeChild(gridGroup.firstChild);
+                const spacing = 50; // px
+                // Вертикальные линии
+                for (let x = 0.5; x <= width; x += spacing) {
+                    const line = document.createElementNS(SVG_NS, 'line');
+                    line.setAttribute('x1', String(x));
+                    line.setAttribute('y1', '0');
+                    line.setAttribute('x2', String(x));
+                    line.setAttribute('y2', String(height));
+                    gridGroup.appendChild(line);
+                }
+                // Горизонтальные линии
+                for (let y = 0.5; y <= height; y += spacing) {
+                    const line = document.createElementNS(SVG_NS, 'line');
+                    line.setAttribute('x1', '0');
+                    line.setAttribute('y1', String(y));
+                    line.setAttribute('x2', String(width));
+                    line.setAttribute('y2', String(y));
+                    gridGroup.appendChild(line);
+                }
+            }
+
+            function updateGridMaskForZones() {
+                // Удаляем все прямоугольники-заглушки, оставляя белый фон маски
+                while (mask.children.length > 1) mask.removeChild(mask.lastChild);
+                const panRect = panLayer.getBoundingClientRect();
+                // Используем текущий список зон
+                zones.forEach(z => {
+                    const zr = z.getBoundingClientRect();
+                    const rect = document.createElementNS(SVG_NS, 'rect');
+                    rect.setAttribute('x', String(zr.left - panRect.left));
+                    rect.setAttribute('y', String(zr.top - panRect.top));
+                    rect.setAttribute('width', String(zr.width));
+                    rect.setAttribute('height', String(zr.height));
+                    rect.setAttribute('fill', 'black'); // вычитаем зоны из маски
+                    mask.appendChild(rect);
+                });
+            }
+
+            // Инициализация и обновление при ресайзе
+            const rebuild = () => { buildGridLines(); updateGridMaskForZones(); };
+            rebuild();
+            window.addEventListener('resize', rebuild);
         }
 
         // Состояние панорамирования

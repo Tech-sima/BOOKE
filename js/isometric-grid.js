@@ -19,6 +19,11 @@
         numberShadowBlur: 2
     };
 
+    // Default tiles to hide (removed) by number
+    const DEFAULT_HIDDEN_NUMBERS = [
+        107, 94, 264, 265, 266, 267, 250, 251, 252, 253, 254, 237, 238, 239, 223, 224, 225, 226, 227, 212, 213, 214, 198, 199, 200, 201, 184, 185, 186, 187, 170, 171, 172, 173, 156, 157, 158, 159, 142, 143, 144, 145, 128, 129, 130, 131, 98, 112, 113, 126, 127, 125, 139, 140, 141, 153, 154, 155, 167, 168, 164, 151, 168, 124, 137, 150, 163, 136, 123, 110, 149, 135, 122, 109, 121, 108
+    ];
+
     let canvas = null;
     let ctx = null;
     let mapImage = null;
@@ -228,6 +233,8 @@
 
     function init(){
         if (!ensureElements()) return;
+        // Apply default hidden numbers before first draw
+        DEFAULT_HIDDEN_NUMBERS.forEach(function(n){ gridState.hiddenNumbers.add(n); });
 
         if (mapImage.complete){
             redraw();

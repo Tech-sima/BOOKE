@@ -7,31 +7,17 @@
 
     // Configuration (can be tweaked later)
     const CONFIG = {
-        // Fixed tile width in pixels; height is half for isometric diamonds
+        // Fixed tile width in image pixels; height is half for isometric diamonds
         baseTileWidth: 90,
         minTileWidth: 60,
         maxTileWidth: 260,
-        // Keep grid appearance identical across resolutions by using a fixed
-        // number of tiles across the container width
-        uniformAcrossResolutions: true,
-        gridColsAcrossWidth: 12,
-        strokeStyle: 'rgba(255,255,255,0.9)',
-        lineWidth: 1.5,
+        strokeStyle: 'rgba(0,0,0,0.25)',
+        lineWidth: 1,
         numberFillStyle: 'rgba(0,0,0,0.8)',
         numberFont: '12px Segoe UI, Arial, sans-serif',
         numberShadowColor: 'rgba(255,255,255,0.9)',
-        numberShadowBlur: 2,
-        maxGridRadius: 30 // radius in tile steps from center in both axes
+        numberShadowBlur: 2
     };
-    
-    // Default tiles to hide (removed) by number
-    const DEFAULT_HIDDEN_NUMBERS = [
-        118, 108, 129, 119, 109, 130, 120, 110,
-        100, 99, 98, 87, 88, 89, 66, 67,
-        76, 77, 78, 79,
-        19, 20, 21, 22, 30, 31, 32, 33, 34, 23, 24, 40, 41, 42, 43, 44, 45, 50, 54, 55, 64, 65, 74, 75,
-        12, 61, 62, 63, 71, 72, 73, 82, 83, 84, 85, 86
-    ];
 
     let canvas = null;
     let ctx = null;
@@ -39,18 +25,15 @@
     let container = null;
     let panLayer = null;
 
-    // Internal grid state
+    // Internal grid state (tile sizes are in IMAGE PIXELS)
     const gridState = {
         tileWidth: CONFIG.baseTileWidth,
         tileHeight: Math.floor(CONFIG.baseTileWidth/2),
-        centerX: 0,
-        centerY: 0,
-        tiles: new Map(),               // key: `${r}:${c}` -> { number, r, c, cx, cy }
-        keyToNumber: new Map(),         // `${r}:${c}` -> number
-        numberToKey: new Map(),         // number -> `${r}:${c}`
+        tiles: new Map(),               // key: `${u}:${v}` -> { number, r: v, c: u, cx, cy }
+        keyToNumber: new Map(),         // `${u}:${v}` -> number
+        numberToKey: new Map(),         // number -> `${u}:${v}`
         hiddenNumbers: new Set(),       // numbers to hide (deleted)
-        nextNumber: 1,
-        mappingReady: false
+        nextNumber: 1
     };
 
     function clamp(value, min, max){
@@ -76,7 +59,6 @@
                 canvas.style.pointerEvents = 'none';
                 canvas.style.zIndex = '2';
                 canvas.style.transformOrigin = 'center center';
-                canvas.style.transition = 'none';
                 if (panLayer) {
                     panLayer.appendChild(canvas);
                 } else {
@@ -113,16 +95,8 @@
         canvas.style.width = width + 'px';
         canvas.style.height = height + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        gridState.centerX = Math.floor(width / 2);
-        gridState.centerY = Math.floor(height / 2);
-        // Scale tile size to keep the same number of tiles across width
-        if (CONFIG.uniformAcrossResolutions && CONFIG.gridColsAcrossWidth > 0){
-            const proposed = Math.floor(width / CONFIG.gridColsAcrossWidth);
-            gridState.tileWidth = clamp(proposed, CONFIG.minTileWidth, CONFIG.maxTileWidth);
-        } else {
-            // Keep fixed tile size; do not auto-adapt on resize
-            gridState.tileWidth = clamp(gridState.tileWidth, CONFIG.minTileWidth, CONFIG.maxTileWidth);
-        }
+        // Keep fixed tile size in IMAGE pixels
+        gridState.tileWidth = clamp(gridState.tileWidth, CONFIG.minTileWidth, CONFIG.maxTileWidth);
         gridState.tileHeight = Math.floor(gridState.tileWidth / 2);
     }
 
@@ -131,8 +105,9 @@
         const imgStyle = getComputedStyle(mapImage);
         canvas.style.transform = imgStyle.transform === 'none' ? 'none' : imgStyle.transform;
         canvas.style.transformOrigin = imgStyle.transformOrigin || 'center center';
-        // Disable any animation on the grid overlay during image zooms
-        canvas.style.transition = 'none';
+        canvas.style.transition = imgStyle.transition && imgStyle.transition.includes('transform')
+            ? imgStyle.transition
+            : '';
     }
 
     function drawDiamond(cx, cy, w, h){
@@ -165,22 +140,6 @@
         return num;
     }
 
-    function ensureNumberingAssigned(){
-        if (gridState.mappingReady) return;
-        const radius = CONFIG.maxGridRadius;
-        for (let r = -radius; r <= radius; r++){
-            for (let c = -radius; c <= radius; c++){
-                const key = `${r}:${c}`;
-                if (!gridState.keyToNumber.has(key)){
-                    const num = gridState.nextNumber++;
-                    gridState.keyToNumber.set(key, num);
-                    gridState.numberToKey.set(num, key);
-                }
-            }
-        }
-        gridState.mappingReady = true;
-    }
-
     function drawGrid(){
         if (!ctx || !canvas) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -189,34 +148,61 @@
         const height = parseInt(canvas.style.height, 10) || 0;
         if (!width || !height) return;
 
-        const tileW = gridState.tileWidth;
-        const tileH = gridState.tileHeight;
-        const originX = gridState.centerX;
-        const originY = gridState.centerY;
+        // Natural image size (resolution-invariant basis)
+        const nW = mapImage.naturalWidth || width;
+        const nH = mapImage.naturalHeight || height;
+
+        // Object-fit: cover uniform scale and centering offsets
+        const s = Math.max(width / nW, height / nH);
+        const offsetX = (width - nW * s) / 2;
+        const offsetY = (height - nH * s) / 2;
+
+        // Tile sizes in image and display pixels
+        const tileW_img = gridState.tileWidth;
+        const tileH_img = gridState.tileHeight;
+        const tileW = tileW_img * s;
+        const tileH = tileH_img * s;
+
+        // Origin in image space: half-tile from top-left for neat coverage
+        const O_img_x = tileW_img / 2;
+        const O_img_y = tileH_img / 2;
+
+        // Precompute constraints for u,v ranges to fully cover the image rect [0..nW] x [0..nH]
+        const a_max = Math.floor(2 * nW / tileW_img - 1);           // for (u - v) <= a_max
+        const b_max = Math.floor(2 * nH / tileH_img - 1);           // for (u + v) <= b_max
+        const v_min = Math.ceil((-1 - a_max) / 2);
+        const v_max = Math.floor((b_max + 1) / 2);
 
         ctx.lineWidth = CONFIG.lineWidth;
         ctx.strokeStyle = CONFIG.strokeStyle;
 
         gridState.tiles.clear();
 
-        const radius = CONFIG.maxGridRadius;
-        for (let r = -radius; r <= radius; r++){
-            for (let c = -radius; c <= radius; c++){
-                const cx = originX + (c - r) * (tileW / 2);
-                const cy = originY + (c + r) * (tileH / 2);
+        for (let v = v_min; v <= v_max; v++){
+            const u_lower = -1 + Math.abs(v);
+            const u_upper = Math.min(a_max + v, b_max - v);
+            for (let u = Math.ceil(u_lower); u <= u_upper; u++){
+                // Center in image pixels
+                const cx_img = O_img_x + (u - v) * (tileW_img / 2);
+                const cy_img = O_img_y + (u + v) * (tileH_img / 2);
+                // Map to display pixels
+                const cx = offsetX + cx_img * s;
+                const cy = offsetY + cy_img * s;
 
+                // Cull diamonds outside the visible canvas
                 if (cx < -tileW || cx > width + tileW || cy < -tileH || cy > height + tileH){
                     continue;
                 }
 
-                const key = `${r}:${c}`;
-                const number = gridState.keyToNumber.get(key) || getOrAssignNumberForKey(key);
+                const key = `${u}:${v}`;
+                const number = getOrAssignNumberForKey(key);
                 if (gridState.hiddenNumbers.has(number)) {
                     continue; // skip drawing hidden tiles
                 }
 
                 drawDiamond(cx, cy, tileW, tileH);
-                gridState.tiles.set(key, { number, r, c, cx, cy });
+                drawNumber(String(number), cx, cy);
+                gridState.tiles.set(key, { number, r: v, c: u, cx, cy });
             }
         }
     }
@@ -242,9 +228,6 @@
 
     function init(){
         if (!ensureElements()) return;
-
-        // Apply default hidden numbers
-        DEFAULT_HIDDEN_NUMBERS.forEach(n => gridState.hiddenNumbers.add(n));
 
         if (mapImage.complete){
             redraw();
@@ -273,6 +256,7 @@
         // Public API
         window.isoGrid = {
             redraw,
+            // px is in IMAGE pixels to keep resolution-invariant mapping
             setTileSize(px){
                 gridState.tileWidth = clamp(Math.floor(px), CONFIG.minTileWidth, CONFIG.maxTileWidth);
                 gridState.tileHeight = Math.floor(gridState.tileWidth/2);
@@ -305,8 +289,29 @@
                 if (!key) return null;
                 const t = gridState.tiles.get(key);
                 if (t) return t;
-                const [r,c] = key.split(':').map(Number);
-                return { number: n, r, c };
+
+                // Recompute current screen position from key deterministically
+                const [uStr, vStr] = key.split(':');
+                const u = parseInt(uStr, 10);
+                const v = parseInt(vStr, 10);
+
+                const width = parseInt(canvas.style.width, 10) || 0;
+                const height = parseInt(canvas.style.height, 10) || 0;
+                const nW = mapImage.naturalWidth || width;
+                const nH = mapImage.naturalHeight || height;
+                const s = Math.max(width / nW, height / nH);
+                const offsetX = (width - nW * s) / 2;
+                const offsetY = (height - nH * s) / 2;
+                const tileW_img = gridState.tileWidth;
+                const tileH_img = gridState.tileHeight;
+                const O_img_x = tileW_img / 2;
+                const O_img_y = tileH_img / 2;
+                const cx_img = O_img_x + (u - v) * (tileW_img / 2);
+                const cy_img = O_img_y + (u + v) * (tileH_img / 2);
+                const cx = offsetX + cx_img * s;
+                const cy = offsetY + cy_img * s;
+
+                return { number: n, r: v, c: u, cx, cy };
             }
         };
     }

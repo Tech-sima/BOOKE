@@ -939,19 +939,25 @@ function animate() {
         const infoPanelBg = document.querySelector('#info-panel .info-panel-bg');
         if (infoPanelBg) {
             const rect = infoPanelBg.getBoundingClientRect();
-            const circleRadius = 35; // 70px / 2
-            const circleX = sx2;
-            const circleTop = sy2 - 85; // позиция верхнего края прогресс-круга
+            const diameter = (factoryProgressDiv && factoryProgressDiv.offsetWidth) ? factoryProgressDiv.offsetWidth : 70;
+            const radius = diameter / 2;
 
-            // Если центр круга попадает левее правого края панели и вертикально пересекается — смещаем вниз
-            const overlapsHorizontally = (circleX - circleRadius) < (rect.left + rect.width);
-            const overlapsVertically = (circleTop + circleRadius) > rect.top && (circleTop - circleRadius) < (rect.bottom);
+            const circleCenterX = sx2;
+            const circleLeft = circleCenterX - radius;
+            const circleRight = circleCenterX + radius;
+
+            const circleTop = sy2 - 85; // текущая позиция верхнего края круга
+            const circleBottom = circleTop + diameter;
+
+            const overlapsHorizontally = (circleLeft < rect.right) && (circleRight > rect.left);
+            const overlapsVertically = (circleBottom > rect.top) && (circleTop < rect.bottom);
 
             if (overlapsHorizontally && overlapsVertically) {
-                // Смещаем верх круга сразу под панель с небольшим зазором
-                const desiredTop = rect.bottom + 12; // зазор 12px
-                const delta = desiredTop - circleTop;
-                sy2 += delta;
+                const desiredTop = rect.bottom + 12; // зазор под панелью
+                const deltaTop = desiredTop - circleTop;
+                if (deltaTop > 0) {
+                    sy2 += deltaTop;
+                }
             }
         }
 

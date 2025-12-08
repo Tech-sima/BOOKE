@@ -9,8 +9,8 @@
         return;
     }
 
-    if (!firebaseService || typeof firebaseService.isEnabled !== 'function' || !firebaseService.isEnabled()) {
-        console.warn('[cloud-storage] firebaseService is not initialized. Local storage will be used only.');
+    if (!firebaseService) {
+        console.warn('[cloud-storage] firebaseService is not available. Local storage will be used only.');
         return;
     }
 

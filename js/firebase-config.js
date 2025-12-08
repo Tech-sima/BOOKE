@@ -3,11 +3,11 @@
  * Для разных окружений можно переопределять window.BOOKE_FIREBASE_CONFIG до подключения этого скрипта.
  */
 window.BOOKE_FIREBASE_CONFIG = window.BOOKE_FIREBASE_CONFIG || {
-    apiKey: 'REPLACE_WITH_API_KEY',
-    authDomain: 'REPLACE_WITH_AUTH_DOMAIN',
-    projectId: 'REPLACE_WITH_PROJECT_ID',
-    storageBucket: 'REPLACE_WITH_STORAGE_BUCKET',
-    messagingSenderId: 'REPLACE_WITH_SENDER_ID',
-    appId: 'REPLACE_WITH_APP_ID'
+    apiKey: 'AIzaSyDZ7RHt1TXz9VY3gR2MWMG323EABXTTXhI',
+    authDomain: 'booke-91f1e.firebaseapp.com',
+    projectId: 'booke-91f1e',
+    storageBucket: 'booke-91f1e.firebasestorage.app',
+    messagingSenderId: '839822980762',
+    appId: '1:839822980762:web:fb47e07efc439027901123'
 };
 

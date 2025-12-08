@@ -107,12 +107,9 @@
             return;
         }
 
-        if (service.authReady) {
-            await service.authReady;
-        }
-
         const docId = service.getCurrentUid ? service.getCurrentUid() : null;
         if (!docId) {
+            console.warn('[firebase-sync] Firebase auth user is missing. Skipping sync.');
             return;
         }
 
@@ -134,15 +131,34 @@
         }
     }
 
-    function startSyncLoop() {
+    async function startSyncLoop() {
         if (syncTimer) {
             return;
         }
+
+        const service = getFirebaseService();
+        if (!service) {
+            return;
+        }
+
+        if (service.authReady) {
+            const user = await service.authReady;
+            if (!user) {
+                console.warn('[firebase-sync] Firebase auth is not ready. Data will not be synced.');
+                return;
+            }
+        }
+
         syncTimer = setInterval(syncOnce, SYNC_INTERVAL_MS);
         syncOnce();
     }
 
-    document.addEventListener('DOMContentLoaded', startSyncLoop);
+    document.addEventListener('DOMContentLoaded', () => {
+        startSyncLoop();
+    });
+    document.addEventListener('firebase-service-ready', () => {
+        startSyncLoop();
+    });
     window.addEventListener('focus', syncOnce);
     window.addEventListener('beforeunload', syncOnce);
 })();

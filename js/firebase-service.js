@@ -18,11 +18,26 @@ let app = null;
 let db = null;
 let fieldValue = null;
 let auth = null;
-let authReady = Promise.resolve(null);
 let currentUser = null;
+let resolveAuthReady = null;
+const authReady = new Promise((resolve) => {
+    resolveAuthReady = resolve;
+});
+
+function notifyAuthReady(user) {
+    currentUser = user || null;
+    if (resolveAuthReady) {
+        resolveAuthReady(currentUser);
+        resolveAuthReady = null;
+    }
+    if (currentUser) {
+        document.dispatchEvent(new CustomEvent('firebase-service-ready', { detail: { user: currentUser } }));
+    }
+}
 
     if (typeof firebase === 'undefined') {
         console.warn('[Firebase] SDK not found. Skipping initialization.');
+    notifyAuthReady(null);
     } else if (isConfigFilled) {
         app = firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
@@ -32,34 +47,30 @@ let currentUser = null;
 
     if (auth) {
         if (auth.currentUser) {
-            currentUser = auth.currentUser;
-            authReady = Promise.resolve(currentUser);
+            notifyAuthReady(auth.currentUser);
         } else {
-            authReady = new Promise((resolve) => {
-                const unsubscribe = auth.onAuthStateChanged(
-                    (user) => {
-                        if (user) {
-                            currentUser = user;
-                            resolve(user);
-                            unsubscribe();
-                        }
-                    },
-                    (error) => {
-                        console.error('[Firebase] Auth state error:', error);
-                        resolve(null);
+            const unsubscribe = auth.onAuthStateChanged(
+                (user) => {
+                    if (user) {
+                        notifyAuthReady(user);
                         unsubscribe();
                     }
-                );
+                },
+                (error) => {
+                    console.error('[Firebase] Auth state error:', error);
+                    notifyAuthReady(null);
+                    unsubscribe();
+                }
+            );
+            auth.signInAnonymously().catch((error) => {
+                console.error('[Firebase] Anonymous auth failed:', error);
+                notifyAuthReady(null);
             });
-            auth
-                .signInAnonymously()
-                .catch((error) => {
-                    console.error('[Firebase] Anonymous auth failed:', error);
-                });
         }
     }
     } else {
         console.warn('[Firebase] Configuration is incomplete. Update js/firebase-service.js with your project keys.');
+    notifyAuthReady(null);
     }
 
     async function fetchUserProgress(docId) {
@@ -118,5 +129,7 @@ function getCurrentUid() {
         fetchUserProgress,
         saveUserProgress
     };
+
+window.firebaseServiceReady = authReady;
 })();
 

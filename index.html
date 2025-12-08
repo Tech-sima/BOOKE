@@ -1,0 +1,1886 @@
+пше <!DOCTYPE html>
+<html>
+<head>
+    <title>Booke 3D Map</title>
+    <link rel="stylesheet" href="styles/tokens.css?v=6.5"/>
+    <link rel="stylesheet" href="styles/ui-kit.css?v=7.3"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+    <meta charset="utf-8"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <link rel="preload" href="assets/png/map-full.png" as="image" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.disableVerticalSwipes();
+        window.Telegram.WebApp.requestFullscreen();
+        // Добавляем класс для Telegram Mini App
+        document.documentElement.classList.add('telegram-mini-app');
+      }
+    </script>
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+        body { font-family: "Segoe UI", Arial, sans-serif; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        canvas { display: block; }
+        /* Общие стили для панелей */
+        .panel{position:absolute;z-index:10;user-select:none}
+        /* Панель денег (левый верх) */
+        #money-panel{top:10px;left:10px;background:#2d6a4f;border-radius:8px;padding:4px 10px;color:#fff;font-weight:600;display:flex;align-items:center;gap:6px}
+        #money-panel i{color:#ffeb3b}
+        /* Вертикальная панель кнопок (право) */
+        #right-panel{
+            position:fixed;
+            right:-8px;
+            top:45%;
+            transform:translateY(-50%);
+            width:80px;height:300px;
+        }
+        /* Учет Telegram Mini App и вырезов экрана */
+        .telegram-mini-app #right-panel{
+            right:-8px;
+            top:45%;
+            transform:translateY(-50%);
+        }
+        /* Адаптация для очень низких экранов по высоте */
+        @media (max-height: 520px){
+            #right-panel{transform:translateY(-50%) scale(0.9);transform-origin:right center;}
+        }
+        @media (max-height: 480px){
+            #right-panel{transform:translateY(-50%) scale(0.8);transform-origin:right center;}
+        }
+        @media (max-height: 440px){
+            #right-panel{transform:translateY(-50%) scale(0.7);transform-origin:right center;}
+        }
+        .right-menu-bg{
+            width:100%;height:100%;
+            position:absolute;top:0;left:0;
+            z-index:1;
+        }
+        .invisible-btn{
+            position:absolute;background:transparent;border:none;cursor:pointer;
+            z-index:10;transition:all 0.2s ease;
+        }
+        .invisible-btn:hover{
+            background:rgba(255,255,255,0.1);border-radius:6px;
+        }
+        .invisible-btn.active{
+            background:rgba(255,255,255,0.2);border:2px solid #fff;border-radius:6px;
+        }
+        .red-dot{
+            position:absolute;top:2px;right:2px;width:8px;height:8px;
+            background:#ff0000;border-radius:50%;z-index:15;
+        }
+        
+        /* Специальный стиль для кружочка заданий - слева */
+        #tasks-dot{
+            position:absolute;top:8px;left:2px;width:12px;height:12px;
+            background:#ff0000;border-radius:50%;z-index:15;
+        }
+        /* Нижняя панель навигации - стили перенесены в ui-kit.css */
+        /* Upgrade button styles */
+        #upgrade-btn{transition:transform .05s}
+        #upgrade-btn:active{transform:scale(0.97)}
+        /* Switch active */
+        .switch-btn.active{background:#1976d2 !important;opacity:1 !important}
+
+        /* Панели баланса */
+        .balance-panel{display:flex;align-items:center;border-radius:6px;padding:4px 8px;font-weight:600;color:#fff;gap:6px}
+        #money-panel{background:#2d6a4f;}
+        #credits-panel{background:#000000dd}
+        #credits-panel i{color:#b71c1c}
+        /* plus circle */
+        #credits-plus{position:absolute;top:-8px;right:-20px;width:38px;height:38px;background:#00c853;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 0 4px rgba(0,0,0,.4)}
+        /* Сейфы */
+        .crate{cursor:pointer;border-radius:6px;position:relative;overflow:hidden;transition:transform .1s}
+        .crate:active{transform:scale(0.96)}
+        /* Оверлей открытия сейфа */
+        #crate-overlay{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:40;color:#fff;font-family:"Segoe UI",Arial,sans-serif}
+        /* Оверлей оффлайн дохода — отключен */
+
+        .city-item{position:relative;background:#e0e0e0;border-radius:12px;margin:0 0 12px;padding:16px;display:flex;align-items:center;gap:10px;color:#2d2d2d;border:1px solid #ccc}
+        .city-item img{width:60px;height:60px;border-radius:6px}
+        .city-item .info{flex:1;text-align:left;font-size:14px}
+        .city-item .info h3{margin:0 0 4px;font-size:16px}
+        .city-item button{background:#2d2d2d;border:none;border-radius:8px;color:#fff;font-weight:600;padding:8px 16px;cursor:pointer;font-size:12px}
+        .city-item button:disabled{opacity:.5;cursor:default}
+        /* общий стиль svg-иконок */
+        .icon{width:20px;height:20px;display:inline-block;vertical-align:middle}
+        /* Панель друзей стили */
+        .friend-item{display:flex;align-items:center;gap:10px;background:#bcbcbc;border-radius:12px;padding:8px 12px;position:relative}
+        .friend-item img{width:40px;height:40px;border-radius:8px;background:#666}
+        .badge-new{position:absolute;top:-6px;left:-6px;background:#000;color:#fff;font-size:9px;padding:2px 4px;border-radius:4px}
+        .rbc-tag{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;background:#9e9e9e;padding:2px 6px;border-radius:6px}
+        .rbc-tag i{font-style:normal}
+        /* --------- НОВОЕ ГЛАВНОЕ МЕНЮ С PNG --------- */
+        #map-container{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:auto;z-index:15;overflow:hidden;background:transparent;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;margin:0;padding:0;}
+        
+        /* Адаптивное главное меню */
+        .main-menu-bg{width:100%;height:100%;object-fit:contain;object-position:center center;pointer-events:auto;cursor:default;transition:opacity 0.3s ease;opacity:1;transform-origin:center center;margin:0;}
+        
+        /* Интерактивные зоны на карте */
+        .building-zone{
+            position: absolute;
+            cursor: pointer;
+            border-radius: 4px;
+            background: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: none;
+            transition: none;
+        }
+        
+        /* Убираем все эффекты - зоны невидимы */
+        .building-zone:hover,
+        .building-zone.active,
+        .building-zone:focus,
+        .building-zone:active {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            transform: none !important;
+            outline: none !important;
+            color: transparent !important;
+        }
+        /* Loading overlay minimal resets live here to avoid touching global CSS */
+        #loading-overlay{position:fixed;inset:0;background:#90908D;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:5000;color:#fff}
+        #loading-overlay .content{position:relative;text-align:center;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%}
+        #loading-overlay .loading-svg-container{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:1}
+        #loading-overlay .loading-svg{width:100vw;height:100vh;object-fit:cover;min-width:100%;min-height:100%}
+        #loading-overlay .loading-text{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:15px;z-index:2}
+        #loading-overlay .progress-container{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;transform:translateY(8px);animation:fadeUp 1.2s ease 1.5s forwards}
+        #loading-overlay .progress-bar{width:300px;height:28px;background:rgba(255,255,255,0.2);border-radius:14px;overflow:hidden;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center}
+        #loading-overlay .progress-fill{height:100%;background:linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39);border-radius:14px;width:0%;transition:width 0.3s ease;position:absolute;top:0;left:0;overflow:hidden}
+        #loading-overlay .progress-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);animation:progressShine 2s infinite}
+        #loading-overlay .progress-text{font-size:16px;font-weight:900;color:#fff;z-index:2;position:relative;white-space:nowrap;pointer-events:none}
+        #loading-overlay .start-btn{display:none;padding:14px 32px;border:none;border-radius:999px;background:#ffffff;color:#0b0d10;font-weight:800;font-size:18px;cursor:pointer;box-shadow:0 8px 28px rgba(255,255,255,0.12);opacity:0;transform:translateY(10px) scale(.98);filter:blur(3px);transition:all 0.3s ease;min-height:52px;min-width:180px}
+        #loading-overlay .start-btn.revealed{animation:btnReveal 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+        #loading-overlay .start-btn:hover{box-shadow:0 10px 34px rgba(255,255,255,0.18);transform:translateY(-2px)}
+        @keyframes btnReveal{0%{opacity:0;transform:translateY(10px) scale(.98);filter:blur(3px)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes progressShine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+        
+        /* Мобильная адаптивность */
+        @media (max-width: 768px) {
+            #loading-overlay .loading-svg{object-fit:cover;width:100vw;height:100vh}
+            #loading-overlay .loading-text{bottom:40px}
+            #loading-overlay .progress-bar{width:280px;height:32px}
+            #loading-overlay .progress-text{font-size:16px;font-weight:900}
+            #loading-overlay .start-btn{padding:16px 32px;font-size:18px;min-height:56px;min-width:200px}
+        }
+        
+        @media (max-width: 480px) {
+            #loading-overlay .loading-text{bottom:30px;gap:16px}
+            #loading-overlay .progress-bar{width:260px;height:28px}
+            #loading-overlay .progress-text{font-size:15px;font-weight:900}
+            #loading-overlay .start-btn{padding:14px 28px;font-size:16px;min-height:52px;min-width:180px}
+        }
+        
+        /* Дополнительная адаптивность для очень маленьких экранов */
+        @media (max-width: 360px) {
+            #loading-overlay .loading-text{bottom:25px;gap:14px}
+            #loading-overlay .progress-bar{width:240px;height:26px}
+            #loading-overlay .progress-text{font-size:14px;font-weight:900}
+            #loading-overlay .start-btn{padding:12px 24px;font-size:15px;min-height:48px;min-width:160px}
+        }
+        
+        /* Отключаем стандартное выделение браузера */
+        .building-zone {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+        /* DEBUG: делаем зоны видимыми для редактирования */
+        #map-container .building-zone{
+            background: rgba(255, 0, 0, 0.18) !important;
+            border: 1px dashed rgba(255, 0, 0, 0.7) !important;
+            color: rgba(255, 45, 45, 0.85) !important;
+            z-index: 20;
+            box-sizing: border-box;
+            pointer-events: auto;
+        }
+
+        /* Компенсация зума слоя: зоны в 3 раза меньше при scale(3) карты */
+        #map-pan-layer .building-zone{
+            transform: scale(0.333333);
+            transform-origin: center center;
+        }
+        
+        /* Стили для панелей зданий */
+        .building-panel{
+            position:fixed;bottom:160px;left:50%;transform:translateX(-50%) scale(0.8);
+            width:90%;max-width:380px;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);
+            border-radius:16px;padding:16px;color:white;z-index:10000;
+            backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);
+            box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);
+            opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+            font-family:'Segoe UI',Arial,sans-serif;
+        }
+        .building-panel.show{opacity:1;transform:translateX(-50%) scale(1);}
+        .building-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:2px;}
+        .building-panel-title{display:flex;align-items:center;gap:4px;}
+        .building-icon{font-size:20px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));}
+        .building-panel-title h2{margin:0;font-size:14px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);}
+        .building-panel-close{background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;
+            width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+            border-radius:8px;transition:all 0.2s ease;}
+        .building-panel-close:hover{background:rgba(255,255,255,0.2);transform:scale(1.1);}
+        .building-panel-section{background:rgba(255,255,255,0.05);border-radius:4px;padding:4px;margin-bottom:1px;border:1px solid rgba(255,255,255,0.1);}
+        .building-panel-section h3{margin:0 0 2px;font-size:11px;font-weight:600;color:#ff9800;text-shadow:0 1px 2px rgba(0,0,0,0.5);}
+        .building-panel-info{display:grid;gap:1px;font-size:10px;}
+        .building-panel-info-row{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;border-radius:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;}
+        .building-panel-info-row:hover{background:rgba(255,255,255,0.08);transform:translateX(3px);}
+        .building-panel-info-row:last-child{border-bottom:none;}
+        .building-panel-info-value{font-weight:700;color:#4caf50;text-shadow:0 1px 2px rgba(0,0,0,0.5);}
+        .building-panel-info-value.success{color:#4caf50;}
+        .building-panel-info-value.error{color:#f44336;}
+        .building-panel-actions{display:grid;gap:1px;}
+        .building-panel-btn{position:relative;width:100%;border:none;border-radius:4px;color:white;padding:6px 8px;
+            font-size:11px;font-weight:600;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:3px;
+            box-shadow:0 4px 15px rgba(33,150,243,0.3);overflow:hidden;}
+        .building-panel-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s;}
+        .building-panel-btn:hover::before{left:100%;}
+        .building-panel-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(33,150,243,0.4);}
+        .building-panel-btn.enabled{cursor:pointer;}
+        .building-panel-btn.disabled{opacity:0.6;cursor:not-allowed;background:linear-gradient(135deg,#666 0%,#555 100%);box-shadow:none;}
+        .building-panel-btn.disabled:hover{transform:none;box-shadow:none;}
+        .btn-icon{font-size:10px;}
+        .btn-text{flex:1;}
+        .btn-hint{font-size:8px;opacity:0.8;font-style:italic;}
+        .building-panel-btn.upgrade{background:linear-gradient(135deg,#4caf50 0%,#45a049 100%);box-shadow:0 4px 15px rgba(76,175,80,0.3);}
+        .building-panel-btn.upgrade:hover{box-shadow:0 8px 25px rgba(76,175,80,0.4);}
+        .building-panel-btn.income{background:linear-gradient(135deg,#2196f3 0%,#1976d2 100%);box-shadow:0 4px 15px rgba(33,150,243,0.3);}
+        .building-panel-btn.income:hover{box-shadow:0 8px 25px rgba(33,150,243,0.4);}
+        .building-panel-btn.worker{background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%);box-shadow:0 4px 15px rgba(255,152,0,0.3);}
+        .building-panel-btn.worker:hover{box-shadow:0 8px 25px rgba(255,152,0,0.4);}
+        .building-panel-btn.buy{background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%);box-shadow:0 4px 15px rgba(255,152,0,0.3);animation:pulse 2s infinite;}
+        .building-panel-btn.buy:hover{box-shadow:0 8px 25px rgba(255,152,0,0.4);}
+        
+        /* Анимация пульсации для кнопки покупки */
+        @keyframes pulse{
+            0%{box-shadow:0 0 0 0 rgba(255,152,0,0.7);}
+            70%{box-shadow:0 0 0 10px rgba(255,152,0,0);}
+            100%{box-shadow:0 0 0 0 rgba(255,152,0,0);}
+        }
+        
+        /* Индикаторы сотрудников рядом с зданиями */
+        .profit-indicator{
+            position:fixed;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            z-index:1000;
+            opacity:1;
+            transition:all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Исправление позиционирования индикаторов для Telegram Mini App */
+        .telegram-mini-app .profit-indicator {
+            position: fixed !important;
+        }
+        .profit-indicator.show{opacity:1;transform:scale(1);}
+
+        .profit-indicator:hover .profit-indicator-wrapper{
+            transform:scale(1.1);
+            box-shadow:0 8px 25px rgba(0,0,0,0.5);
+            transition:all 0.2s ease;
+        }
+
+        /* Обертка для круга */
+        .profit-indicator-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            /* Концентрические кольца как на изображении */
+            background: 
+                radial-gradient(circle at center, transparent 18px, #2d2d2d 18px, #2d2d2d 20px, transparent 20px),
+                radial-gradient(circle at center, transparent 14px, #424242 14px, #424242 18px, transparent 18px),
+                radial-gradient(circle at center, #000000 0px, #000000 14px, transparent 14px);
+            border: 2px solid rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Прогресс-кружок внутри индикатора */
+        .profit-indicator .pi-progress{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:50%;background:conic-gradient(var(--pi-color, #ff6b9d) 0deg, transparent 0deg);}
+        .profit-indicator .pi-inner{position:absolute;top:4px;left:4px;right:4px;bottom:4px;border-radius:50%;background:rgba(0,0,0,0.85);}
+        .profit-indicator .pi-avatar{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;z-index:1;}
+        .profit-indicator .pi-avatar img{width:44px;height:44px;filter:brightness(0.95);}
+        
+        /* Индикатор накопленной прибыли под кругом */
+        .profit-amount-label {
+            margin-top: 4px;
+            padding: 4px 12px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            z-index: 1001;
+            min-width: 48px;
+            text-align: center;
+            letter-spacing: 0.4px;
+        }
+        
+        /* Зоны для каждого здания */
+        #zone-print{top:56%;left:8%;width:2.5%;height:2.5%;}
+        #zone-factory{top:45%;left:8%;width:3.3333%;height:4%;}
+        #zone-storage{top:54%;left:38%;width:2.8%;height:2.5%;}
+        #zone-library{bottom:42%;right:39%;width:3%;height:3.6667%;}
+        
+        /* Dev кнопки */
+        
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .building-zone{
+                background: rgba(255, 0, 0, 0.18) !important;
+                border: 1px dashed rgba(255, 0, 0, 0.7) !important;
+                color: rgba(255, 45, 45, 0.85) !important;
+            }
+            #zone-storage{width:2.8%;height:2.5%;}
+            #zone-library{width:3%;height:3.6667%;}
+            #zone-factory{width:3.3333%;height:4%;}
+            #zone-print{top:48%;left:8%;width:2.5%;height:2.5%;}
+            #zone-factory{top:35%;left:5%;}
+            #zone-storage{top:52%;left:38%;}
+            #zone-library{bottom:37%;right:34%;}
+            
+            /* Адаптация панелей для планшетов */
+            #money-panel{padding:3px 8px;font-size:12px;gap:4px;}
+            #credits-panel{padding:3px 8px;font-size:12px;gap:4px;}
+            #bottom-nav{height:70px;padding:10px 12px 16px 12px;}
+            #bottom-nav button{font-size:11px;gap:3px;}
+            #bottom-nav button .icon{width:22px;height:22px;}
+        }
+        
+        /* Анимация камеры для зданий */
+        .main-menu-bg {
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
+        }
+        
+        /* Анимации для уведомлений */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        /* Базовый зум (будет переопределяться JavaScript) */
+        .main-menu-bg.zoomed {
+            transform: scale(1.4);
+        }
+        
+        @media (max-width: 480px) {
+            .building-zone{
+                background: rgba(255, 0, 0, 0.2) !important;
+                border: 1px dashed rgba(255, 0, 0, 0.75) !important;
+                color: rgba(255, 45, 45, 0.9) !important;
+            }
+            #zone-storage{width:2.8%;height:2.6%;}
+            #zone-library{width:3.1111%;height:3.7778%;}
+            #zone-factory{width:3.3333%;height:3.8889%;}
+            #zone-print{top:41%;left:8%;width:2.5%;height:2.5%;}
+            #zone-factory{top:25%;left:3%;}
+            #zone-storage{top:50%;left:38%;}
+            #zone-library{bottom:32%;right:32%;}
+            
+            /* Адаптация панелей для смартфонов */
+            #money-panel{padding:2px 6px;font-size:11px;gap:3px;border-radius:6px;}
+            #credits-panel{padding:2px 6px;font-size:11px;gap:3px;border-radius:6px;}
+            #bottom-nav{height:65px;padding:8px 12px 14px 12px;}
+            #bottom-nav button{font-size:10px;gap:2px;}
+            #bottom-nav button .icon{width:20px;height:20px;}
+        }
+        
+        /* Оптимизация для очень маленьких экранов */
+        @media (max-width: 360px) {
+            .building-zone{
+                background: rgba(255, 0, 0, 0.22) !important;
+                border: 1px dashed rgba(255, 0, 0, 0.8) !important;
+                color: rgba(255, 45, 45, 0.95) !important;
+            }
+            #zone-storage{width:3.0%;height:2.7%;}
+            #zone-library{width:3.2222%;height:3.8889%;}
+            #zone-factory{width:3.5556%;height:4.1111%;}
+            #zone-print{top:34%;left:8%;width:2.5%;height:2.5%;}
+            #zone-factory{top:20%;left:2%;}
+            #zone-storage{top:48%;left:38%;}
+            #zone-library{bottom:27%;right:30%;}
+            
+            /* Адаптация панелей для очень маленьких экранов */
+            #money-panel{padding:1px 4px;font-size:10px;gap:2px;border-radius:4px;}
+            #credits-panel{padding:1px 4px;font-size:10px;gap:2px;border-radius:4px;}
+            #bottom-nav{height:60px;padding:6px 12px 12px 12px;}
+            #bottom-nav button{font-size:9px;gap:1px;}
+            #bottom-nav button .icon{width:18px;height:18px;}
+        }
+        
+        /* === ОПТИМИЗАЦИЯ ДЛЯ TELEGRAM MINI APP === */
+        /* Специальные стили для Telegram Mini App на мобильных устройствах */
+        @media (max-width: 768px) {
+            .telegram-mini-app .building-zone {
+                /* Увеличиваем зоны для лучшего тапа в Telegram */
+                min-width: 50px;
+                min-height: 50px;
+                background: transparent !important;
+                border: none !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                color: transparent !important;
+            }
+            
+            .telegram-mini-app #zone-print {
+                top: 48%;
+                left: 8%;
+                width: 20%;
+                height: 20%;
+            }
+            
+            .telegram-mini-app #zone-factory {
+                top: 35%;
+                left: 7%;
+                width: 22%;
+                height: 30%;
+            }
+            
+            .telegram-mini-app #zone-storage {
+                bottom: 14%;
+                left: 38%;
+                width: 18%;
+                height: 16%;
+            }
+            
+            .telegram-mini-app #zone-library {
+                bottom: 37%;
+                right: 34%;
+                width: 20%;
+                height: 24%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .telegram-mini-app .building-zone {
+                min-width: 45px;
+                min-height: 45px;
+                background: transparent !important;
+                border: none !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                color: transparent !important;
+            }
+            
+            .telegram-mini-app #zone-print {
+                top: 41%;
+                left: 8%;
+                width: 22%;
+                height: 22%;
+            }
+            
+            .telegram-mini-app #zone-factory {
+                top: 25%;
+                left: 4%;
+                width: 26%;
+                height: 34%;
+            }
+            
+            .telegram-mini-app #zone-storage {
+                bottom: 9%;
+                left: 38%;
+                width: 20%;
+                height: 18%;
+            }
+            
+            .telegram-mini-app #zone-library {
+                bottom: 32%;
+                right: 32%;
+                width: 22%;
+                height: 26%;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .telegram-mini-app .building-zone {
+                min-width: 40px;
+                min-height: 40px;
+                background: transparent !important;
+                border: none !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                color: transparent !important;
+            }
+            
+            .telegram-mini-app #zone-print {
+                top: 34%;
+                left: 8%;
+                width: 24%;
+                height: 24%;
+            }
+            
+            .telegram-mini-app #zone-factory {
+                top: 20%;
+                left: 2%;
+                width: 30%;
+                height: 38%;
+            }
+            
+            .telegram-mini-app #zone-storage {
+                bottom: 7%;
+                left: 38%;
+                width: 22%;
+                height: 20%;
+            }
+            
+            .telegram-mini-app #zone-library {
+                bottom: 27%;
+                right: 30%;
+                width: 24%;
+                height: 30%;
+            }
+        }
+        
+        /* Специальные стили для экранов с маленькой высотой */
+        @media (max-height: 600px) {
+            #money-panel{padding:2px 6px;font-size:11px;}
+            #credits-panel{padding:2px 6px;font-size:11px;}
+            #bottom-nav{height:60px;padding:6px 12px 12px 12px;}
+            #bottom-nav button{font-size:9px;}
+            #bottom-nav button .icon{width:18px;height:18px;}
+        }
+        
+        /* Комбинированные стили для очень маленьких экранов */
+        @media (max-width: 360px) and (max-height: 600px) {
+            #money-panel{padding:1px 3px;font-size:9px;}
+            #credits-panel{padding:1px 3px;font-size:9px;}
+            #bottom-nav{height:55px;padding:4px 12px 10px 12px;}
+            #bottom-nav button{font-size:8px;}
+            #bottom-nav button .icon{width:16px;height:16px;}
+        }
+        
+        /* кнопка "Вся карта" */
+        #btn-show-all{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border:none;border-radius:12px;background:rgba(66,66,66,0.9);color:#fff;font-weight:700;z-index:20;cursor:pointer;display:none;align-items:center;gap:8px;backdrop-filter:blur(10px);}
+        
+        /* кнопка "Назад к карте" (над нижней панелью) */
+        #btn-back-map{
+            position:fixed;
+            left:50%;
+            transform:translateX(-50%);
+            bottom:102px; /* немного выше над нижней панелью */
+            padding:10px 20px;
+            border:none;
+            border-radius:9999px; /* овальная форма */
+            background:rgba(24,24,24,0.92); /* более темная, немного прозрачная */
+            color:#fff;
+            font-weight:700;
+            z-index:35; /* поверх нижней панели и интерфейса */
+            cursor:pointer;
+            display:none; /* показывается логикой JS */
+            align-items:center;
+            gap:8px;
+            backdrop-filter:blur(10px);
+            box-shadow:0 6px 16px rgba(0,0,0,0.35);
+        }
+         
+         /* Адаптивность кнопки "Вся карта" */
+         @media (max-width: 768px) {
+             #btn-show-all{padding:10px 20px;font-size:14px;gap:6px;}
+             #btn-back-map{padding:10px 20px;font-size:14px;gap:6px;bottom:92px;}
+         }
+         
+         @media (max-width: 480px) {
+             #btn-show-all{padding:8px 16px;font-size:12px;gap:4px;border-radius:8px;}
+             #btn-back-map{padding:8px 16px;font-size:12px;gap:4px;border-radius:9999px;bottom:84px;}
+         }
+         
+         @media (max-width: 360px) {
+             #btn-show-all{padding:6px 12px;font-size:11px;gap:3px;border-radius:6px;}
+             #btn-back-map{padding:8px 14px;font-size:11px;gap:4px;border-radius:9999px;bottom:78px;}
+         }
+        /* --------- ПАНЕЛЬ ЗДАНИЯ --------- */
+        #building-info-panel{position:fixed;left:0;right:0;top:50vh;bottom:60px;background:#e0e0e0;border-radius:24px 24px 0 0;box-shadow:0 -4px 12px rgba(0,0,0,.35);padding:18px 14px;overflow-y:auto;display:none;z-index:30;font-family:"Segoe UI",Arial,sans-serif;}
+        
+        /* Адаптивность панели здания */
+        @media (max-width: 768px) {
+            #building-info-panel{padding:14px 10px;border-radius:20px 20px 0 0;}
+        }
+        
+        @media (max-width: 480px) {
+            #building-info-panel{padding:12px 8px;border-radius:16px 16px 0 0;bottom:45px;}
+        }
+        
+        @media (max-width: 360px) {
+            #building-info-panel{padding:10px 6px;border-radius:12px 12px 0 0;bottom:40px;}
+        }
+        
+        /* Telegram Mini App стили для панели здания */
+        .telegram-mini-app #building-info-panel {
+            bottom: 130px !important; /* 60px + 70px Telegram offset */
+        }
+        
+        @media (max-width: 360px) {
+            .telegram-mini-app #building-info-panel { bottom: 110px !important; } /* 40px + 70px */
+        }
+        
+        @media (max-width: 480px) {
+            .telegram-mini-app #building-info-panel { bottom: 125px !important; } /* 45px + 80px */
+        }
+        
+        @media (max-width: 768px) {
+            .telegram-mini-app #building-info-panel { bottom: 130px !important; } /* 60px + 70px */
+        }
+        .info-section{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;}
+        .btn-main{width:100%;background:#000;border:none;color:#fff;border-radius:14px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;}
+        .progress-bar{height:14px;background:#bdbdbd;border-radius:7px;overflow:hidden;margin:6px 0 10px;}
+        .progress-bar .fill{height:100%;width:0;background:#4caf50;}
+        /* скрываем старые круги дохода */
+        #income-progress,#income-bank,#factory-income-progress,#factory-income-bank,#storage-sale-progress{display:none!important;}
+        
+        /* Стили для слайдеров в меню доставки */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            height: 6px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff6b9d;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ff6b9d;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        input[type="range"]:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="content">
+            <div class="loading-svg-container">
+                <img src="assets/svg/loading/Group 2363.svg" alt="Loading" class="loading-svg">
+            </div>
+            <div class="loading-text">
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div class="progress-text" id="progress-text">0%</div>
+                    </div>
+                </div>
+                <button class="start-btn" id="start-button">Начать</button>
+            </div>
+        </div>
+    </div>
+    <div id="ui-root">
+        <!-- Header -->
+        <div id="app-header" class="app-header">
+            <img src="assets/icons/Logo_full.svg" alt="logo" class="app-logo">
+        </div>
+
+        <!-- === НОВОЕ ГЛАВНОЕ МЕНЮ С PNG === -->
+        <div id="map-container">
+            <!-- Интерактивная карта как основная: GDevelop runtime во фрейме -->
+            <div id="pure-map-stage" style="position:absolute;inset:0;overflow:hidden;z-index:2;">
+                <div id="pure-map-content" style="position:absolute;left:0;top:0;transform-origin:0 0;">
+                    <img id="pure-map-bg" src="building-templates/interactive-map/Frame 1.png" alt="map" style="position:absolute;left:0;top:0;">
+                    <div id="pure-map-buildings"></div>
+                </div>
+            </div>
+            
+            <!-- Зоны зданий больше не используются: покупка только через панель города -->
+            
+            <button id="btn-show-all">
+                <img src="assets/icons/arrow-small-left.svg" alt="←" style="width:16px;height:16px;">
+                Вся карта
+            </button>
+            <button id="btn-back-map">
+                <img src="assets/icons/arrow-small-left.svg" alt="←" style="width:16px;height:16px;">
+                Назад к карте
+            </button>
+        </div>
+        
+        <div id="building-info-panel">
+        </div>
+        <!-- === /КАРТА === -->
+    <!-- Панель денег -->
+            <div id="money-panel" class="panel balance-panel" style="top:10px;left:10px;"><i class="fa-solid fa-money"></i><span id="money-amount">10000</span></div>
+
+    <!-- Панель кредитов -->
+    <div id="credits-panel" class="panel balance-panel" style="top:10px;right:80px;position:absolute;">
+        <i class="fa-solid fa-circle-xmark"></i><span id="credits-amount">0</span>
+        <div id="credits-plus"><i class="fa-solid fa-plus" data-no-replace></i></div>
+    </div>
+
+    <!-- Панель новостей в правом верхнем углу -->
+    <div id="news-panel" class="panel news-corner" style="display: none;">
+        <div class="news-header">
+            <span class="news-label">📰 НОВОСТИ</span>
+            <button class="news-close" id="news-close">✕</button>
+        </div>
+        <div class="news-content">
+            <div class="news-item">
+                <span class="news-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Предварительная загрузка изображений персонажей и сотрудников -->
+    <div style="display:none;">
+        <!-- Персонажи для панели персонажей -->
+        <img src="assets/svg/characters-panel/bloomi.svg" alt="Bloomi">
+        <img src="assets/svg/characters-panel/redgi.svg" alt="Redgi">
+        <img src="assets/svg/characters-panel/grinni.svg" alt="Grinni">
+        <img src="assets/svg/characters-panel/purpe.svg" alt="Purpe">
+        <img src="assets/svg/characters-panel/pinky.svg" alt="Pinky">
+        <img src="assets/svg/characters-panel/seecret.svg" alt="Seecret">
+        <!-- Сотрудники для зданий -->
+        <img src="assets/svg/employees/blumy-hired.svg" alt="Blumy Hired">
+        <img src="assets/svg/employees/grinni-hired.svg" alt="Grinni Hired">
+        <img src="assets/svg/employees/purpe-hired.svg" alt="Purpe Hired">
+        <img src="assets/svg/employees/redjy-hired.svg" alt="Redjy Hired">
+        <img src="assets/svg/employees/not-hired.svg" alt="Not Hired">
+    </div>
+
+    <!-- Вертикальная панель кнопок -->
+    <div id="right-panel" class="panel">
+        <img src="assets/svg/right-menu.svg" class="right-menu-bg" alt="Right Menu">
+        
+        <!-- Невидимые кнопки поверх SVG для сохранения функционала -->
+        <button class="side-btn invisible-btn" id="btn-sound" title="Звук" style="position:absolute;top:0px;left:10px;width:60px;height:60px;background:transparent;border:none;cursor:pointer;z-index:15;"></button>
+        <button class="side-btn invisible-btn" id="btn-tasks" title="Задания" style="position:absolute;top:60px;left:10px;width:60px;height:60px;background:transparent;border:none;cursor:pointer;z-index:14;">
+            <span class="red-dot" id="tasks-dot"></span>
+        </button>
+        <button class="side-btn invisible-btn" id="btn-phone" title="P2P Маркет" style="position:absolute;top:120px;left:10px;width:60px;height:60px;background:transparent;border:none;cursor:pointer;z-index:13;">
+            <span class="red-dot" id="phone-dot"></span>
+        </button>
+        <button class="side-btn invisible-btn" id="btn-news" title="Статистика" style="position:absolute;top:180px;left:10px;width:60px;height:60px;background:transparent;border:none;cursor:pointer;z-index:12;"></button>
+        <button class="side-btn invisible-btn" id="btn-settings" title="Настройки" style="position:absolute;top:240px;left:10px;width:60px;height:60px;background:transparent;border:none;cursor:pointer;z-index:11;"></button>
+    </div>
+
+    <!-- Статистика слева с PNG фоном -->
+    <div id="info-panel" class="panel info-stack">
+        <div class="info-panel-bg">
+                                    <!-- RBC токены -->
+                        <div id="rbc-cell" class="info-item-bg rbc-bg" style="position:absolute;top:10px;left:10px;width:115px;height:32px;background:rgba(26,26,26,0.9);border:1px solid #ffd700;border-radius:16px;display:flex;align-items:center;gap:10px;padding:0 14px;box-shadow:0 2px 6px rgba(0,0,0,0.3);cursor:pointer;">
+                            <img src="assets/svg/rbc-icon.svg" class="info-icon" alt="RBC" style="width:24px;height:24px;" loading="eager" decoding="sync">
+                            <div class="info-value" id="rbc-value" style="color:#fff;font-weight:700;font-size:13px;">0</div>
+                            <!-- Кнопка добавления RBC внутри ячейки -->
+                            <button id="btn-add-rbc" class="add-credits-btn" style="position:absolute;top:50%;right:8px;transform:translateY(-50%);width:18px;height:18px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;cursor:default;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none;">
+                                <img src="assets/icons/add.svg" class="icon" alt="add" style="width:12px;height:12px;filter:brightness(0) invert(1);">
+                            </button>
+                        </div>
+                        
+                        <!-- BC монеты -->
+                        <div class="info-item-bg bc-bg" style="position:absolute;top:54px;left:10px;width:115px;height:32px;background:rgba(26,26,26,0.9);border-radius:16px;display:flex;align-items:center;gap:10px;padding:0 14px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+                            <img src="assets/svg/bc-icon.svg" class="info-icon" alt="BC" style="width:24px;height:24px;" loading="eager" decoding="sync">
+                            <div class="info-value" id="bc-value" style="color:#fff;font-weight:700;font-size:13px;">0</div>
+                        </div>
+                        
+                        <!-- Сотрудники -->
+                        <div class="info-item-bg ref-bg" style="position:absolute;top:98px;left:10px;width:115px;height:32px;background:rgba(26,26,26,0.9);border-radius:16px;display:flex;align-items:center;gap:10px;padding:0 14px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+                            <img src="assets/svg/ref-icon.svg" class="info-icon" alt="Employees" style="width:24px;height:24px;" loading="eager" decoding="sync">
+                            <div class="info-value" id="ref-value" style="color:#fff;font-weight:700;font-size:13px;">0/5</div>
+                        </div>
+                        
+
+
+        </div>
+    </div>
+
+    <!-- Нижняя панель навигации -->
+    <div id="bottom-nav" class="panel">
+        <button>
+            <img src="assets/icons/store.svg" class="icon" alt="store">
+            <span>Магазин</span>
+        </button>
+        <button>
+            <img src="assets/icons/people.svg" class="icon" alt="heroes">
+            <span>Герои</span>
+        </button>
+        <button>
+            <img src="assets/icons/building.svg" class="icon" alt="city">
+            <span>Город</span>
+        </button>
+        <button>
+            <img src="assets/icons/ballot-check.svg" class="icon" alt="tasks">
+            <span>Задания</span>
+        </button>
+        <button onclick="openProfilePanel()">
+            <img src="assets/icons/user.svg" class="icon" alt="profile">
+            <span>Профиль</span>
+        </button>
+    </div>
+
+    <!-- Панель улучшения здания -->
+    <div id="upgrade-panel" class="panel modal" style="z-index:20;display:none;left:0;right:0;top:15%;margin:auto;width:90%;max-width:360px;background:#333;color:#fff;border-radius:10px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.4)">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #555;padding-bottom:6px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:6px"><i class="fa-solid fa-book"></i><span id="panel-title">Библиотека</span></div>
+            <button id="panel-close" style="background:none;border:none;color:#fff;font-size:20px"><i class="fa-solid fa-circle-xmark"></i></button>
+        </div>
+        <div id="panel-content" style="font-size:14px;">
+            <p>Уровень: <span id="building-level">1</span> | доход: <span id="building-income">0</span>/с</p>
+            <button id="upgrade-btn" style="width:100%;background:#4caf50;border:none;border-radius:6px;color:#fff;padding:8px;margin-top:8px;font-size:16px;cursor:pointer">Улучшить <span id="upgrade-cost">100</span> <i class="fa-solid fa-money"></i></button>
+        </div>
+    </div>
+
+    <!-- Панель улучшения Завода -->
+    <div id="factory-upgrade-panel" class="panel modal" style="z-index:20;display:none;left:0;right:0;top:15%;margin:auto;width:90%;max-width:360px;background:#333;color:#fff;border-radius:10px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.4)">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #555;padding-bottom:6px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:6px"><i class="fa-solid fa-industry"></i><span id="factory-panel-title">Завод</span></div>
+            <button id="factory-panel-close" style="background:none;border:none;color:#fff;font-size:20px"><i class="fa-solid fa-circle-xmark"></i></button>
+        </div>
+        <div id="factory-panel-content" style="font-size:14px;">
+            <p>Уровень: <span id="factory-level">1</span> | доход: <span id="factory-income">0</span>/с</p>
+            <button id="factory-upgrade-btn" style="width:100%;background:#4caf50;border:none;border-radius:6px;color:#fff;padding:8px;margin-top:8px;font-size:16px;cursor:pointer">Улучшить <span id="factory-upgrade-cost">100</span> <i class="fa-solid fa-money"></i></button>
+        </div>
+    </div>
+
+    <script src="js/pure-map.js"></script>
+    <script>
+    // Обновление состояния зон на карте в зависимости от покупки зданий
+    window.updateBuildingZones = function(){
+        try{
+            const data = JSON.parse(localStorage.getItem('buildingsData')||'{}');
+            const setState = (key)=>{
+                const zone = document.querySelector('[data-building="'+key+'"]');
+                if(!zone) return;
+                const owned = data[key]?.isOwned === true;
+                zone.classList.toggle('owned', owned);
+                zone.classList.toggle('locked', !owned && key!=='library');
+                // Библиотека всегда активна (построена изначально)
+                if(key==='library'){
+                    zone.classList.remove('locked');
+                    zone.classList.add('owned');
+                }
+            };
+            ['factory','storage','print','library'].forEach(setState);
+        }catch(e){
+            console.warn('updateBuildingZones error', e);
+        }
+    };
+    // Инициализация после загрузки DOM
+    document.addEventListener('DOMContentLoaded', function(){
+        if(typeof window.updateBuildingZones === 'function'){
+            window.updateBuildingZones();
+        }
+    });
+    // Обновление при изменении локального хранилища в других вкладках
+    window.addEventListener('storage', function(e){
+        if(e.key==='buildingsData' && typeof window.updateBuildingZones==='function'){
+            window.updateBuildingZones();
+        }
+    });
+
+    // Уведомление интерактивной карты о покупке здания
+    // Для чистой HTML-карты: мгновенное обновление зданий после покупки
+    window.notifyMapBuildingPurchased = function(key, options){
+        try{
+            if(window.playBuildingPurchaseSequence){
+                window.playBuildingPurchaseSequence(key, options || {});
+                return;
+            }
+            if(window.pureMap && typeof window.pureMap.showBuilding==='function'){
+                window.pureMap.showBuilding(key);
+            }
+        }catch(e){
+            console.warn('notifyMapBuildingPurchased error', e);
+        }
+    };
+    </script>
+
+    <!-- Панель магазина -->
+    <div id="shop-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:1500;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #shop-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #shop-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #shop-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #shop-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и черным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель магазина -->
+            <div id="shop-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="shop-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">МАГАЗИН</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Монеты и активы</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
+                            </div>
+                
+
+                
+                <!-- Секция сундуков -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Сундуки с монетами</h3>
+                    
+                    <!-- Простое место для SVG сундука с навигацией -->
+                    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;position:relative;min-height:120px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;">
+                        <!-- SVG картинка сундука -->
+                        <img id="chest-image" src="assets/svg/chests/chest-1.svg" alt="Сундук" style="width:100%;height:100%;object-fit:contain;transition:all 0.2s ease-in-out;" onerror="this.style.display='none'">
+                        
+                        <!-- Прозрачная кнопка "Купить" поверх SVG -->
+                        <button id="buy-chest-btn" style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:180px;height:40px;background:transparent;border:none;cursor:pointer;z-index:10;" title="Купить"></button>
+                        
+                        <!-- Стрелки навигации -->
+                        <button id="chest-left-arrow" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
+                        <button id="chest-right-arrow" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+                    </div>
+                </div>
+                
+                <!-- Секция сейфов -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Монеты и активы</h3>
+                    
+                    <!-- Простое место для SVG сейфа с навигацией -->
+                    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;position:relative;min-height:120px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;">
+                        <!-- SVG картинка сейфа -->
+                        <img id="safe-image" src="assets/svg/safes/safe-common.svg" alt="Сейф" style="width:100%;height:100%;object-fit:contain;transition:all 0.2s ease-in-out;" onerror="this.style.display='none'">
+                        
+                        <!-- Прозрачная кнопка "Купить" поверх SVG -->
+                        <button id="buy-safe-btn" style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:180px;height:40px;background:transparent;border:none;cursor:pointer;z-index:10;" title="Купить"></button>
+                        
+                        <!-- Стрелки навигации -->
+                        <button id="safe-left-arrow" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
+                        <button id="safe-right-arrow" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+                    </div>
+                </div>
+                
+                <!-- Секция наборов персонажей -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Наборы персонажей</h3>
+                    
+                    <!-- Простое место для SVG персонажа с навигацией -->
+                    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;position:relative;min-height:140px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;">
+                        <!-- SVG картинка персонажа -->
+                        <img id="character-image" src="assets/svg/characters/character-1.svg" alt="Персонаж" style="width:100%;height:100%;object-fit:contain;transition:all 0.2s ease-in-out;" onerror="this.style.display='none'">
+                        
+                        <!-- Прозрачная кнопка "Купить" поверх SVG -->
+                        <button id="buy-character-btn" style="position:absolute;bottom:15%;left:50%;transform:translateX(-50%);width:180px;height:40px;background:transparent;border:none;cursor:pointer;z-index:10;" title="Купить"></button>
+                        
+                        <!-- Стрелки навигации -->
+                        <button id="character-left-arrow" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
+                        <button id="character-right-arrow" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+                            </div>
+                        </div>
+                
+                    </div>
+            
+        </div>
+    </div>
+
+    <!-- Оверлей открытия сейфа -->
+    <div id="crate-overlay" class="modal"></div>
+    
+    <!-- Панель наград для сейфов и сундуков -->
+    <div id="reward-panel" class="modal" style="display:none;position:fixed;inset:0;z-index:2000;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <div id="reward-panel-content" style="background:linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);max-width:420px;width:90%;transform:scale(0.8);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+            
+            <!-- HTML/CSS панель наград -->
+            <div style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="reward-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:2px solid rgba(255,255,255,0.1);padding-bottom:15px;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:28px;height:28px;background:linear-gradient(135deg, #1a237e, #283593);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,35,126,0.4);">
+                            <i class="fa-solid fa-gift" style="font-size:14px;color:#fff;"></i>
+                        </div>
+                        <h2 id="reward-title" style="margin:0;font-size:18px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Сейф открыт!</h2>
+                    </div>
+                </div>
+                
+                <!-- SVG изображение сейфа/сундука -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1);">
+                    <img id="reward-item-image" src="" alt="Предмет" style="width:180px;height:180px;object-fit:contain;margin:0 auto;display:block;">
+                </div>
+                
+                <!-- Секция наград -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1);">
+                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Получено</h3>
+                    
+                    <!-- Награды -->
+                    <div id="reward-items" style="display:grid;gap:8px;">
+                        <!-- Награды будут добавляться динамически -->
+                    </div>
+                </div>
+                
+                <!-- Кнопка закрытия -->
+                <button id="reward-ok-btn" style="width:100%;background:linear-gradient(135deg, #4caf50 0%, #45a049 100%);border:none;border-radius:12px;color:white;padding:16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(76,175,80,0.3);transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(76,175,80,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(76,175,80,0.3)'">
+                    Отлично!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Оффлайн заработок — панель удалена -->
+
+        <!-- Панель города -->
+    <div id="city-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:120;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            <style>
+                #city-panel > div::-webkit-scrollbar {
+                    width: 8px;
+                }
+                #city-panel > div::-webkit-scrollbar-track {
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 4px;
+                }
+                #city-panel > div::-webkit-scrollbar-thumb {
+                    background: rgba(255,255,255,0.3);
+                    border-radius: 4px;
+                }
+                #city-panel > div::-webkit-scrollbar-thumb:hover {
+                    background: rgba(255,255,255,0.5);
+                }
+                
+                /* Адаптивные стили для кнопок карточек города */
+                .city-building-button {
+                    align-self: flex-start;
+                    margin-left: 20px;
+                    min-width: 160px;
+                    max-width: calc(100% - 0px);
+                }
+                
+                /* Мобильные устройства */
+                @media (max-width: 480px) {
+                    .city-building-button {
+                        margin-left: 20px;
+                        min-width: 160px;
+                        max-width: calc(100% - 0px);
+                        font-size: 11px;
+                        padding: 5px 14px;
+                    }
+                }
+                
+                @media (max-width: 360px) {
+                    .city-building-button {
+                        margin-left: 20px;
+                        min-width: 160px;
+                        max-width: calc(100% - 0px);
+                        font-size: 11px;
+                        padding: 5px 14px;
+                    }
+                }
+                
+                /* Обеспечиваем, что кнопки не заходят под SVG */
+                .building-card {
+                    position: relative;
+                    overflow: visible;
+                }
+                
+                .building-card > div {
+                    position: relative;
+                }
+                
+                .building-card img {
+                    position: relative;
+                    z-index: 1;
+                }
+                
+                .building-card .city-building-button {
+                    position: relative;
+                    z-index: 2;
+                }
+            </style>
+            
+            <div id="city-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="city-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:12px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">ГОРОД</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Городские объекты</h3>
+                    <p style="margin:0 0 12px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Строите новые здания для развития города и получения дополнительного дохода</p>
+            </div>
+            
+                <!-- Контейнер для содержимого -->
+                <div class="city-content-container" style="width:100%;">
+                    <!-- Содержимое будет добавлено динамически через JavaScript -->
+                </div>
+                
+                </div>
+                
+        </div>
+    </div>
+
+    <!-- Phone panel (mobile) -->
+    <div id="phone-panel" class="panel phone-panel modal" style="display:none;position:relative;">
+        <button id="phone-close" class="phone-close" style="z-index:10;">&times;</button>
+        <div id="phone-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center;color:#fff;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:5;">
+            <div style="font-size:40px;">🚧</div>
+            <p style="margin:0;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">в разработке</p>
+        </div>
+        <!-- Status bar -->
+        <div id="phone-status" style="position:absolute;top:6px;left:8px;font-size:12px;color:#fff;opacity:.8;">--:--</div>
+        <!-- Home grid with app icons -->
+        <div id="phone-home" class="phone-home">
+            <button id="app-bookeio" class="phone-app" style="position:relative;"><img src="assets/icons/book.svg" class="icon" alt><span>BOOKEIO</span></button>
+            <button id="app-delivery" class="phone-app" style="position:relative;"><img src="assets/icons/delivery.svg" class="icon" alt><span>DELIVERY</span></button>
+            <button id="app-messages" class="phone-app" style="position:relative;"><img src="assets/icons/message.svg" class="icon" alt><span>MESSAGES</span><span class="red-dot" id="msg-dot"></span></button>
+        </div>
+        <!-- Bookeio app screen -->
+        <div id="bookeio-app" class="phone-screen" style="display:none;">
+            <h3>BOOKEIO</h3>
+            <div class="bookeio-grid">
+                <div class="bookeio-column">
+                    <h4>ЖУРНАЛЫ</h4>
+                    <img src="assets/icons/book.svg" class="app-item-img" alt>
+                    <div class="slider-row">
+                        <input type="range" id="mag-slider" min="0" max="1000" value="0">
+                        <span id="mag-qty" class="qty-label">0</span>
+                        <span id="mag-cost" class="cost-label">0$</span>
+                    </div>
+                    <button id="btn-order-mag" class="order-btn">ЗАКАЗАТЬ</button>
+                </div>
+                <div class="bookeio-column">
+                    <h4>КНИГИ</h4>
+                    <img src="assets/icons/book.svg" class="app-item-img" alt>
+                    <div class="slider-row">
+                        <input type="range" id="book-slider" min="0" max="1000" value="0">
+                        <span id="book-qty" class="qty-label">0</span>
+                        <span id="book-cost" class="cost-label">0$</span>
+                    </div>
+                    <button id="btn-order-book" class="order-btn">ЗАКАЗАТЬ</button>
+                </div>
+            </div>
+            <button class="phone-back" style="margin-top:auto;">← Назад</button>
+        </div>
+        <!-- Delivery app screen -->
+        <div id="delivery-app" class="phone-screen" style="display:none;">
+            <h3>ДОСТАВКА</h3>
+            <div id="orders-container" style="flex:1;width:100%;overflow-y:auto;margin-bottom:8px;"></div>
+            <button id="btn-collect-all" style="margin-top:auto;">Забрать всё</button>
+            <button class="phone-back" style="margin-top:4px;">← Назад</button>
+        </div>
+        <!-- Messages app screen -->
+        <div id="messages-app" class="phone-screen" style="display:none;">
+            <h3>MESSAGES</h3>
+            <div id="messages-container" style="flex:1;width:100%;overflow-y:auto;margin-bottom:8px;"></div>
+            <button class="phone-back" style="margin-top:auto;">← Назад</button>
+        </div>
+    </div>
+
+    <!-- Profile panel -->
+    <div id="profile-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:1500;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #profile-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #profile-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #profile-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #profile-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и черным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель профиля -->
+            <div id="profile-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="profile-close" onclick="hidePanelWithAnimation('profile-panel')" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">ПРОФИЛЬ</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Личный кабинет</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Управляйте своим профилем, уровнем и инвентарем</p>
+                </div>
+                
+                <!-- User Information Section -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:20px;padding:16px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1);">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+                        <!-- Avatar Circle -->
+                        <div id="profile-avatar" style="width:50px;height:50px;background:rgba(128,128,128,0.3);border-radius:50%;border:1px solid rgba(255,255,255,0.2);box-shadow:0 2px 8px rgba(0,0,0,0.2);overflow:hidden;position:relative;">
+                            <img id="profile-avatar-img" src="" alt="Avatar" style="width:100%;height:100%;object-fit:cover;display:none;" onerror="handleAvatarError()">
+                            <div id="profile-avatar-fallback" style="width:100%;height:100%;background:rgba(128,128,128,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;color:rgba(255,255,255,0.8);">👤</div>
+                        </div>
+                        
+                        <!-- User Info -->
+                        <div style="width:100%;text-align:center;">
+                            <!-- Name and Edit Button -->
+                            <div style="display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
+                                <h3 id="profile-nickname" style="margin:0;font-size:16px;font-weight:700;color:#fff;">Пользователь</h3>
+                            </div>
+                            
+                            <!-- ID with Copy Button -->
+                            <div style="display:flex;align-items:center;justify-content:center;margin-bottom:8px;">
+                                <div id="profile-user-id" style="background:rgba(255,255,255,0.1);border-radius:6px;padding:3px 6px;font-size:11px;color:rgba(255,255,255,0.8);cursor:pointer;transition:all 0.2s ease;" onclick="copyUserId()" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                                    ID 12345678
+                                </div>
+                            </div>
+                            
+                            <!-- Level -->
+                            <div style="font-size:12px;color:rgba(255,255,255,0.9);margin-bottom:8px;text-align:center;">
+                                <span class="profile-level-text">Уровень 5</span>
+                            </div>
+                            
+                            <!-- XP Progress Bar -->
+                            <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:4px;margin-bottom:8px;position:relative;width:100%;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,0.2);">
+                                <!-- Main progress bar -->
+                                <div class="profile-xp-progress-bar" style="height:12px;background:linear-gradient(90deg, #9c27b0, #673ab7, #9c27b0);border-radius:8px;width:0%;transition:width 0.8s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 2px 8px rgba(156,39,176,0.4), inset 0 1px 0 rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+                                    <!-- XP text -->
+                                    <span class="profile-xp-text" style="font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);z-index:2;position:relative;">0 XP</span>
+                                </div>
+                            </div>
+                            
+
+                            
+                            <!-- XP Earning Prompt -->
+                            <div style="font-size:11px;color:rgba(255,255,255,0.6);text-align:center;">
+                                Как заработать XP?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+    <!-- /Profile panel -->
+
+
+
+
+
+    <!-- Friends panel -->
+    <div id="friends-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:120;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #friends-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #friends-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #friends-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #friends-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и черным фоном -->
+        <div style="width:90%;max-width:380px;max-height:60vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:12px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель реферальной программы -->
+            <div id="friends-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="friends-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:16px;text-align:center;">
+                    <h2 style="margin:0 0 6px;font-size:16px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">РЕФЕРАЛЬНАЯ ПРОГРАММА</h2>
+                    <h3 style="margin:0 0 8px;font-size:20px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Пригласи друзей</h3>
+                    <p style="margin:0 0 12px;font-size:10px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:280px;">Получай награды за каждого приглашенного друга и их друзей</p>
+                </div>
+
+                <!-- Placeholder content -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:32px 20px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;">
+                    <div style="font-size:36px;">🚧</div>
+                    <p style="margin:0;font-size:14px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:1px;">в разработке</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Characters panel -->
+    <div id="characters-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:120;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #characters-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #characters-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #characters-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #characters-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и черным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель персонажей -->
+            <div id="characters-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="chars-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">ПЕРСОНАЖИ</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Сотрудники</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Познакомьтесь с сотрудниками, которые помогут сделать Ваш город лучше!</p>
+                    
+                    <!-- Кнопки фильтрации -->
+                    <div style="display:flex;gap:8px;">
+                        <button id="char-tab-available" class="char-filter-btn" style="width:120px;height:36px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);border-radius:18px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s ease;" onclick="switchCharacterTab('available')">Доступные</button>
+                        <button id="char-tab-all" class="char-filter-btn active" style="width:120px;height:36px;background:linear-gradient(135deg, #2196f3, #1976d2);border:none;color:white;border-radius:18px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s ease;box-shadow:0 2px 8px rgba(33,150,243,0.3);" onclick="switchCharacterTab('all')">Все</button>
+                        </div>
+                        </div>
+                
+                <!-- Контейнер для содержимого персонажей -->
+                <div class="characters-content-container" style="width:100%;">
+                    <!-- Содержимое будет добавлено динамически через JavaScript -->
+                </div>
+                
+                </div>
+                
+        </div>
+    </div>
+    <!-- /Characters panel -->
+
+    <!-- Assignment overlay -->
+    <div id="assign-overlay" class="modal" style="display:none;position:fixed;inset:0;justify-content:center;align-items:center;z-index:200;">
+        <div id="assign-grid" style="background:#000;border-radius:20px;padding:20px;width:280px;display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative;">
+            <!-- populated dynamically -->
+        </div>
+    </div>
+    <!-- /Assignment overlay -->
+
+    <!-- Tasks panel -->
+    <div id="tasks-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:120;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #tasks-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #tasks-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #tasks-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #tasks-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и черным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель партнерских заданий -->
+            <div id="tasks-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="tasks-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">ЗАДАНИЯ</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Партнерские задания</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Выполняйте партнерские задачи и получайте в награду игровую валюту</p>
+            </div>
+
+            <!-- Summary Cards -->
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-bottom:0px;">Заданий выполнено</div>
+                        <div id="partner-completed-count" style="font-size:20px;font-weight:700;color:#fff;">0</div>
+                </div>
+                    <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-bottom:0px;">Заданий доступно</div>
+                        <div id="partner-total-count" style="font-size:20px;font-weight:700;color:#fff;">0</div>
+                </div>
+            </div>
+
+                <!-- Available Tasks Section -->
+                <div style="padding:0;">
+                    <h3 style="text-align:center;font-size:16px;margin:0 0 16px;color:#fff;font-weight:700;">Доступные задания</h3>
+            <div id="tasks-list" style="display:flex;flex-direction:column;gap:8px;">
+                        <!-- Задания будут добавлены позже -->
+            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Tasks panel -->
+
+    <!-- Game Tasks panel (new) -->
+    <div id="game-tasks-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:1500;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #game-tasks-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #game-tasks-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #game-tasks-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #game-tasks-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и черным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель игровых заданий -->
+            <div id="game-tasks-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="game-tasks-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">ЗАДАНИЯ</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Игровые задания</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Выполняйте задания, чтобы получить в награду игровую валюту и уникальные объекты</p>
+                </div>
+
+                <!-- Summary Cards -->
+                <div style="display:flex;gap:8px;margin-bottom:8px;">
+                    <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-bottom:0px;">Заданий выполнено</div>
+                        <div style="font-size:20px;font-weight:700;color:#fff;">0</div>
+                    </div>
+                    <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;text-align:center;border:1px solid rgba(255,255,255,0.1);">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-bottom:0px;">Заданий доступно</div>
+                        <div style="font-size:20px;font-weight:700;color:#fff;">6</div>
+                    </div>
+                </div>
+
+                <!-- Available Tasks Section -->
+                <div style="padding:0;">
+                    <h3 style="text-align:center;font-size:16px;margin:0 0 16px;color:#fff;font-weight:700;">Доступные задания</h3>
+                    <div id="game-tasks-list" style="display:flex;flex-direction:column;gap:8px;min-height:200px;">
+                        <!-- SVG элементы будут добавлены через JavaScript с фиксированной высотой -->
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+    <!-- /Game Tasks panel -->
+
+    <!-- Statistics panel -->
+    <div id="statistics-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:120;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #statistics-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #statistics-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #statistics-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #statistics-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и темным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель статистики -->
+            <div id="statistics-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="statistics-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">СТАТИСТИКА</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Дополнительная</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Детальная статистика по зданиям и доходам</p>
+                </div>
+                
+
+
+                <!-- Детальная статистика -->
+                <div style="background:rgba(128,128,128,0.3);border-radius:20px;padding:16px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 8px 32px rgba(0,0,0,0.6);font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;">
+                    <h3 style="text-align:center;font-size:12px;margin:0 0 16px;color:rgba(255,255,255,0.9);font-weight:700;">Детальная статистика</h3>
+                    
+                    <!-- Общий доход -->
+                    <div style="text-align:center;margin-bottom:16px;padding:12px;background:rgba(0,0,0,0.9);border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-bottom:6px;">Суммарный ежедневный доход</div>
+                        <div class="stat-total" style="font-size:16px;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <img src="assets/svg/money-icon.svg" style="width:16px;height:16px;">
+                            <span>0</span>
+                    </div>
+                </div>
+
+                    <!-- Разбивка по зданиям -->
+                    <div class="income-breakdown">
+                        <!-- Библиотека -->
+                        <div class="stat-item" data-category="income" style="background:rgba(0,0,0,0.9);border-radius:20px;padding:8px;margin-bottom:8px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                    <span class="stat-name" style="font-size:11px;color:#fff;font-weight:600;">Библиотека</span>
+                            </div>
+                            <div style="text-align:right;">
+                                    <div class="stat-value" style="font-size:12px;font-weight:600;color:#fff;">0/день</div>
+                                    <div class="stat-percentage" style="font-size:9px;color:rgba(255,255,255,0.7);">0% от общего</div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Завод -->
+                        <div class="stat-item" data-category="income" style="background:rgba(0,0,0,0.9);border-radius:20px;padding:8px;margin-bottom:8px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                    <span class="stat-name" style="font-size:11px;color:#fff;font-weight:600;">Завод</span>
+                            </div>
+                            <div style="text-align:right;">
+                                    <div class="stat-value" style="font-size:12px;font-weight:600;color:#fff;">0/день</div>
+                                    <div class="stat-percentage" style="font-size:9px;color:rgba(255,255,255,0.7);">0% от общего</div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Почта -->
+                        <div class="stat-item" data-category="income" style="background:rgba(0,0,0,0.9);border-radius:20px;padding:8px;margin-bottom:8px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                    <span class="stat-name" style="font-size:11px;color:#fff;font-weight:600;">Почта</span>
+                            </div>
+                            <div style="text-align:right;">
+                                    <div class="stat-value" style="font-size:12px;font-weight:600;color:#fff;">0/день</div>
+                                    <div class="stat-percentage" style="font-size:9px;color:rgba(255,255,255,0.7);">0% от общего</div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- Статуя -->
+                        <div class="stat-item" data-category="income" style="background:rgba(0,0,0,0.9);border-radius:20px;padding:8px;margin-bottom:8px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.8);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                    <span class="stat-name" style="font-size:11px;color:#fff;font-weight:600;">Статуя</span>
+                            </div>
+                            <div style="text-align:right;">
+                                    <div class="stat-value" style="font-size:12px;font-weight:600;color:#fff;">0/день</div>
+                                    <div class="stat-percentage" style="font-size:9px;color:rgba(255,255,255,0.7);">0% от общего</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="stat-category-btn active" data-category="income" style="flex:1;background:linear-gradient(135deg, #666 0%, #555 100%);border:none;border-radius:10px;color:#fff;padding:10px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:all 0.2s ease;">Доходы</button>
+                    <button class="stat-category-btn" data-category="expenses" style="flex:1;background:linear-gradient(135deg, #424242 0%, #333 100%);border:none;border-radius:10px;color:#fff;padding:10px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:all 0.2s ease;">Расходы</button>
+                    <button class="stat-category-btn" data-category="balance" style="flex:1;background:linear-gradient(135deg, #424242 0%, #333 100%);border:none;border-radius:10px;color:#fff;padding:10px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:all 0.2s ease;">Баланс</button>
+                </div>
+            </div>
+
+            <!-- Employees Section -->
+            <div style="background:#5a5a5a;border-radius:20px;padding:16px;">
+                <h3 style="text-align:center;font-size:16px;margin:0 0 16px;color:#fff;font-weight:700;">Сотрудники</h3>
+                
+                <!-- Employee Cards -->
+                <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;">
+                    <!-- Блуми -->
+                    <div class="employee-card" data-employee="bloomi" style="background:#424242;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="width:40px;height:40px;background:#666;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#ccc;margin:0 auto 4px;">👤</div>
+                        <div style="font-size:10px;color:#fff;font-weight:600;">Блуми</div>
+                        <div class="employee-level" style="font-size:8px;color:#ccc;">Уровень <span data-level="bloomi">1</span></div>
+                    </div>
+                    
+                    <!-- Реджи -->
+                    <div class="employee-card" data-employee="reggi" style="background:#424242;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="width:40px;height:40px;background:#666;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#ccc;margin:0 auto 4px;">👤</div>
+                        <div style="font-size:10px;color:#fff;font-weight:600;">Реджи</div>
+                        <div class="employee-level" style="font-size:8px;color:#ccc;">Уровень <span data-level="reggi">1</span></div>
+                    </div>
+                    
+                    <!-- Спайки -->
+                    <div class="employee-card" data-employee="spikes" style="background:#424242;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="width:40px;height:40px;background:#666;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#ccc;margin:0 auto 4px;">👤</div>
+                        <div style="font-size:10px;color:#fff;font-weight:600;">Спайки</div>
+                        <div class="employee-level" style="font-size:8px;color:#ccc;">Уровень <span data-level="spikes">1</span></div>
+                    </div>
+                    
+                    <!-- Гринни -->
+                    <div class="employee-card" data-employee="grinni" style="background:#424242;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="width:40px;height:40px;background:#666;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#ccc;margin:0 auto 4px;">👤</div>
+                        <div style="font-size:10px;color:#fff;font-weight:600;">Гринни</div>
+                        <div class="employee-level" style="font-size:8px;color:#ccc;">Уровень <span data-level="grinni">1</span></div>
+                    </div>
+                    
+                    <!-- Перпи -->
+                    <div class="employee-card" data-employee="perpi" style="background:#424242;border-radius:8px;padding:8px;text-align:center;">
+                        <div style="width:40px;height:40px;background:#666;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#ccc;margin:0 auto 4px;">👤</div>
+                        <div style="font-size:10px;color:#fff;font-weight:600;">Перпи</div>
+                        <div class="employee-level" style="font-size:8px;color:#ccc;">Уровень <span data-level="perpi">1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Statistics panel -->
+
+    <!-- Панель настроек -->
+    <div id="settings-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:150;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #settings-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #settings-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #settings-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #settings-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и темным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель настроек -->
+            <div style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="settings-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:12px;text-align:center;">
+                    <h2 style="margin:0 0 4px;font-size:16px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">НАСТРОЙКИ</h2>
+                    <h3 style="margin:0 0 8px;font-size:20px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Параметры</h3>
+                    <p style="margin:0 0 12px;font-size:10px;color:rgba(255,255,255,0.9);line-height:1.3;max-width:280px;">Управляйте настройками игры и аккаунта</p>
+                </div>
+
+                <!-- Пункты меню -->
+                <!-- Язык -->
+                <div class="settings-menu-item" id="settings-language" style="background:rgba(255,255,255,0.05);border-radius:20px;padding:6px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                    <span style="flex:1;font-size:13px;font-weight:600;color:#fff;text-align:center;">Язык</span>
+                </div>
+                
+                <!-- FAQ -->
+                <div class="settings-menu-item" id="settings-faq" style="background:rgba(255,255,255,0.05);border-radius:20px;padding:6px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                    <span style="flex:1;font-size:13px;font-weight:600;color:#fff;text-align:center;">FAQ</span>
+                </div>
+                
+                <!-- О нас -->
+                <div class="settings-menu-item" id="settings-about" style="background:rgba(255,255,255,0.05);border-radius:20px;padding:6px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                    <span style="flex:1;font-size:13px;font-weight:600;color:#fff;text-align:center;">О нас</span>
+                </div>
+
+
+
+                <!-- User ID -->
+                <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;">
+                    UserID: <span id="settings-userid" style="color:rgba(255,255,255,0.9);">00000000</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Панель выбора языка -->
+    <div id="language-panel" class="panel modal" style="display:none;position:fixed;inset:0;z-index:160;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+        <style>
+            #language-panel > div::-webkit-scrollbar {
+                width: 8px;
+            }
+            #language-panel > div::-webkit-scrollbar-track {
+                background: rgba(255,255,255,0.1);
+                border-radius: 4px;
+            }
+            #language-panel > div::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            #language-panel > div::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.5);
+            }
+        </style>
+        <!-- Контейнер для панели с ограниченной высотой и темным фоном -->
+        <div style="width:90%;max-width:420px;max-height:70vh;overflow-y:auto;position:relative;display:flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,rgba(0,0,0,0.95) 0%,rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);">
+            
+            <!-- HTML/CSS панель выбора языка -->
+            <div style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
+                
+                <!-- Кнопка закрытия -->
+                <button id="language-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+                
+                <!-- Заголовок -->
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">ВЫБОР ЯЗЫКА</h2>
+                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Language</h3>
+                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Выберите предпочитаемый язык интерфейса</p>
+                </div>
+
+                <!-- Опции языков -->
+                <div style="background:rgba(255,255,255,0.05);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.1);">
+                    <div class="language-option" data-lang="ru" style="background:rgba(255,255,255,0.05);border-radius:20px;padding:8px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <span style="flex:1;font-size:14px;font-weight:600;color:#fff;text-align:center;">Русский</span>
+                        <span class="language-check" style="color:#4caf50;font-size:14px;font-weight:700;">✓</span>
+                    </div>
+                    
+                    <div class="language-option" data-lang="en" style="background:rgba(255,255,255,0.05);border-radius:20px;padding:8px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <span style="flex:1;font-size:14px;font-weight:600;color:#fff;text-align:center;">English</span>
+                        <span class="language-check" style="color:#4caf50;font-size:14px;font-weight:700;display:none;">✓</span>
+                    </div>
+                    
+                    <div class="language-option" data-lang="es" style="background:rgba(255,255,255,0.05);border-radius:20px;padding:8px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                        <span style="flex:1;font-size:14px;font-weight:600;color:#fff;text-align:center;">Español</span>
+                        <span class="language-check" style="color:#4caf50;font-size:14px;font-weight:700;display:none;">✓</span>
+                    </div>
+                </div>
+
+                <!-- Кнопка Назад -->
+                <div style="margin-top:16px;">
+                    <button id="language-back" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;color:#fff;padding:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s ease;box-shadow:0 4px 16px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">Назад</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level-up overlay -->
+    <div id="levelup-overlay" style="display:none;position:fixed;inset:0;justify-content:center;align-items:center;z-index:200;pointer-events:none;">
+        <div id="levelup-badge" style="display:flex;flex-direction:column;align-items:center;gap:4px;background:#4caf50;border-radius:50%;width:120px;height:120px;color:#fff;font-weight:700;font-size:32px;justify-content:center;transform:scale(0);"></div>
+    </div>
+    <!-- Storage upgrade panel (старая панель - скрыта) -->
+    <div id="storage-upgrade-panel" class="panel modal" style="z-index:20;display:none;left:0;right:0;top:15%;margin:auto;width:90%;max-width:360px;background:#333;color:#fff;border-radius:10px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.4)">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #555;padding-bottom:6px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:6px"><i class="fa-solid fa-warehouse"></i><span>Почта (старая панель)</span></div>
+            <button id="storage-panel-close" style="background:none;border:none;color:#fff;font-size:20px"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="storage-panel-content" style="font-size:14px;display:flex;flex-direction:column;gap:8px;">
+            <!-- new storage card design -->
+            <div id="storage-card" style="display:flex;flex-direction:column;gap:4px;background:linear-gradient(180deg,#0d47a1,#1976d2);border-radius:14px;padding:14px;color:#fff;position:relative;overflow:hidden;">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;opacity:.9;">
+                    <span>Почта</span>
+                    <img src="assets/png/safe.png" alt="safe" style="width:38px;height:38px;object-fit:contain;">
+                </div>
+                <div id="storage-card-percent" style="font-size:32px;font-weight:700;line-height:1">0%</div>
+                <div id="storage-card-amt" style="font-size:12px;opacity:.8">0 / 0</div>
+            </div>
+            <!-- /storage card -->
+
+            <!-- старый блок вместимости оставляем для апгрейдов -->
+            <div id="storage-capacity" style="background:#424242;border-radius:8px;padding:8px;text-align:center;">
+                <div id="storage-progress-text" style="font-size:24px;font-weight:700;color:#8bc34a">0%</div>
+                <div style="height:6px;background:#2b2b2b;border-radius:3px;overflow:hidden;margin:4px 0;">
+                    <div id="storage-progress-bar" style="height:100%;width:0;background:#8bc34a;"></div>
+                </div>
+                <div id="storage-amount" style="font-size:12px;opacity:.8">0/1000</div>
+            </div>
+            <button id="storage-upgrade-btn" style="width:100%;background:#4caf50;border:none;border-radius:6px;color:#fff;padding:8px;font-size:16px;cursor:pointer">Улучшить <span id="storage-upgrade-cost">1000</span> <i class="fa-solid fa-money-bill"></i></button>
+        </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-service.js"></script>
+    <script src="js/services/firebase-storage.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="js/iconReplace.js"></script>
+    <script src="js/loader.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/referral.js"></script>
+    <script src="js/map_ui.js"></script>
+    <script src="js/main-menu.js"></script>
+    <script src="js/game-tasks.js"></script>
+    <script src="js/partner-tasks.js"></script>
+    <script src="js/tasks-swap.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/employee-levels.js"></script>
+</body>
+</html> 

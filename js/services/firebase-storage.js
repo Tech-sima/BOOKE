@@ -15,7 +15,7 @@
     }
 
     const app = firebaseService.app || (firebase.apps && firebase.apps.length ? firebase.app() : null);
-    const auth = firebase.auth ? firebase.auth() : null;
+    const auth = firebaseService.auth || (firebase.auth ? firebase.auth() : null);
     const db = firebaseService.db || (firebase.firestore ? firebase.firestore() : null);
     const FieldValue = firebaseService.FieldValue || (firebase.firestore && firebase.firestore.FieldValue ? firebase.firestore.FieldValue : null);
 
@@ -357,8 +357,22 @@
 
     async function initFirebase() {
         try {
-            const credential = await auth.signInAnonymously();
-            const uid = credential.user.uid;
+            let uid = null;
+            if (firebaseService && firebaseService.authReady) {
+                const user = await firebaseService.authReady;
+                uid = user && user.uid;
+            }
+            if (!uid && auth) {
+                const fallback = auth.currentUser
+                    ? auth.currentUser
+                    : await auth.signInAnonymously();
+                uid = fallback && fallback.uid ? fallback.uid : fallback.user?.uid;
+            }
+
+            if (!uid) {
+                throw new Error('Anonymous authentication failed');
+            }
+
             global.cloudStorageUid = uid;
             await initDocReference(uid);
             document.dispatchEvent(new CustomEvent('cloud-storage-ready', { detail: { uid } }));

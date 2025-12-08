@@ -10,18 +10,6 @@
             : null;
     }
 
-    function resolveDocId() {
-        const tgUser = typeof window.getTelegramUser === 'function' ? window.getTelegramUser() : null;
-        if (tgUser && tgUser.id) {
-            return `tg_${tgUser.id}`;
-        }
-        if (window.currentUserId) {
-            return `uid_${window.currentUserId}`;
-        }
-        const storedId = localStorage.getItem('uniqueUserId');
-        return storedId ? `uid_${storedId}` : null;
-    }
-
     function safeParse(json) {
         if (!json) return {};
         try {
@@ -91,9 +79,11 @@
         return stored ? parseFloat(stored) : 0;
     }
 
-    function buildPayload() {
+    function buildPayload(docId) {
         const buildings = collectBuildings();
+        const tgUser = typeof window.getTelegramUser === 'function' ? window.getTelegramUser() : null;
         return {
+            authUid: docId || null,
             userId: window.currentUserId || localStorage.getItem('uniqueUserId') || null,
             balance: collectBalance(),
             buildings: {
@@ -102,7 +92,10 @@
                 status: buildings.details
             },
             buildingsData: buildings.raw,
-            profile: collectProfile(),
+            profile: {
+                ...collectProfile(),
+                telegramId: tgUser?.id || null
+            },
             platform: window.isTelegramApp ? 'telegram' : 'web',
             updatedAtClient: Date.now()
         };
@@ -114,12 +107,16 @@
             return;
         }
 
-        const docId = resolveDocId();
+        if (service.authReady) {
+            await service.authReady;
+        }
+
+        const docId = service.getCurrentUid ? service.getCurrentUid() : null;
         if (!docId) {
             return;
         }
 
-        const payload = buildPayload();
+        const payload = buildPayload(docId);
         const signature = JSON.stringify(payload);
         if (signature === lastSignature && hasSyncedOnce) {
             return;

@@ -1182,14 +1182,12 @@
     </div>
 
     <!-- Phone panel (mobile) -->
-    <div id="phone-panel" class="panel phone-panel modal" style="display:none;position:relative;">
-        <button id="phone-close" class="phone-close" style="z-index:10;">&times;</button>
-        <div id="phone-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center;color:#fff;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);z-index:5;">
-            <div style="font-size:40px;">🚧</div>
-            <p style="margin:0;font-size:16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">в разработке</p>
+    <div id="phone-panel" class="panel phone-panel modal" style="display:none;">
+        <button id="phone-close" class="phone-close">&times;</button>
+        <div id="phone-placeholder" class="phone-placeholder">
+            <p>в разработке</p>
+            <div id="phone-gesture-bar" class="phone-gesture-bar"></div>
         </div>
-        <!-- Status bar -->
-        <div id="phone-status" style="position:absolute;top:6px;left:8px;font-size:12px;color:#fff;opacity:.8;">--:--</div>
         <!-- Home grid with app icons -->
         <div id="phone-home" class="phone-home">
             <button id="app-bookeio" class="phone-app" style="position:relative;"><img src="assets/icons/book.svg" class="icon" alt><span>BOOKEIO</span></button>

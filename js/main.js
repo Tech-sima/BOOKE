@@ -1873,25 +1873,53 @@ if(phonePanel){
         list.forEach(el=>{el.style.visibility=show?'visible':'hidden';});
     }
 
-    safeAddEventListener('btn-phone', 'click', () => {
-        showPanelWithAnimation('phone-panel');
-        showHome();
-        toggleCircles(false);
-        setActiveSideButton('btn-phone');
-    });
-    safeAddEventListener('phone-close', 'click', () => {
+    function closePhonePanel(){
         hidePanelWithAnimation('phone-panel', () => {
             toggleCircles(true);
             clearActiveSideButton();
-            // Восстанавливаем индикаторы прибыли
             if (window.updateProfitIndicators) {
                 setTimeout(() => {
                     window.updateProfitIndicators();
                 }, 100);
             }
         });
+    }
+
+    safeAddEventListener('btn-phone', 'click', () => {
+        showPanelWithAnimation('phone-panel');
+        showHome();
+        toggleCircles(false);
+        setActiveSideButton('btn-phone');
     });
+    safeAddEventListener('phone-close', 'click', closePhonePanel);
     document.querySelectorAll('.phone-back').forEach(btn=>btn.addEventListener('click',()=>{showHome();}));
+    const phoneGestureBar=document.getElementById('phone-gesture-bar');
+    if(phoneGestureBar){
+        let startY=null;
+        const SWIPE_THRESHOLD=40;
+        phoneGestureBar.addEventListener('touchstart',e=>{
+            if(e.touches.length>0){
+                startY=e.touches[0].clientY;
+            }
+        },{passive:true});
+        phoneGestureBar.addEventListener('touchmove',e=>{
+            if(startY===null) return;
+            const currentY=e.touches[0].clientY;
+            if(startY-currentY>SWIPE_THRESHOLD){
+                startY=null;
+                closePhonePanel();
+            }
+        },{passive:true});
+        phoneGestureBar.addEventListener('touchend',e=>{
+            if(startY===null) return;
+            const endY=e.changedTouches[0].clientY;
+            if(startY-endY>SWIPE_THRESHOLD){
+                closePhonePanel();
+            }
+            startY=null;
+        });
+        phoneGestureBar.addEventListener('click',closePhonePanel);
+    }
     safeAddEventListener('app-bookeio', 'click', () => openScreen(bookeioScreen));
     safeAddEventListener('app-delivery', 'click', () => {refreshDeliveryList();openScreen(deliveryScreen);});
     safeAddEventListener('app-messages', 'click', () => {renderMessages();openScreen(messagesScreen);messagesArr.forEach(m=>m.read=true);saveMessages();updateDots();});

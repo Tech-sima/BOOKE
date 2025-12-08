@@ -1,165 +1,180 @@
-(function initFirebaseSync() {
-    const SYNC_INTERVAL_MS = 15000;
-    let syncTimer = null;
-    let lastSignature = null;
-    let hasSyncedOnce = localStorage.getItem('firebase.sync.initialized') === '1';
+(function initRealtimeUserSync() {
+    const SYNC_INTERVAL = 15000;
+    const STORAGE_KEYS_TO_MONITOR = ['balance', 'buildingsData', 'profile.username', 'uniqueUserId'];
 
-    function getFirebaseService() {
-        return window.firebaseService && window.firebaseService.isEnabled && window.firebaseService.isEnabled()
+    let timerId = null;
+    let lastPayloadHash = null;
+    let firstSyncDone = localStorage.getItem('firebase.sync.initialized') === '1';
+
+    const REQUIRED_BUILDINGS = ['library', 'factory', 'storage', 'print'];
+
+    function getService() {
+        return window.firebaseService && window.firebaseService.isReady()
             ? window.firebaseService
             : null;
     }
 
-    function safeParse(json) {
-        if (!json) return {};
+    function parseJSON(value, fallback = {}) {
+        if (!value) return fallback;
         try {
-            return JSON.parse(json);
+            return JSON.parse(value);
         } catch (error) {
-            console.warn('[firebase-sync] Cannot parse buildingsData', error);
-            return {};
+            console.warn('[firebase-sync] Failed to parse JSON', error);
+            return fallback;
         }
     }
 
-    function collectBuildings() {
-        const parsed = safeParse(localStorage.getItem('buildingsData'));
-        const details = {};
-        let ownedCount = 0;
-        let upgradedCount = 0;
+    function collectBuildingsSummary() {
+        const raw = parseJSON(localStorage.getItem('buildingsData'));
+        const status = {};
+        let owned = 0;
+        let upgraded = 0;
 
-        Object.entries(parsed).forEach(([key, value]) => {
-            const owned = Boolean(value && value.isOwned);
-            const level = owned ? parseInt(value.level, 10) || 1 : 0;
-            const upgraded = owned && level > 1;
+        REQUIRED_BUILDINGS.forEach((key) => {
+            const info = raw[key] || {};
+            const isOwned = Boolean(info.isOwned);
+            const level = isOwned ? parseInt(info.level, 10) || 1 : 0;
+            const isUpgraded = isOwned && level > 1;
 
-            details[key] = {
-                owned,
+            status[key] = {
+                owned: isOwned,
                 level,
-                upgraded,
-                name: value?.name || null
+                upgraded: isUpgraded,
+                name: info.name || key
             };
 
-            if (owned) {
-                ownedCount += 1;
-            }
-            if (upgraded) {
-                upgradedCount += 1;
-            }
+            if (isOwned) owned += 1;
+            if (isUpgraded) upgraded += 1;
         });
 
         return {
-            raw: parsed,
-            ownedCount,
-            upgradedCount,
-            details
+            raw,
+            status,
+            ownedCount: owned,
+            upgradedCount: upgraded,
+            label: `${owned}/${REQUIRED_BUILDINGS.length}`
         };
     }
 
-    function collectProfile() {
+    function collectProfileInfo() {
         const tgUser = typeof window.getTelegramUser === 'function' ? window.getTelegramUser() : null;
-        const username = localStorage.getItem('profile.username') || null;
+        const storedName = localStorage.getItem('profile.username') || null;
 
         return {
-            username,
+            username: storedName,
             telegram: tgUser
                 ? {
-                    id: tgUser.id || null,
-                    username: tgUser.username || null,
-                    firstName: tgUser.first_name || null,
-                    lastName: tgUser.last_name || null
-                }
+                      id: tgUser.id || null,
+                      username: tgUser.username || null,
+                      firstName: tgUser.first_name || null,
+                      lastName: tgUser.last_name || null
+                  }
                 : null
         };
     }
 
-    function collectBalance() {
+    function getBalance() {
         if (typeof window.getBalance === 'function') {
             return window.getBalance();
         }
-        const stored = localStorage.getItem('balance');
-        return stored ? parseFloat(stored) : 0;
+        const raw = localStorage.getItem('balance');
+        return raw ? parseFloat(raw) : 0;
     }
 
-    function buildPayload(docId) {
-        const buildings = collectBuildings();
-        const tgUser = typeof window.getTelegramUser === 'function' ? window.getTelegramUser() : null;
+    function buildSnapshot(uid) {
+        const buildings = collectBuildingsSummary();
+        const profile = collectProfileInfo();
+        const localUserId = window.currentUserId || localStorage.getItem('uniqueUserId') || null;
+
         return {
-            authUid: docId || null,
-            userId: window.currentUserId || localStorage.getItem('uniqueUserId') || null,
-            balance: collectBalance(),
+            authUid: uid,
+            publicIds: {
+                telegram: profile.telegram?.id || null,
+                local: localUserId
+            },
+            balance: getBalance(),
             buildings: {
                 ownedCount: buildings.ownedCount,
                 upgradedCount: buildings.upgradedCount,
-                status: buildings.details
+                label: buildings.label,
+                status: buildings.status
             },
             buildingsData: buildings.raw,
-            profile: {
-                ...collectProfile(),
-                telegramId: tgUser?.id || null
-            },
+            profile,
             platform: window.isTelegramApp ? 'telegram' : 'web',
             updatedAtClient: Date.now()
         };
     }
 
-    async function syncOnce() {
-        const service = getFirebaseService();
+    async function pushSnapshot() {
+        const service = getService();
         if (!service) {
             return;
         }
 
-        const docId = service.getCurrentUid ? service.getCurrentUid() : null;
-        if (!docId) {
-            console.warn('[firebase-sync] Firebase auth user is missing. Skipping sync.');
-            return;
-        }
-
-        const payload = buildPayload(docId);
-        const signature = JSON.stringify(payload);
-        if (signature === lastSignature && hasSyncedOnce) {
-            return;
-        }
-
-        try {
-            await service.saveUserProgress(docId, payload, { setFirstLogin: !hasSyncedOnce });
-            lastSignature = signature;
-            if (!hasSyncedOnce) {
-                hasSyncedOnce = true;
-                localStorage.setItem('firebase.sync.initialized', '1');
-            }
-        } catch (error) {
-            console.error('[firebase-sync] Failed to sync user progress', error);
-        }
-    }
-
-    async function startSyncLoop() {
-        if (syncTimer) {
-            return;
-        }
-
-        const service = getFirebaseService();
-        if (!service) {
-            return;
-        }
-
-        if (service.authReady) {
-            const user = await service.authReady;
-            if (!user) {
-                console.warn('[firebase-sync] Firebase auth is not ready. Data will not be synced.');
+        let uid = service.getCurrentUid && service.getCurrentUid();
+        if (!uid && typeof service.ensureAuthenticated === 'function') {
+            try {
+                const user = await service.ensureAuthenticated();
+                uid = user && user.uid;
+            } catch (error) {
+                console.error('[firebase-sync] Cannot authenticate user:', error);
                 return;
             }
         }
 
-        syncTimer = setInterval(syncOnce, SYNC_INTERVAL_MS);
-        syncOnce();
+        if (!uid) {
+            console.warn('[firebase-sync] Auth UID is missing. Skip sync.');
+            return;
+        }
+
+        const payload = buildSnapshot(uid);
+        const signature = JSON.stringify(payload);
+        if (signature === lastPayloadHash) {
+            return;
+        }
+
+        try {
+            await service.saveUserProgress(uid, payload, { setFirstLogin: !firstSyncDone });
+            lastPayloadHash = signature;
+            if (!firstSyncDone) {
+                firstSyncDone = true;
+                localStorage.setItem('firebase.sync.initialized', '1');
+            }
+        } catch (error) {
+            console.error('[firebase-sync] Failed to push snapshot', error);
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        startSyncLoop();
-    });
-    document.addEventListener('firebase-service-ready', () => {
-        startSyncLoop();
-    });
-    window.addEventListener('focus', syncOnce);
-    window.addEventListener('beforeunload', syncOnce);
-})();
+    async function ensureLoop() {
+        if (timerId) {
+            return;
+        }
 
+        const service = window.firebaseService;
+        if (!service) {
+            return;
+        }
+
+        if (typeof service.authReady !== 'undefined') {
+            const user = await service.authReady;
+            if (!user) {
+                console.warn('[firebase-sync] Firebase auth is not ready yet.');
+                return;
+            }
+        }
+
+        timerId = setInterval(pushSnapshot, SYNC_INTERVAL);
+        pushSnapshot();
+    }
+
+    document.addEventListener('DOMContentLoaded', ensureLoop);
+    document.addEventListener('firebase-service-ready', ensureLoop);
+    window.addEventListener('focus', pushSnapshot);
+    window.addEventListener('beforeunload', pushSnapshot);
+    window.addEventListener('storage', (event) => {
+        if (STORAGE_KEYS_TO_MONITOR.includes(event.key)) {
+            pushSnapshot();
+        }
+    });
+})();

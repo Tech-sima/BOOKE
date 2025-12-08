@@ -1,93 +1,104 @@
 (function () {
-    const firebaseConfig = {
-        apiKey: 'AIzaSyD0nX_4Z8xUWq3IlXuBEfhgFedwHT6bL8U"',
-        authDomain: 'booke-a3b98.firebaseapp.com',
-        projectId: 'booke-a3b98',
-        storageBucket: 'booke-a3b98.firebasestorage.app',
-        messagingSenderId: '872731055996',
-        appId: '1:872731055996:web:cdc3713efd92c46d48b6f9'
-    };
-
     const COLLECTION_NAME = 'gameProgress';
-
-    const isConfigFilled = Object.values(firebaseConfig).every((value) => {
-        return typeof value === 'string' && value.trim() !== '' && !value.includes('YOUR_FIREBASE_');
-    });
-
-let app = null;
-let db = null;
-let fieldValue = null;
-let auth = null;
-let currentUser = null;
-let resolveAuthReady = null;
-const authReady = new Promise((resolve) => {
-    resolveAuthReady = resolve;
-});
-
-function notifyAuthReady(user) {
-    currentUser = user || null;
-    if (resolveAuthReady) {
-        resolveAuthReady(currentUser);
-        resolveAuthReady = null;
-    }
-    if (currentUser) {
-        document.dispatchEvent(new CustomEvent('firebase-service-ready', { detail: { user: currentUser } }));
-    }
-}
+    const config =
+        (typeof window !== 'undefined' && (window.BOOKE_FIREBASE_CONFIG || window.firebaseConfig)) || null;
 
     if (typeof firebase === 'undefined') {
-        console.warn('[Firebase] SDK not found. Skipping initialization.');
-    notifyAuthReady(null);
-    } else if (isConfigFilled) {
-        app = firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-    auth = firebase.auth ? firebase.auth() : null;
-        fieldValue = firebase.firestore.FieldValue;
-        console.info('[Firebase] Firestore initialized.');
+        console.error(
+            '[Firebase] Firebase SDK not found. Include firebase-app-compat/firebase-auth-compat/firebase-firestore-compat before firebase-service.js.'
+        );
+        return;
+    }
 
-    if (auth) {
-        if (auth.currentUser) {
-            notifyAuthReady(auth.currentUser);
-        } else {
-            const unsubscribe = auth.onAuthStateChanged(
-                (user) => {
-                    if (user) {
-                        notifyAuthReady(user);
-                        unsubscribe();
-                    }
-                },
-                (error) => {
-                    console.error('[Firebase] Auth state error:', error);
-                    notifyAuthReady(null);
-                    unsubscribe();
-                }
-            );
+    if (!config) {
+        console.error(
+            '[Firebase] window.BOOKE_FIREBASE_CONFIG is not defined. Create js/firebase-config.js with your project keys before loading firebase-service.js.'
+        );
+        return;
+    }
+
+    let app = null;
+    let db = null;
+    let auth = null;
+    let fieldValue = null;
+    let currentUser = null;
+    let resolveAuthReady;
+
+    const authReady = new Promise((resolve) => {
+        resolveAuthReady = resolve;
+    });
+
+    function emitReady(user) {
+        currentUser = user || null;
+        if (resolveAuthReady) {
+            resolveAuthReady(currentUser);
+            resolveAuthReady = null;
+        }
+        document.dispatchEvent(new CustomEvent('firebase-service-ready', { detail: { user: currentUser } }));
+    }
+
+    function initFirebase() {
+        try {
+            app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(config);
+            db = firebase.firestore();
+            auth = firebase.auth();
+            fieldValue = firebase.firestore.FieldValue;
+        } catch (error) {
+            console.error('[Firebase] Initialization failed:', error);
+            emitReady(null);
+            return;
+        }
+
+        auth.onAuthStateChanged(
+            (user) => {
+                emitReady(user);
+            },
+            (error) => {
+                console.error('[Firebase] Auth state error:', error);
+                emitReady(null);
+            }
+        );
+
+        if (!auth.currentUser) {
             auth.signInAnonymously().catch((error) => {
                 console.error('[Firebase] Anonymous auth failed:', error);
-                notifyAuthReady(null);
             });
+        } else {
+            emitReady(auth.currentUser);
         }
     }
-    } else {
-        console.warn('[Firebase] Configuration is incomplete. Update js/firebase-service.js with your project keys.');
-    notifyAuthReady(null);
+
+    async function ensureAuthenticated() {
+        if (currentUser) {
+            return currentUser;
+        }
+        const user = await authReady;
+        if (!user) {
+            throw new Error('[Firebase] Authentication is not available.');
+        }
+        return user;
     }
 
     async function fetchUserProgress(docId) {
-        if (!db || !docId) return null;
-        const docRef = db.collection(COLLECTION_NAME).doc(docId);
-        const snapshot = await docRef.get();
-        if (!snapshot.exists) {
+        if (!db || !docId) {
             return null;
         }
-        return { id: snapshot.id, ...snapshot.data() };
+        await ensureAuthenticated();
+        const docRef = db.collection(COLLECTION_NAME).doc(docId);
+        const snapshot = await docRef.get();
+        return snapshot.exists ? { id: snapshot.id, ...snapshot.data() } : null;
     }
 
     async function saveUserProgress(docId, payload, options = {}) {
-    if (!db || !docId || !payload) return;
-        const docRef = db.collection(COLLECTION_NAME).doc(docId);
+        if (!db || !payload) {
+            return;
+        }
+        const user = await ensureAuthenticated();
+        const targetId = docId || user.uid;
+        const docRef = db.collection(COLLECTION_NAME).doc(targetId);
         const dataToSave = {
             ...payload,
+            authUid: targetId,
             updatedAt: fieldValue && fieldValue.serverTimestamp ? fieldValue.serverTimestamp() : new Date()
         };
 
@@ -98,38 +109,32 @@ function notifyAuthReady(user) {
         await docRef.set(dataToSave, { merge: true });
     }
 
-    function isEnabled() {
-        return Boolean(db);
-    }
-
-function getCurrentUser() {
-    if (currentUser) {
-        return currentUser;
-    }
-    if (auth && auth.currentUser) {
-        currentUser = auth.currentUser;
-    }
-    return currentUser;
-}
-
-function getCurrentUid() {
-    const user = getCurrentUser();
-    return user ? user.uid : null;
-}
+    initFirebase();
 
     window.firebaseService = {
-        app,
-        db,
-        isEnabled,
-    auth,
-    authReady,
+        get app() {
+            return app;
+        },
+        get db() {
+            return db;
+        },
+        get auth() {
+            return auth;
+        },
         FieldValue: fieldValue,
-    getCurrentUser,
-    getCurrentUid,
+        authReady,
+        ensureAuthenticated,
+        isReady() {
+            return Boolean(db && currentUser);
+        },
+        getCurrentUser() {
+            return currentUser;
+        },
+        getCurrentUid() {
+            return currentUser ? currentUser.uid : null;
+        },
         fetchUserProgress,
         saveUserProgress
     };
-
-window.firebaseServiceReady = authReady;
 })();
 

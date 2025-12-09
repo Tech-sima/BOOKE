@@ -72,9 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Засчитываем задачу подписки на канал при возврате в приложение
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
-            const wasChannelLinkOpened = localStorage.getItem('partner_join_channel_clicked') === 'true';
-            if (wasChannelLinkOpened && localStorage.getItem(`partner_task_completed_${PARTNER_TASK_KEYS.JOIN_PRISMAKOV}`) !== 'true') {
-                markPartnerTaskAsCompleted(PARTNER_TASK_KEYS.JOIN_PRISMAKOV);
+            const legacyFlag = localStorage.getItem('partner_join_channel_clicked') === 'true';
+            const wasChannelLinkOpened = localStorage.getItem(PARTNER_JOIN_FLAG_KEY) === 'true' || legacyFlag;
+            
+            // Поддержка старого флага, чтобы не потерять прогресс
+            if (legacyFlag) {
+                localStorage.setItem(PARTNER_JOIN_FLAG_KEY, 'true');
+            }
+            
+            if (wasChannelLinkOpened && localStorage.getItem(`partner_task_completed_${PARTNER_TASK_KEYS.JOIN_BOOKE}`) !== 'true') {
+                markPartnerTaskAsCompleted(PARTNER_TASK_KEYS.JOIN_BOOKE);
             }
         }
     });
@@ -83,22 +90,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const PARTNER_TASK_KEYS = {
-    JOIN_PRISMAKOV: 'partner_join_prismakov'
+    JOIN_BOOKE: 'partner_join_booke'
 };
+
+const PARTNER_CHANNEL_LINK = 'https://t.me/bookecoin';
+const PARTNER_JOIN_FLAG_KEY = 'partner_join_booke_clicked';
 
 // Функция для получения данных партнерских заданий
 function getPartnerTasksData(category = 'social') {
-    const joinCompleted = localStorage.getItem(`partner_task_completed_${PARTNER_TASK_KEYS.JOIN_PRISMAKOV}`) === 'true';
+    const joinCompleted = localStorage.getItem(`partner_task_completed_${PARTNER_TASK_KEYS.JOIN_BOOKE}`) === 'true';
 
     const socialTasks = [
         {
-            id: PARTNER_TASK_KEYS.JOIN_PRISMAKOV,
-            title: "Присоединись к Prismakov's path",
-            description: 'Открой канал и подпишись',
+            id: PARTNER_TASK_KEYS.JOIN_BOOKE,
+            title: 'Присоединяйтесь к BOOKE',
+            description: 'Вступите в наш Telegram-канал',
             reward: '50 000',
             progress: joinCompleted ? 1 : 0,
             target: 1,
-            status: getPartnerTaskStatus(PARTNER_TASK_KEYS.JOIN_PRISMAKOV, joinCompleted)
+            status: getPartnerTaskStatus(PARTNER_TASK_KEYS.JOIN_BOOKE, joinCompleted)
         }
     ];
 
@@ -141,6 +151,17 @@ function renderPartnerTasks(category = 'social') {
     const container = document.getElementById('tasks-list');
     if (!container) return;
     
+    const flashClaimHighlight = (el, originalBorder) => {
+        if (!el) return;
+        const prevBoxShadow = el.style.boxShadow;
+        el.style.border = '1px solid rgba(76,175,80,0.9)';
+        el.style.boxShadow = '0 0 0 2px rgba(76,175,80,0.5)';
+        setTimeout(() => {
+            el.style.border = originalBorder || el.style.border;
+            el.style.boxShadow = prevBoxShadow || '';
+        }, 220);
+    };
+    
     container.innerHTML = '';
     
     // Получаем актуальные данные заданий для выбранной категории
@@ -177,6 +198,7 @@ function renderPartnerTasks(category = 'social') {
 
         taskCard.style.background = backgroundColor;
         taskCard.style.border = `1px solid ${borderColor}`;
+        const originalBorder = taskCard.style.border;
 
         taskCard.onmouseenter = () => {
             taskCard.style.transform = 'translateY(-2px)';
@@ -234,6 +256,7 @@ function renderPartnerTasks(category = 'social') {
         taskCard.onclick = () => {
             if (task.status === 'completed') {
                 // Выдача награды
+                flashClaimHighlight(taskCard, originalBorder);
                 markPartnerTaskAsClaimed(task.id);
                 const rewardValue = parseInt(task.reward.replace(/\s/g, ''));
                 const currentBalance = window.getBalance ? window.getBalance() : parseFloat(localStorage.getItem('balance') || '100');
@@ -249,19 +272,21 @@ function renderPartnerTasks(category = 'social') {
                 }
             } else if (task.status === 'pending') {
                 // Специальное действие для задачи подписки на канал
-                if (task.id === PARTNER_TASK_KEYS.JOIN_PRISMAKOV) {
+                if (task.id === PARTNER_TASK_KEYS.JOIN_BOOKE) {
                     const tg = (window.Telegram && Telegram.WebApp) ? Telegram.WebApp : null;
-                    const link = 'https://t.me/prismakovchannel';
+                    const link = PARTNER_CHANNEL_LINK;
                     try {
                         if (tg && typeof tg.openTelegramLink === 'function') {
                             tg.openTelegramLink(link);
                         } else {
                             window.open(link, '_blank');
                         }
-                        localStorage.setItem('partner_join_channel_clicked', 'true');
+                        localStorage.setItem(PARTNER_JOIN_FLAG_KEY, 'true');
+                        localStorage.removeItem('partner_join_channel_clicked');
                     } catch (e) {
                         window.open(link, '_blank');
-                        localStorage.setItem('partner_join_channel_clicked', 'true');
+                        localStorage.setItem(PARTNER_JOIN_FLAG_KEY, 'true');
+                        localStorage.removeItem('partner_join_channel_clicked');
                     }
                 }
             }

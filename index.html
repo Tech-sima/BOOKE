@@ -1183,57 +1183,14 @@
 
     <!-- Phone panel (mobile) -->
     <div id="phone-panel" class="panel phone-panel modal" style="display:none;">
-        <button id="phone-close" class="phone-close">&times;</button>
         <div id="phone-placeholder" class="phone-placeholder">
             <p>в разработке</p>
             <div id="phone-gesture-bar" class="phone-gesture-bar"></div>
         </div>
         <!-- Home grid with app icons -->
-        <div id="phone-home" class="phone-home">
-            <button id="app-bookeio" class="phone-app" style="position:relative;"><img src="assets/icons/book.svg" class="icon" alt><span>BOOKEIO</span></button>
-            <button id="app-delivery" class="phone-app" style="position:relative;"><img src="assets/icons/delivery.svg" class="icon" alt><span>DELIVERY</span></button>
-            <button id="app-messages" class="phone-app" style="position:relative;"><img src="assets/icons/message.svg" class="icon" alt><span>MESSAGES</span><span class="red-dot" id="msg-dot"></span></button>
-        </div>
-        <!-- Bookeio app screen -->
-        <div id="bookeio-app" class="phone-screen" style="display:none;">
-            <h3>BOOKEIO</h3>
-            <div class="bookeio-grid">
-                <div class="bookeio-column">
-                    <h4>ЖУРНАЛЫ</h4>
-                    <img src="assets/icons/book.svg" class="app-item-img" alt>
-                    <div class="slider-row">
-                        <input type="range" id="mag-slider" min="0" max="1000" value="0">
-                        <span id="mag-qty" class="qty-label">0</span>
-                        <span id="mag-cost" class="cost-label">0$</span>
-                    </div>
-                    <button id="btn-order-mag" class="order-btn">ЗАКАЗАТЬ</button>
-                </div>
-                <div class="bookeio-column">
-                    <h4>КНИГИ</h4>
-                    <img src="assets/icons/book.svg" class="app-item-img" alt>
-                    <div class="slider-row">
-                        <input type="range" id="book-slider" min="0" max="1000" value="0">
-                        <span id="book-qty" class="qty-label">0</span>
-                        <span id="book-cost" class="cost-label">0$</span>
-                    </div>
-                    <button id="btn-order-book" class="order-btn">ЗАКАЗАТЬ</button>
-                </div>
-            </div>
-            <button class="phone-back" style="margin-top:auto;">← Назад</button>
-        </div>
-        <!-- Delivery app screen -->
-        <div id="delivery-app" class="phone-screen" style="display:none;">
-            <h3>ДОСТАВКА</h3>
-            <div id="orders-container" style="flex:1;width:100%;overflow-y:auto;margin-bottom:8px;"></div>
-            <button id="btn-collect-all" style="margin-top:auto;">Забрать всё</button>
-            <button class="phone-back" style="margin-top:4px;">← Назад</button>
-        </div>
+        <div id="phone-home" class="phone-home"></div>
         <!-- Messages app screen -->
-        <div id="messages-app" class="phone-screen" style="display:none;">
-            <h3>MESSAGES</h3>
-            <div id="messages-container" style="flex:1;width:100%;overflow-y:auto;margin-bottom:8px;"></div>
-            <button class="phone-back" style="margin-top:auto;">← Назад</button>
-        </div>
+        
     </div>
 
     <!-- Profile panel -->

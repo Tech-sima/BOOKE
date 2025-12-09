@@ -374,25 +374,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     border-radius:4px;
     box-shadow:0 0 12px rgba(241,20,33,0.4);
 }
-.phone-close{
-    position:absolute;
-    top:-14px;
-    right:-14px;
-    width:30px;
-    height:30px;
-    background:#f11421;
-    border:none;
-    color:#fff;
-    font-size:20px;
-    border-radius:50%;
-    cursor:pointer;
-    z-index:20;
-    box-shadow:0 8px 18px rgba(0,0,0,0.45);
-    transition:transform .25s ease;
-}
-.phone-close:hover{
-    transform:scale(1.08);
-}
+.phone-close{display:none;}
 .phone-home{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px;width:100%;}
 .phone-app{width:72px;height:72px;background:#6d6d6d;border:none;border-radius:22px;color:#fff;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:6px;padding:6px;}
 .phone-app .icon{width:28px;height:28px;}
@@ -402,47 +384,59 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .phone-placeholder{
     position:absolute;
     inset:7px;
-    background:#fff;
+    /* Черно-красный современный узор */
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,0,64,0.35), transparent 32%),
+        radial-gradient(circle at 80% 15%, rgba(255,64,0,0.3), transparent 28%),
+        radial-gradient(circle at 70% 70%, rgba(255,0,0,0.35), transparent 34%),
+        linear-gradient(135deg, rgba(0,0,0,0.9), rgba(20,20,20,0.9)),
+        repeating-linear-gradient(45deg, rgba(255,0,64,0.08) 0 10px, rgba(255,0,64,0) 10px 20px);
     border-radius:41px;
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:flex-start;
-    gap:24px;
+    justify-content:center;
+    gap:20px;
     text-align:center;
-    color:#050505;
+    color:#f7f7f7;
     text-transform:uppercase;
     letter-spacing:0.12em;
     font-size:16px;
     font-weight:700;
     z-index:10;
-    box-shadow:0 10px 20px rgba(0,0,0,0.22);
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
     padding:48px 20px 12px;
-    border:1px solid rgba(5,5,5,0.65);
+    border:1px solid rgba(255,0,64,0.35);
 }
 .phone-placeholder::before{
     content:'';
     position:absolute;
-    top:6px;
+    top:12px;
     left:50%;
     transform:translateX(-50%);
     width:98px;
     height:24px;
-    background:#020202;
+    background:linear-gradient(180deg, rgba(0,0,0,0.9), rgba(10,10,10,0.9));
+    border:1px solid rgba(255,255,255,0.38);
     border-radius:999px;
-    box-shadow:0 4px 8px rgba(0,0,0,0.35);
+    box-shadow:0 6px 12px rgba(0,0,0,0.45), 0 0 0 4px rgba(255,255,255,0.05);
 }
 .phone-placeholder p{
-    margin:12px 0 0;
+    margin:0;
+    text-align:center;
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 .phone-gesture-bar{
     width:108px;
-    height:7px;
+    height:4px;
     border-radius:999px;
-    background:#050505;
-    opacity:0.55;
+    background:#ffffff;
+    opacity:0.9;
     margin-top:auto;
-    margin-bottom:2px;
+    margin-bottom:-2px;
 }
 #orders-container .order-item{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;background:#6d6d6d;border-radius:8px;padding:6px 8px;margin-bottom:4px;font-size:12px;}
 .order-item input[type=checkbox]{width:16px;height:16px;accent-color:#4caf50;}
@@ -477,11 +471,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 #profile-panel {
   z-index:130!important;
 }
-
-#messages-app{display:flex;flex-direction:column;align-items:center;width:100%;}
-#messages-container{flex:1;width:100%;overflow-y:auto;padding-right:4px;box-sizing:border-box;}
-#messages-container::-webkit-scrollbar{width:4px;} 
-#messages-container::-webkit-scrollbar-thumb{background:#888;border-radius:2px;} 
 
 /* === PANEL ANIMATIONS === */
 /* Анимация появления панелей снизу вверх */

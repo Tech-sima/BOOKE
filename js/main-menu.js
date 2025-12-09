@@ -896,7 +896,8 @@
                 indicator.style.top = (zoneRect.top - 20) + 'px';
             }
             indicator.style.right = (window.innerWidth - zoneRect.right + 35) + 'px';
-            indicator.style.zIndex = '1000';
+            // Держим индикаторы ниже правой панели, но выше карты
+            indicator.style.zIndex = '90';
             
             document.body.appendChild(indicator);
 
@@ -6187,6 +6188,14 @@
             window.setPlayerMoney(currentMoney + deliveryOrder.totalCost);
         }
         
+        // Засчитываем игровое задание на доставку журналов
+        if (deliveryOrder.magazines > 0) {
+            localStorage.setItem('hasDeliveredMagazines', 'true');
+            if (window.markTaskAsCompleted) {
+                window.markTaskAsCompleted('task_deliver_magazines');
+            }
+        }
+        
         // Убираем из очереди
         const index = deliveryQueue.findIndex(order => order.id === deliveryOrder.id);
         if (index > -1) {
@@ -6203,21 +6212,6 @@
         const progressPanel = document.getElementById('delivery-progress-panel');
         if (progressPanel) {
             progressPanel.remove();
-        }
-        
-        // Показываем уведомление
-        if (window.showNotification) {
-            const timeText = deliveryOrder.isExpedited ? '3 минуты' : '30 минут';
-            window.showNotification(`✅ Доставка завершена! Получено: ${deliveryOrder.totalCost}$`, 'success');
-        }
-        
-        // Отправляем уведомление на телефон
-        if (window.pushNotification) {
-            const timeText = deliveryOrder.isExpedited ? '3 минуты' : '30 минут';
-            const booksText = deliveryOrder.books > 0 ? `${deliveryOrder.books} книг` : '';
-            const magazinesText = deliveryOrder.magazines > 0 ? `${deliveryOrder.magazines} журналов` : '';
-            const itemsText = [booksText, magazinesText].filter(text => text).join(', ');
-            window.pushNotification('DELIVERY', `Доставка завершена! Продано: ${itemsText}. Доход: ${deliveryOrder.totalCost}$`, 'assets/icons/delivery.svg');
         }
         
         // Открываем панель почты

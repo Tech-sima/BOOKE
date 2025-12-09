@@ -1850,23 +1850,6 @@ if(refValue) refValue.textContent=getRefs()+'/5';
 const phonePanel=document.getElementById('phone-panel');
 if(phonePanel){
     const phoneHome=document.getElementById('phone-home');
-    const bookeioScreen=document.getElementById('bookeio-app');
-    const deliveryScreen=document.getElementById('delivery-app');
-    const messagesScreen=document.getElementById('messages-app');
-
-    function showHome(){
-        phoneHome.style.display='flex';
-        bookeioScreen.style.display='none';
-        deliveryScreen.style.display='none';
-        messagesScreen.style.display='none';
-    }
-    function openScreen(scr){
-        phoneHome.style.display='none';
-        bookeioScreen.style.display='none';
-        deliveryScreen.style.display='none';
-        scr.style.display='flex';
-    }
-
     // открытие/закрытие телефона
     function toggleCircles(show){
         const list=[incomeProgress,incomeBank,factoryProgressDiv,factoryBankDiv,storageProgressDiv];
@@ -1887,12 +1870,11 @@ if(phonePanel){
 
     safeAddEventListener('btn-phone', 'click', () => {
         showPanelWithAnimation('phone-panel');
-        showHome();
+        if (phoneHome) phoneHome.style.display='flex';
         toggleCircles(false);
         setActiveSideButton('btn-phone');
     });
     safeAddEventListener('phone-close', 'click', closePhonePanel);
-    document.querySelectorAll('.phone-back').forEach(btn=>btn.addEventListener('click',()=>{showHome();}));
     const phoneGestureBar=document.getElementById('phone-gesture-bar');
     if(phoneGestureBar){
         let startY=null;
@@ -1920,121 +1902,11 @@ if(phonePanel){
         });
         phoneGestureBar.addEventListener('click',closePhonePanel);
     }
-    safeAddEventListener('app-bookeio', 'click', () => openScreen(bookeioScreen));
-    safeAddEventListener('app-delivery', 'click', () => {refreshDeliveryList();openScreen(deliveryScreen);});
-    safeAddEventListener('app-messages', 'click', () => {renderMessages();openScreen(messagesScreen);messagesArr.forEach(m=>m.read=true);saveMessages();updateDots();});
-
-    // данные заказов и цены
-    const BOOK_COST=50;
-    const MAG_COST=10;
-    const SELL_MULT=2;
-    orders=JSON.parse(localStorage.getItem('orders')||'[]');
-    function saveOrders(){localStorage.setItem('orders',JSON.stringify(orders));}
-
-    // слайдеры и отображение стоимости
-    const bookSlider=document.getElementById('book-slider');
-    const magSlider=document.getElementById('mag-slider');
-    const bookCostLabel=document.getElementById('book-cost');
-    const magCostLabel=document.getElementById('mag-cost');
-    const bookQtyLabel=document.getElementById('book-qty');
-    const magQtyLabel=document.getElementById('mag-qty');
-    function updateCostLabels(){
-        bookCostLabel.textContent = formatNumber(bookSlider.value*BOOK_COST)+'$';
-        magCostLabel.textContent = formatNumber(magSlider.value*MAG_COST)+'$';
-        bookQtyLabel.textContent = bookSlider.value;
-        magQtyLabel.textContent  = magSlider.value;
-    }
-    if(bookSlider){bookSlider.addEventListener('input',updateCostLabels);} 
-    if(magSlider){magSlider.addEventListener('input',updateCostLabels);}
-    updateCostLabels();
-
-    // отдельные заказы
-    const orderBookBtn=document.getElementById('btn-order-book');
-    const orderMagBtn=document.getElementById('btn-order-mag');
-    if(orderBookBtn){orderBookBtn.addEventListener('click',()=>{
-        const qty=parseInt(bookSlider.value);
-        if(qty<=0){alert('Выберите количество');return;}
-        const cost=qty*BOOK_COST;
-        if(getBalance()<cost){alert('Недостаточно BC');return;}
-        setBalance(getBalance()-cost);
-        bookSlider.value=0;updateCostLabels();
-        alert('Заказ оформлен!');
-        const qtyCopy=qty;
-        setTimeout(()=>{
-            orders.push({type:'books',qty:qtyCopy,cost:cost});
-            saveOrders();
-            pushNotification('DELIVERY',`Книги (${qtyCopy}) доставлены на почту`,'assets/icons/delivery.svg');
-            updateDots();
-            refreshDeliveryList();
-        },15000);
-    });}
-    if(orderMagBtn){orderMagBtn.addEventListener('click',()=>{
-        const qty=parseInt(magSlider.value);
-        if(qty<=0){alert('Выберите количество');return;}
-        const cost=qty*MAG_COST;
-        if(getBalance()<cost){alert('Недостаточно BC');return;}
-        setBalance(getBalance()-cost);
-        magSlider.value=0;updateCostLabels();
-        alert('Заказ оформлен!');
-        const qtyCopy=qty;
-        setTimeout(()=>{
-            orders.push({type:'magazines',qty:qtyCopy,cost:cost});
-            saveOrders();
-            pushNotification('DELIVERY',`Журналы (${qtyCopy}) доставлены на почту`,'assets/icons/delivery.svg');
-            updateDots();
-            refreshDeliveryList();
-        },15000);
-    });}
-
-    function refreshDeliveryList(){
-        const cont=document.getElementById('orders-container');
-        cont.innerHTML='';
-        if(orders.length===0){cont.innerHTML='<p style="text-align:center;width:100%;opacity:.6">Нет заказов</p>';return;}
-        orders.forEach(o=>{
-            const div=document.createElement('div');
-            div.className='order-item';
-            div.innerHTML=`<span>${o.type==='books'?'Книги':'Журналы'} ×${o.qty}</span><span>${formatNumber(o.cost)}$</span>`;
-            cont.appendChild(div);
-        });
-    }
-
-    // удалён старый обработчик "забрать всё" (моментальная продажа). Новый обработчик определён ниже.
+    document.querySelectorAll('.phone-back').forEach(btn=>btn.addEventListener('click',()=>{}));
 } 
 
-// === NOTIFICATION & MESSAGES ===
-let messagesArr=JSON.parse(localStorage.getItem('messages')||'[]');
-function saveMessages(){localStorage.setItem('messages',JSON.stringify(messagesArr));}
-function hasUnread(){return messagesArr.some(m=>!m.read);} 
-function updateDots(){
-   const show=hasUnread();
-   document.getElementById('phone-dot').style.display=show?'block':'none';
-   document.getElementById('msg-dot').style.display=show?'block':'none';
-}
-function pushNotification(app,text,icon){
-   const msg={app,text,time:Date.now(),read:false,icon};
-   messagesArr.push(msg);saveMessages();updateDots();
-}
-function formatTimeHHMM(t){const d=new Date(t);return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
-function renderMessages(){
-   const cont=document.getElementById('messages-container');if(!cont) return;
-   cont.innerHTML='';
-   messagesArr.slice().reverse().forEach(m=>{
-      const item=document.createElement('div');item.style.cssText='display:flex;align-items:center;gap:6px;background:#6d6d6d;border-radius:8px;padding:6px;margin-bottom:6px;font-size:12px;';
-      item.innerHTML=`<img src="${m.icon||'assets/icons/delivery.svg'}" style="width:24px;height:24px;"> <div style="flex:1;">${m.text}</div><span style="opacity:.6;">${formatTimeHHMM(m.time)}</span>`;
-      cont.appendChild(item);
-   });
-}
-// статус-бар время
-setInterval(()=>{
-    const t=new Date();
-    const phoneStatus = document.getElementById('phone-status');
-    if(phoneStatus) {
-        phoneStatus.textContent=t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    }
-},1000*30);
-// open Messages app (обработчик добавлен внутри phonePanel блока)
-// initialize dots
-updateDots(); 
+// Отключенная система уведомлений/сообщений
+function pushNotification(){/* no-op */} 
 
 // === PLAYER LEVEL SYSTEM ===
 const XP_BASE=20;

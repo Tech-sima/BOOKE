@@ -86,7 +86,6 @@ const TASK_KEYS = {
     EARN_100: 'task_earn_100',
     EARN_300: 'task_earn_300', 
     EARN_500: 'task_earn_500',
-    HIRE_REGGI: 'task_hire_reggi',
     DELIVER_MAGAZINES: 'task_deliver_magazines',
     PRINT_BOOK: 'task_print_book'
 };
@@ -94,7 +93,6 @@ const TASK_KEYS = {
 // Функция для получения данных заданий с учетом сохраненного прогресса
 function getGameTasksData() {
     const currentBalance = window.getBalance ? window.getBalance() : parseFloat(localStorage.getItem('balance') || '100');
-    const hasReggi = localStorage.getItem('hasReggi') === 'true';
     const hasDeliveredMagazines = localStorage.getItem('hasDeliveredMagazines') === 'true';
     const hasPrintedBook = localStorage.getItem('hasPrintedBook') === 'true';
     
@@ -123,18 +121,9 @@ function getGameTasksData() {
             status: getTaskStatus(TASK_KEYS.EARN_300, currentBalance >= 300)
         },
         {
-            id: TASK_KEYS.HIRE_REGGI,
-            title: 'Нанять Реджи',
-            description: 'Наймите персонажа Реджи в свою команду',
-            reward: '10 000',
-            progress: hasReggi ? 1 : 0,
-            target: 1,
-            status: getTaskStatus(TASK_KEYS.HIRE_REGGI, hasReggi)
-        },
-        {
             id: TASK_KEYS.DELIVER_MAGAZINES,
             title: 'Доставить журналы в библиотеку',
-            description: 'Доставьте журналы в библиотеку для получения награды',
+            description: 'Завершите доставку журналов в библиотеку',
             reward: '3 000',
             progress: hasDeliveredMagazines ? 1 : 0,
             target: 1,
@@ -175,7 +164,6 @@ function getTaskStatus(taskKey, isCompleted) {
 // Функция для проверки выполнения заданий
 function checkTasksCompletion() {
     const currentBalance = window.getBalance ? window.getBalance() : parseFloat(localStorage.getItem('balance') || '100');
-    const hasReggi = localStorage.getItem('hasReggi') === 'true';
     const hasDeliveredMagazines = localStorage.getItem('hasDeliveredMagazines') === 'true';
     const hasPrintedBook = localStorage.getItem('hasPrintedBook') === 'true';
     
@@ -198,11 +186,6 @@ function checkTasksCompletion() {
     }
     
     // Проверяем остальные задания
-    if (hasReggi && localStorage.getItem(`task_completed_${TASK_KEYS.HIRE_REGGI}`) !== 'true') {
-        localStorage.setItem(`task_completed_${TASK_KEYS.HIRE_REGGI}`, 'true');
-        hasUpdates = true;
-    }
-    
     if (hasDeliveredMagazines && localStorage.getItem(`task_completed_${TASK_KEYS.DELIVER_MAGAZINES}`) !== 'true') {
         localStorage.setItem(`task_completed_${TASK_KEYS.DELIVER_MAGAZINES}`, 'true');
         hasUpdates = true;
@@ -244,6 +227,17 @@ function markTaskAsClaimed(taskId) {
 function renderGameTasks() {
     const container = document.getElementById('game-tasks-list');
     if (!container) return;
+    
+    const flashClaimHighlight = (el, originalBorder) => {
+        if (!el) return;
+        const prevBoxShadow = el.style.boxShadow;
+        el.style.border = '1px solid rgba(76,175,80,0.9)';
+        el.style.boxShadow = '0 0 0 2px rgba(76,175,80,0.5)';
+        setTimeout(() => {
+            el.style.border = originalBorder || el.style.border;
+            el.style.boxShadow = prevBoxShadow || '';
+        }, 220);
+    };
     
     // Получаем данные заданий
     const tasks = getGameTasksData();
@@ -289,6 +283,7 @@ function renderGameTasks() {
         
         taskCard.style.background = backgroundColor;
         taskCard.style.border = `1px solid ${borderColor}`;
+        const originalBorder = taskCard.style.border;
         
         // Добавляем hover эффект
         taskCard.onmouseenter = () => {
@@ -352,6 +347,7 @@ function renderGameTasks() {
         // Добавляем обработчик клика на всю карточку
         taskCard.onclick = () => {
             if (task.status === 'completed') {
+                flashClaimHighlight(taskCard, originalBorder);
                 claimTaskReward(task);
             }
         };
@@ -429,9 +425,8 @@ window.onMoneyEarned = function(amount) {
 };
 
 window.onReggiHired = function() {
-    // Вызывается при найме Реджи
+    // Квест убран; сохраняем флаг для возможной логики без отметки задания
     localStorage.setItem('hasReggi', 'true');
-    markTaskAsCompleted(TASK_KEYS.HIRE_REGGI);
 };
 
 window.onSofaBought = function() {

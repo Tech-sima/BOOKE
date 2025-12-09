@@ -32,7 +32,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   border-top:1px solid rgba(58,58,58,0.8);
   box-shadow:0 -2px 6px rgba(0,0,0,.15);
   backdrop-filter:blur(6px);
-  z-index:10;
+  z-index:40;
 }
 #bottom-nav button{
   flex:1;
@@ -56,6 +56,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Side bar update */
 .side-bar{position:fixed;margin-right:-16px;margin-top:calc(40px + env(safe-area-inset-top, 0px));right:0;width:80px;height:auto;background:transparent;border-top-left-radius:40px;border-bottom-left-radius:40px;padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:0;}
+.side-bar{z-index:35;}
 .side-btn{width:80px;height:80px;background:transparent;border:none;border-radius:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background-color 0.2s ease;}
 .side-btn img{width:38px;height:38px;}
 .side-btn.active{background:#fff;color:#4D4D4D;}

@@ -196,6 +196,9 @@ function checkTasksCompletion() {
         hasUpdates = true;
     }
     
+    // Автоматически выдаем награды за все выполненные, но не полученные задания
+    autoClaimCompletedGameTasks();
+    
     // Если есть обновления, перерисовываем панель заданий
     if (hasUpdates) {
         renderGameTasks();
@@ -203,6 +206,19 @@ function checkTasksCompletion() {
         const tasks = getGameTasksData();
         updateTaskCounters(tasks);
     }
+}
+
+// Автовыдача наград за выполненные задания
+function autoClaimCompletedGameTasks() {
+    const tasks = getGameTasksData();
+    tasks.forEach(task => {
+        const isCompleted = localStorage.getItem(`task_completed_${task.id}`) === 'true';
+        const isClaimed = localStorage.getItem(`task_claimed_${task.id}`) === 'true';
+        if (isCompleted && !isClaimed) {
+            // Выдаем награду и отмечаем как полученную
+            claimTaskReward(task);
+        }
+    });
 }
 
 // Функция для отметки задания как выполненного

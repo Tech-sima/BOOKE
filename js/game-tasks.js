@@ -161,6 +161,28 @@ function getTaskStatus(taskKey, isCompleted) {
     return 'pending';
 }
 
+// Автовыдача награды при завершении
+function autoClaimGameReward(taskId) {
+    const isClaimed = localStorage.getItem(`task_claimed_${taskId}`) === 'true';
+    const isCompleted = localStorage.getItem(`task_completed_${taskId}`) === 'true';
+    if (isClaimed || !isCompleted) return;
+    
+    const tasks = getGameTasksData();
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const rewardValue = parseInt(task.reward.replace(/\s/g, ''));
+    if (window.setBalance && window.getBalance) {
+        const currentBalance = window.getBalance();
+        window.setBalance(currentBalance + rewardValue);
+    }
+    
+    localStorage.setItem(`task_claimed_${taskId}`, 'true');
+    renderGameTasks();
+    const updatedTasks = getGameTasksData();
+    updateTaskCounters(updatedTasks);
+}
+
 // Функция для проверки выполнения заданий
 function checkTasksCompletion() {
     const currentBalance = window.getBalance ? window.getBalance() : parseFloat(localStorage.getItem('balance') || '100');
@@ -172,32 +194,34 @@ function checkTasksCompletion() {
     // Проверяем денежные задания
     if (currentBalance >= 100 && localStorage.getItem(`task_completed_${TASK_KEYS.EARN_100}`) !== 'true') {
         localStorage.setItem(`task_completed_${TASK_KEYS.EARN_100}`, 'true');
+        autoClaimGameReward(TASK_KEYS.EARN_100);
         hasUpdates = true;
     }
     
     if (currentBalance >= 300 && localStorage.getItem(`task_completed_${TASK_KEYS.EARN_300}`) !== 'true') {
         localStorage.setItem(`task_completed_${TASK_KEYS.EARN_300}`, 'true');
+        autoClaimGameReward(TASK_KEYS.EARN_300);
         hasUpdates = true;
     }
     
     if (currentBalance >= 500 && localStorage.getItem(`task_completed_${TASK_KEYS.EARN_500}`) !== 'true') {
         localStorage.setItem(`task_completed_${TASK_KEYS.EARN_500}`, 'true');
+        autoClaimGameReward(TASK_KEYS.EARN_500);
         hasUpdates = true;
     }
     
     // Проверяем остальные задания
     if (hasDeliveredMagazines && localStorage.getItem(`task_completed_${TASK_KEYS.DELIVER_MAGAZINES}`) !== 'true') {
         localStorage.setItem(`task_completed_${TASK_KEYS.DELIVER_MAGAZINES}`, 'true');
+        autoClaimGameReward(TASK_KEYS.DELIVER_MAGAZINES);
         hasUpdates = true;
     }
     
     if (hasPrintedBook && localStorage.getItem(`task_completed_${TASK_KEYS.PRINT_BOOK}`) !== 'true') {
         localStorage.setItem(`task_completed_${TASK_KEYS.PRINT_BOOK}`, 'true');
+        autoClaimGameReward(TASK_KEYS.PRINT_BOOK);
         hasUpdates = true;
     }
-    
-    // Автоматически выдаем награды за все выполненные, но не полученные задания
-    autoClaimCompletedGameTasks();
     
     // Если есть обновления, перерисовываем панель заданий
     if (hasUpdates) {
@@ -208,22 +232,10 @@ function checkTasksCompletion() {
     }
 }
 
-// Автовыдача наград за выполненные задания
-function autoClaimCompletedGameTasks() {
-    const tasks = getGameTasksData();
-    tasks.forEach(task => {
-        const isCompleted = localStorage.getItem(`task_completed_${task.id}`) === 'true';
-        const isClaimed = localStorage.getItem(`task_claimed_${task.id}`) === 'true';
-        if (isCompleted && !isClaimed) {
-            // Выдаем награду и отмечаем как полученную
-            claimTaskReward(task);
-        }
-    });
-}
-
 // Функция для отметки задания как выполненного
 function markTaskAsCompleted(taskId) {
     localStorage.setItem(`task_completed_${taskId}`, 'true');
+    autoClaimGameReward(taskId);
     renderGameTasks();
     // Обновляем счетчики
     const tasks = getGameTasksData();
@@ -243,17 +255,6 @@ function markTaskAsClaimed(taskId) {
 function renderGameTasks() {
     const container = document.getElementById('game-tasks-list');
     if (!container) return;
-    
-    const flashClaimHighlight = (el, originalBorder) => {
-        if (!el) return;
-        const prevBoxShadow = el.style.boxShadow;
-        el.style.border = '1px solid rgba(76,175,80,0.9)';
-        el.style.boxShadow = '0 0 0 2px rgba(76,175,80,0.5)';
-        setTimeout(() => {
-            el.style.border = originalBorder || el.style.border;
-            el.style.boxShadow = prevBoxShadow || '';
-        }, 220);
-    };
     
     // Получаем данные заданий
     const tasks = getGameTasksData();
@@ -299,7 +300,6 @@ function renderGameTasks() {
         
         taskCard.style.background = backgroundColor;
         taskCard.style.border = `1px solid ${borderColor}`;
-        const originalBorder = taskCard.style.border;
         
         // Добавляем hover эффект
         taskCard.onmouseenter = () => {
@@ -363,7 +363,6 @@ function renderGameTasks() {
         // Добавляем обработчик клика на всю карточку
         taskCard.onclick = () => {
             if (task.status === 'completed') {
-                flashClaimHighlight(taskCard, originalBorder);
                 claimTaskReward(task);
             }
         };
@@ -440,11 +439,6 @@ window.onMoneyEarned = function(amount) {
     checkTasksCompletion();
 };
 
-window.onReggiHired = function() {
-    // Квест убран; сохраняем флаг для возможной логики без отметки задания
-    localStorage.setItem('hasReggi', 'true');
-};
-
 window.onSofaBought = function() {
     // Вызывается при покупке дивана
     localStorage.setItem('hasSofa', 'true');
@@ -465,7 +459,6 @@ window.testTaskSystem = {
             localStorage.removeItem(`task_completed_${key}`);
             localStorage.removeItem(`task_claimed_${key}`);
         });
-        localStorage.removeItem('hasReggi');
         localStorage.removeItem('hasDeliveredMagazines');
         localStorage.removeItem('hasPrintedBook');
         localStorage.removeItem('gameTasksRewardsClaimed');
@@ -483,8 +476,6 @@ window.testTaskSystem = {
             window.setBalance(1000); // Больше 500 для выполнения всех денежных заданий
         }
         
-        // Отмечаем остальные задания как выполненные
-        localStorage.setItem('hasReggi', 'true');
         localStorage.setItem('hasDeliveredMagazines', 'true');
         localStorage.setItem('hasPrintedBook', 'true');
         

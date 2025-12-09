@@ -2448,10 +2448,6 @@ function assignEmployee(building, empName) {
         // Назначаем сотрудника
         assignments[building] = empName;
         
-        // Проверяем, был ли нанят Реджи
-        if (empName === 'Реджи' && window.onReggiHired) {
-            window.onReggiHired();
-        }
     }
     
     // Сохраняем в localStorage

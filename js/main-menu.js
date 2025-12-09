@@ -749,12 +749,7 @@
             
             // Проверяем, не существует ли уже индикатор для этого здания
             const existingIndicator = document.getElementById(`profit-${buildingType}`);
-            let prevPosition = null;
             if (existingIndicator) {
-                prevPosition = {
-                    top: existingIndicator.style.top,
-                    right: existingIndicator.style.right
-                };
                 existingIndicator.remove();
             }
             
@@ -894,16 +889,15 @@
             
             // Позиционируем индикатор относительно экрана
             indicator.style.position = 'fixed';
-            // Позиционирование (фиксированные точки, без "езды")
-            const baseTop = buildingType === 'factory'
-                ? zoneRect.bottom + 70 // завод опускаем еще на 20px
-                : zoneRect.top - 20;
-            const baseRight = window.innerWidth - zoneRect.right + 35;
-            // Если индикатор уже был, сохраняем прежние координаты, чтобы не "прыгало" при кликах
-            indicator.style.top = prevPosition && prevPosition.top ? prevPosition.top : Math.round(baseTop) + 'px';
-            indicator.style.right = prevPosition && prevPosition.right ? prevPosition.right : Math.round(baseRight) + 'px';
-            // Держим индикаторы ниже основных модальных панелей, но выше боковых/нижних панелей и карты
-            indicator.style.zIndex = '60';
+            // Для завода круг размещается в нижней части здания (исключение)
+            if (buildingType === 'factory') {
+                indicator.style.top = (zoneRect.bottom + 75) + 'px';
+            } else {
+                indicator.style.top = (zoneRect.top - 20) + 'px';
+            }
+            indicator.style.right = (window.innerWidth - zoneRect.right + 65) + 'px';
+            // Держим индикаторы ниже правой панели, но выше карты
+            indicator.style.zIndex = '90';
             
             document.body.appendChild(indicator);
 
@@ -984,7 +978,7 @@
             } else {
                 indicator.style.top = (zoneRect.top - 20) + 'px';
             }
-            indicator.style.right = (window.innerWidth - zoneRect.right + 35) + 'px';
+            indicator.style.right = (window.innerWidth - zoneRect.right + 65) + 'px';
         });
     }
     
@@ -3842,11 +3836,11 @@
                     state.el.style.position = 'fixed';
                     // Для завода круг размещается в нижней части здания (исключение)
                     if (buildingType === 'factory') {
-                        state.el.style.top = (zoneRect.bottom + 50) + 'px';
+                        state.el.style.top = (zoneRect.bottom + 75) + 'px';
                     } else {
                         state.el.style.top = (zoneRect.top + 5) + 'px';
                     }
-                    state.el.style.right = (window.innerWidth - zoneRect.right + 5) + 'px';
+                    state.el.style.right = (window.innerWidth - zoneRect.right + 35) + 'px';
                 });
             } catch (_) {}
         }

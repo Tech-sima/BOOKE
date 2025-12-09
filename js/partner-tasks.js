@@ -128,11 +128,45 @@ function getPartnerTaskStatus(taskKey, isCompleted) {
     return 'pending';
 }
 
+// Автовыдача награды при завершении партнерской задачи
+function autoClaimPartnerReward(taskId) {
+    const isClaimed = localStorage.getItem(`partner_task_claimed_${taskId}`) === 'true';
+    const isCompleted = localStorage.getItem(`partner_task_completed_${taskId}`) === 'true';
+    if (isClaimed || !isCompleted) return;
+    
+    const tasks = getPartnerTasksData();
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const rewardValue = parseInt(task.reward.replace(/\s/g, ''));
+    const hasBalanceApi = typeof window.setBalance === 'function' && typeof window.getBalance === 'function';
+    if (hasBalanceApi) {
+        const currentBalance = window.getBalance();
+        window.setBalance(currentBalance + rewardValue);
+    } else {
+        const currentBalance = parseFloat(localStorage.getItem('balance') || '0');
+        const newBalance = currentBalance + rewardValue;
+        localStorage.setItem('balance', newBalance);
+        const moneyAmount = document.getElementById('money-amount');
+        if (moneyAmount) {
+            moneyAmount.textContent = window.formatNumber ? window.formatNumber(newBalance) : newBalance;
+        }
+    }
+    
+    localStorage.setItem(`partner_task_claimed_${taskId}`, 'true');
+    renderPartnerTasks();
+    const updatedTasks = getPartnerTasksData();
+    updatePartnerTaskCounters(updatedTasks);
+}
+
 // Функция для отметки партнерского задания как выполненного
 function markPartnerTaskAsCompleted(taskId) {
     localStorage.setItem(`partner_task_completed_${taskId}`, 'true');
-    // Автовыдача награды при завершении
     autoClaimPartnerReward(taskId);
+    renderPartnerTasks();
+    // Обновляем счетчики
+    const tasks = getPartnerTasksData();
+    updatePartnerTaskCounters(tasks);
 }
 
 // Функция для отметки партнерского задания как полученного
@@ -144,51 +178,10 @@ function markPartnerTaskAsClaimed(taskId) {
     updatePartnerTaskCounters(tasks);
 }
 
-// Автовыдача награды для партнерского задания
-function grantPartnerReward(task) {
-    if (!task) return;
-    const isClaimed = localStorage.getItem(`partner_task_claimed_${task.id}`) === 'true';
-    if (isClaimed) return;
-    
-    const rewardValue = parseInt(task.reward.replace(/\s/g, ''));
-    const currentBalance = window.getBalance ? window.getBalance() : parseFloat(localStorage.getItem('balance') || '100');
-    const newBalance = currentBalance + rewardValue;
-    if (window.setBalance) {
-        window.setBalance(newBalance);
-    } else {
-        localStorage.setItem('balance', newBalance);
-        const moneyAmount = document.getElementById('money-amount');
-        if (moneyAmount) {
-            moneyAmount.textContent = window.formatNumber ? window.formatNumber(newBalance) : newBalance;
-        }
-    }
-    markPartnerTaskAsClaimed(task.id);
-}
-
-// Автовыдача по идентификатору
-function autoClaimPartnerReward(taskId) {
-    const tasks = [...getPartnerTasksData('social'), ...getPartnerTasksData('booke')];
-    const target = tasks.find(t => t.id === taskId);
-    if (target) {
-        grantPartnerReward(target);
-    }
-}
-
 // Функция для рендеринга партнерских заданий
 function renderPartnerTasks(category = 'social') {
     const container = document.getElementById('tasks-list');
     if (!container) return;
-    
-    const flashClaimHighlight = (el, originalBorder) => {
-        if (!el) return;
-        const prevBoxShadow = el.style.boxShadow;
-        el.style.border = '1px solid rgba(76,175,80,0.9)';
-        el.style.boxShadow = '0 0 0 2px rgba(76,175,80,0.5)';
-        setTimeout(() => {
-            el.style.border = originalBorder || el.style.border;
-            el.style.boxShadow = prevBoxShadow || '';
-        }, 220);
-    };
     
     container.innerHTML = '';
     
@@ -226,7 +219,6 @@ function renderPartnerTasks(category = 'social') {
 
         taskCard.style.background = backgroundColor;
         taskCard.style.border = `1px solid ${borderColor}`;
-        const originalBorder = taskCard.style.border;
 
         taskCard.onmouseenter = () => {
             taskCard.style.transform = 'translateY(-2px)';
@@ -284,8 +276,19 @@ function renderPartnerTasks(category = 'social') {
         taskCard.onclick = () => {
             if (task.status === 'completed') {
                 // Выдача награды
-                flashClaimHighlight(taskCard, originalBorder);
-                grantPartnerReward(task);
+                markPartnerTaskAsClaimed(task.id);
+                const rewardValue = parseInt(task.reward.replace(/\s/g, ''));
+                const currentBalance = window.getBalance ? window.getBalance() : parseFloat(localStorage.getItem('balance') || '100');
+                const newBalance = currentBalance + rewardValue;
+                if (window.setBalance) {
+                    window.setBalance(newBalance);
+                } else {
+                    localStorage.setItem('balance', newBalance);
+                    const moneyAmount = document.getElementById('money-amount');
+                    if (moneyAmount) {
+                        moneyAmount.textContent = window.formatNumber ? window.formatNumber(newBalance) : newBalance;
+                    }
+                }
             } else if (task.status === 'pending') {
                 // Специальное действие для задачи подписки на канал
                 if (task.id === PARTNER_TASK_KEYS.JOIN_BOOKE) {

@@ -1322,6 +1322,7 @@
                 border-radius: 24px;
                 mix-blend-mode: screen;
                 filter: saturate(1.5);
+                /* Оставляем только контур и свечение: убираем заливку, чтобы на устройствах без поддержки blend-mode не появлялись полупрозрачные прямоугольники. */
                 background: transparent;
                 animation: buildingGlowBorder 1.4s ease-in-out infinite;
             }
@@ -1590,23 +1591,8 @@
         
         try {
             const canvas = document.createElement('canvas');
-            let width = element.naturalWidth;
-            let height = element.naturalHeight;
-            if (!width || !height) {
-                return null;
-            }
-            
-            const MAX_CANVAS_AREA = 1600 * 1000; // Cap to avoid memory spikes on low-end devices
-            const MAX_DIMENSION = 1400;
-            const area = width * height;
-            if (area > MAX_CANVAS_AREA || Math.max(width, height) > MAX_DIMENSION) {
-                const scaleByArea = Math.sqrt(MAX_CANVAS_AREA / area);
-                const scaleByDim = MAX_DIMENSION / Math.max(width, height);
-                const scale = Math.min(1, scaleByArea, scaleByDim);
-                width = Math.max(1, Math.round(width * scale));
-                height = Math.max(1, Math.round(height * scale));
-            }
-            
+            const width = element.naturalWidth;
+            const height = element.naturalHeight;
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d', { willReadFrequently: true });

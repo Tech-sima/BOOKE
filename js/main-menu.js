@@ -1322,7 +1322,7 @@
                 border-radius: 24px;
                 mix-blend-mode: screen;
                 filter: saturate(1.5);
-                background: radial-gradient(circle at center, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.08) 55%, transparent 85%);
+                background: transparent;
                 animation: buildingGlowBorder 1.4s ease-in-out infinite;
             }
             .building-glow-overlay::before,
@@ -1590,8 +1590,23 @@
         
         try {
             const canvas = document.createElement('canvas');
-            const width = element.naturalWidth;
-            const height = element.naturalHeight;
+            let width = element.naturalWidth;
+            let height = element.naturalHeight;
+            if (!width || !height) {
+                return null;
+            }
+            
+            const MAX_CANVAS_AREA = 1600 * 1000; // Cap to avoid memory spikes on low-end devices
+            const MAX_DIMENSION = 1400;
+            const area = width * height;
+            if (area > MAX_CANVAS_AREA || Math.max(width, height) > MAX_DIMENSION) {
+                const scaleByArea = Math.sqrt(MAX_CANVAS_AREA / area);
+                const scaleByDim = MAX_DIMENSION / Math.max(width, height);
+                const scale = Math.min(1, scaleByArea, scaleByDim);
+                width = Math.max(1, Math.round(width * scale));
+                height = Math.max(1, Math.round(height * scale));
+            }
+            
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d', { willReadFrequently: true });

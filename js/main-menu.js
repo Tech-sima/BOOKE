@@ -104,6 +104,7 @@
     const BUILDING_PURCHASE_STYLE_ID = 'building-purchase-animation-styles';
     const BUILDING_PURCHASE_PARTICLE_DURATION = 1200;
     const BUILDING_PURCHASE_REVEAL_DELAY = 420;
+    const SUPPORTS_BLEND_MODE = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('mix-blend-mode', 'screen');
     
     const waitFor = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms));
     
@@ -1296,14 +1297,14 @@
         style.id = UPGRADE_GLOW_STYLE_ID;
         style.textContent = `
             @keyframes buildingGlowPulse {
-                0% { filter: drop-shadow(0 0 20px var(--building-glow-color, #ffd54f)) drop-shadow(0 0 30px rgba(255,255,255,0.9)); opacity: 1; }
-                50% { filter: drop-shadow(0 0 70px var(--building-glow-color, #ffd54f)) drop-shadow(0 0 110px rgba(255,255,255,0.8)); opacity: 1; }
-                100% { filter: drop-shadow(0 0 25px var(--building-glow-color, #ffd54f)) drop-shadow(0 0 40px rgba(255,255,255,0.9)); opacity: 1; }
+                0% { filter: drop-shadow(0 0 14px var(--building-glow-color, #ffd54f)) drop-shadow(0 0 22px rgba(255,255,255,0.9)); opacity: 1; }
+                50% { filter: drop-shadow(0 0 32px var(--building-glow-color, #ffd54f)) drop-shadow(0 0 48px rgba(255,255,255,0.8)); opacity: 1; }
+                100% { filter: drop-shadow(0 0 18px var(--building-glow-color, #ffd54f)) drop-shadow(0 0 28px rgba(255,255,255,0.9)); opacity: 1; }
             }
             @keyframes buildingGlowBorder {
-                0% { box-shadow: 0 0 25px rgba(255,255,255,0.55), 0 0 55px var(--building-glow-color, #ffd54f); opacity: 0.95; }
-                50% { box-shadow: 0 0 70px rgba(255,255,255,0.9), 0 0 120px var(--building-glow-color, #ffd54f); opacity: 1; }
-                100% { box-shadow: 0 0 35px rgba(255,255,255,0.6), 0 0 70px var(--building-glow-color, #ffd54f); opacity: 0.95; }
+                0% { box-shadow: 0 0 18px rgba(255,255,255,0.55), 0 0 42px var(--building-glow-color, #ffd54f); opacity: 0.95; }
+                50% { box-shadow: 0 0 38px rgba(255,255,255,0.9), 0 0 70px var(--building-glow-color, #ffd54f); opacity: 1; }
+                100% { box-shadow: 0 0 22px rgba(255,255,255,0.6), 0 0 46px var(--building-glow-color, #ffd54f); opacity: 0.95; }
             }
             @keyframes buildingSparkleTravel {
                 0% { transform: translate(0%, 0%) scale(0.8); opacity: 0; }
@@ -1325,19 +1326,6 @@
                 /* Оставляем только контур и свечение: убираем заливку, чтобы на устройствах без поддержки blend-mode не появлялись полупрозрачные прямоугольники. */
                 background: transparent;
                 animation: buildingGlowBorder 1.4s ease-in-out infinite;
-            }
-            .building-glow-overlay::before,
-            .building-glow-overlay::after {
-                content: '';
-                position: absolute;
-                inset: -6px;
-                border-radius: inherit;
-                border: 2px dashed rgba(255,255,255,0.5);
-                box-shadow: 0 0 45px rgba(255,255,255,0.4), 0 0 65px rgba(255,255,255,0.25);
-                animation: buildingGlowBorder 1.4s linear infinite;
-            }
-            .building-glow-overlay::after {
-                animation-delay: 0.7s;
             }
             .building-glow-sparkle {
                 position: absolute;
@@ -1428,6 +1416,10 @@
         if (!element) {
             return null;
         }
+        // На устройствах без поддержки mix-blend-mode убираем оверлей, чтобы избежать полупрозрачных прямоугольников.
+        if (!SUPPORTS_BLEND_MODE) {
+            return null;
+        }
         const rect = element.getBoundingClientRect();
         const overlay = document.createElement('div');
         overlay.className = 'building-glow-overlay';
@@ -1437,7 +1429,7 @@
         overlay.style.height = `${rect.height}px`;
         overlay.style.setProperty('--building-glow-color', color);
         overlay.style.border = `3px solid ${color}`;
-        overlay.style.boxShadow = `0 0 80px ${color}, 0 0 140px rgba(255,255,255,0.9), inset 0 0 45px ${color}`;
+        overlay.style.boxShadow = `0 0 56px ${color}, 0 0 92px rgba(255,255,255,0.9), inset 0 0 32px ${color}`;
         
         for (let i = 0; i < 3; i++) {
             const sparkle = document.createElement('span');

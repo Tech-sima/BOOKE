@@ -303,15 +303,18 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   display:none;
   z-index:1500;
   box-sizing:border-box;
+  contain:layout style paint;
+  will-change:contents;
+  transform:translateZ(0);
 }
 
-/* Золотые лучи из центра */
+/* Золотые лучи из центра - оптимизированная версия */
 .advent-panel::before{
   content:'';
   position:absolute;
   top:50%;
   left:50%;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%) translateZ(0);
   width:200%;
   height:200%;
   background:
@@ -319,227 +322,27 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
       circle at center,
       transparent 0%,
       transparent 15%,
-      rgba(255,215,0,0.1) 20%,
-      rgba(255,215,0,0.05) 30%,
+      rgba(255,215,0,0.08) 20%,
       transparent 40%
     ),
-    conic-gradient(
+    repeating-conic-gradient(
       from 0deg at center,
       transparent 0deg,
       transparent 7deg,
-      rgba(255,215,0,0.2) 7deg,
-      rgba(255,215,0,0.5) 8deg,
-      rgba(255,215,0,0.65) 9deg,
-      rgba(255,215,0,0.5) 10deg,
-      rgba(255,215,0,0.2) 11deg,
-      transparent 12deg,
-      transparent 19deg,
-      rgba(220,53,69,0.18) 19deg,
-      rgba(220,53,69,0.48) 20deg,
-      rgba(220,53,69,0.62) 21deg,
-      rgba(220,53,69,0.48) 22deg,
-      rgba(220,53,69,0.18) 23deg,
-      transparent 24deg,
-      transparent 31deg,
-      rgba(255,215,0,0.15) 31deg,
-      rgba(255,215,0,0.45) 32deg,
-      rgba(255,215,0,0.6) 33deg,
-      rgba(255,215,0,0.45) 34deg,
-      rgba(255,215,0,0.15) 35deg,
-      transparent 36deg,
-      transparent 43deg,
-      rgba(220,53,69,0.12) 43deg,
-      rgba(220,53,69,0.42) 44deg,
-      rgba(220,53,69,0.58) 45deg,
-      rgba(220,53,69,0.42) 46deg,
-      rgba(220,53,69,0.12) 47deg,
-      transparent 48deg,
-      transparent 55deg,
-      rgba(255,215,0,0.2) 55deg,
-      rgba(255,215,0,0.6) 56deg,
-      rgba(255,215,0,0.8) 57deg,
-      rgba(255,215,0,0.6) 58deg,
-      rgba(255,215,0,0.2) 59deg,
-      transparent 60deg,
-      transparent 67deg,
-      rgba(220,53,69,0.25) 67deg,
-      rgba(220,53,69,0.65) 68deg,
-      rgba(220,53,69,0.85) 69deg,
-      rgba(220,53,69,0.65) 70deg,
-      rgba(220,53,69,0.25) 71deg,
-      transparent 72deg,
-      transparent 79deg,
-      rgba(255,215,0,0.3) 79deg,
-      rgba(255,215,0,0.7) 80deg,
-      rgba(255,215,0,0.9) 81deg,
-      rgba(255,215,0,0.7) 82deg,
-      rgba(255,215,0,0.3) 83deg,
-      transparent 84deg,
-      transparent 91deg,
-      rgba(220,53,69,0.25) 91deg,
-      rgba(220,53,69,0.65) 92deg,
-      rgba(220,53,69,0.85) 93deg,
-      rgba(220,53,69,0.65) 94deg,
-      rgba(220,53,69,0.25) 95deg,
-      transparent 96deg,
-      transparent 103deg,
-      rgba(255,215,0,0.2) 103deg,
-      rgba(255,215,0,0.6) 104deg,
-      rgba(255,215,0,0.8) 105deg,
-      rgba(255,215,0,0.6) 106deg,
-      rgba(255,215,0,0.2) 107deg,
-      transparent 108deg,
-      transparent 115deg,
-      rgba(220,53,69,0.15) 115deg,
-      rgba(220,53,69,0.55) 116deg,
-      rgba(220,53,69,0.75) 117deg,
-      rgba(220,53,69,0.55) 118deg,
-      rgba(220,53,69,0.15) 119deg,
-      transparent 120deg,
-      transparent 127deg,
-      rgba(255,215,0,0.2) 127deg,
-      rgba(255,215,0,0.6) 128deg,
-      rgba(255,215,0,0.8) 129deg,
-      rgba(255,215,0,0.6) 130deg,
-      rgba(255,215,0,0.2) 131deg,
-      transparent 132deg,
-      transparent 139deg,
-      rgba(220,53,69,0.25) 139deg,
-      rgba(220,53,69,0.65) 140deg,
-      rgba(220,53,69,0.85) 141deg,
-      rgba(220,53,69,0.65) 142deg,
-      rgba(220,53,69,0.25) 143deg,
-      transparent 144deg,
-      transparent 151deg,
-      rgba(255,215,0,0.3) 151deg,
-      rgba(255,215,0,0.7) 152deg,
-      rgba(255,215,0,0.9) 153deg,
-      rgba(255,215,0,0.7) 154deg,
-      rgba(255,215,0,0.3) 155deg,
-      transparent 156deg,
-      transparent 163deg,
-      rgba(220,53,69,0.25) 163deg,
-      rgba(220,53,69,0.65) 164deg,
-      rgba(220,53,69,0.85) 165deg,
-      rgba(220,53,69,0.65) 166deg,
-      rgba(220,53,69,0.25) 167deg,
-      transparent 168deg,
-      transparent 175deg,
-      rgba(255,215,0,0.2) 175deg,
-      rgba(255,215,0,0.6) 176deg,
-      rgba(255,215,0,0.8) 177deg,
-      rgba(255,215,0,0.6) 178deg,
-      rgba(255,215,0,0.2) 179deg,
-      transparent 180deg,
-      transparent 187deg,
-      rgba(220,53,69,0.15) 187deg,
-      rgba(220,53,69,0.55) 188deg,
-      rgba(220,53,69,0.75) 189deg,
-      rgba(220,53,69,0.55) 190deg,
-      rgba(220,53,69,0.15) 191deg,
-      transparent 192deg,
-      transparent 199deg,
-      rgba(255,215,0,0.2) 199deg,
-      rgba(255,215,0,0.6) 200deg,
-      rgba(255,215,0,0.8) 201deg,
-      rgba(255,215,0,0.6) 202deg,
-      rgba(255,215,0,0.2) 203deg,
-      transparent 204deg,
-      transparent 211deg,
-      rgba(220,53,69,0.25) 211deg,
-      rgba(220,53,69,0.65) 212deg,
-      rgba(220,53,69,0.85) 213deg,
-      rgba(220,53,69,0.65) 214deg,
-      rgba(220,53,69,0.25) 215deg,
-      transparent 216deg,
-      transparent 223deg,
-      rgba(255,215,0,0.3) 223deg,
-      rgba(255,215,0,0.7) 224deg,
-      rgba(255,215,0,0.9) 225deg,
-      rgba(255,215,0,0.7) 226deg,
-      rgba(255,215,0,0.3) 227deg,
-      transparent 228deg,
-      transparent 235deg,
-      rgba(220,53,69,0.25) 235deg,
-      rgba(220,53,69,0.65) 236deg,
-      rgba(220,53,69,0.85) 237deg,
-      rgba(220,53,69,0.65) 238deg,
-      rgba(220,53,69,0.25) 239deg,
-      transparent 240deg,
-      transparent 247deg,
-      rgba(255,215,0,0.2) 247deg,
-      rgba(255,215,0,0.6) 248deg,
-      rgba(255,215,0,0.8) 249deg,
-      rgba(255,215,0,0.6) 250deg,
-      rgba(255,215,0,0.2) 251deg,
-      transparent 252deg,
-      transparent 259deg,
-      rgba(220,53,69,0.15) 259deg,
-      rgba(220,53,69,0.55) 260deg,
-      rgba(220,53,69,0.75) 261deg,
-      rgba(220,53,69,0.55) 262deg,
-      rgba(220,53,69,0.15) 263deg,
-      transparent 264deg,
-      transparent 271deg,
-      rgba(255,215,0,0.2) 271deg,
-      rgba(255,215,0,0.6) 272deg,
-      rgba(255,215,0,0.8) 273deg,
-      rgba(255,215,0,0.6) 274deg,
-      rgba(255,215,0,0.2) 275deg,
-      transparent 276deg,
-      transparent 283deg,
-      rgba(220,53,69,0.25) 283deg,
-      rgba(220,53,69,0.65) 284deg,
-      rgba(220,53,69,0.85) 285deg,
-      rgba(220,53,69,0.65) 286deg,
-      rgba(220,53,69,0.25) 287deg,
-      transparent 288deg,
-      transparent 295deg,
-      rgba(255,215,0,0.3) 295deg,
-      rgba(255,215,0,0.7) 296deg,
-      rgba(255,215,0,0.9) 297deg,
-      rgba(255,215,0,0.7) 298deg,
-      rgba(255,215,0,0.3) 299deg,
-      transparent 300deg,
-      transparent 307deg,
-      rgba(220,53,69,0.25) 307deg,
-      rgba(220,53,69,0.65) 308deg,
-      rgba(220,53,69,0.85) 309deg,
-      rgba(220,53,69,0.65) 310deg,
-      rgba(220,53,69,0.25) 311deg,
-      transparent 312deg,
-      transparent 319deg,
-      rgba(255,215,0,0.2) 319deg,
-      rgba(255,215,0,0.6) 320deg,
-      rgba(255,215,0,0.8) 321deg,
-      rgba(255,215,0,0.6) 322deg,
-      rgba(255,215,0,0.2) 323deg,
-      transparent 324deg,
-      transparent 331deg,
-      rgba(220,53,69,0.15) 331deg,
-      rgba(220,53,69,0.55) 332deg,
-      rgba(220,53,69,0.75) 333deg,
-      rgba(220,53,69,0.55) 334deg,
-      rgba(220,53,69,0.15) 335deg,
-      transparent 336deg,
-      transparent 343deg,
-      rgba(255,215,0,0.2) 343deg,
-      rgba(255,215,0,0.6) 344deg,
-      rgba(255,215,0,0.8) 345deg,
-      rgba(255,215,0,0.6) 346deg,
-      rgba(255,215,0,0.2) 347deg,
-      transparent 348deg,
-      transparent 355deg,
-      rgba(220,53,69,0.25) 355deg,
-      rgba(220,53,69,0.65) 356deg,
-      rgba(220,53,69,0.85) 357deg,
-      rgba(220,53,69,0.65) 358deg,
-      rgba(220,53,69,0.25) 359deg,
-      transparent 360deg
+      rgba(255,215,0,0.3) 7deg,
+      rgba(255,215,0,0.6) 8deg,
+      rgba(255,215,0,0.3) 9deg,
+      transparent 10deg,
+      transparent 17deg,
+      rgba(220,53,69,0.25) 17deg,
+      rgba(220,53,69,0.55) 18deg,
+      rgba(220,53,69,0.25) 19deg,
+      transparent 20deg
     );
   pointer-events:none;
   z-index:-1;
-  filter:drop-shadow(0 0 6px rgba(255,215,0,0.4)) drop-shadow(0 0 12px rgba(255,215,0,0.3)) drop-shadow(0 0 18px rgba(255,215,0,0.2)) drop-shadow(0 0 6px rgba(220,53,69,0.4)) drop-shadow(0 0 12px rgba(220,53,69,0.3)) drop-shadow(0 0 18px rgba(220,53,69,0.2));
+  will-change:transform;
+  filter:drop-shadow(0 0 8px rgba(255,215,0,0.5)) drop-shadow(0 0 8px rgba(220,53,69,0.5));
 }
 
 .advent-panel.show{
@@ -562,6 +365,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   width:100%;
   position:relative;
   z-index:1;
+  contain:layout style;
+  transform:translateZ(0);
 }
 .advent-panel-content::-webkit-scrollbar{width:0;height:0;}
 .advent-panel-content{scrollbar-width:none;}
@@ -601,14 +406,13 @@ body.advent-locked{overflow:hidden;}
   text-transform:uppercase;
   white-space:normal;
   text-shadow:
-    0 0 15px rgba(255,255,255,1),
-    0 0 30px rgba(255,255,255,1),
-    0 0 45px rgba(255,255,255,0.95),
-    0 0 60px rgba(255,255,255,0.9),
-    0 0 75px rgba(255,255,255,0.85),
-    0 0 90px rgba(255,255,255,0.8),
+    0 0 20px rgba(255,255,255,0.8),
+    0 0 40px rgba(255,255,255,0.6),
+    0 0 60px rgba(255,255,255,0.4),
     0 2px 4px rgba(0,0,0,0.5);
   position:relative;
+  transform:translateZ(0);
+  will-change:contents;
 }
 .advent-title::after{
   content:'';
@@ -649,13 +453,12 @@ body.advent-locked{overflow:hidden;}
   text-transform:none;
   white-space:normal;
   text-shadow:
-    0 0 12px rgba(255,255,255,1),
-    0 0 24px rgba(255,255,255,1),
-    0 0 36px rgba(255,255,255,0.95),
-    0 0 48px rgba(255,255,255,0.9),
-    0 0 60px rgba(255,255,255,0.85),
-    0 0 72px rgba(255,255,255,0.8),
+    0 0 15px rgba(255,255,255,0.8),
+    0 0 30px rgba(255,255,255,0.6),
+    0 0 45px rgba(255,255,255,0.4),
     0 2px 4px rgba(0,0,0,0.5);
+  transform:translateZ(0);
+  will-change:contents;
 }
 .advent-progress-container{
   flex:0 0 auto;
@@ -718,27 +521,28 @@ body.advent-locked{overflow:hidden;}
   box-sizing:border-box;
   position:relative;
   z-index:2;
+  contain:layout style;
+  transform:translateZ(0);
 }
 .advent-grid-item{
   aspect-ratio:1/1;
-  background:rgba(0,0,0,0.4) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
+  background:rgba(0,0,0,0.5) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
   background-size:160%;
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
   border:1px solid rgba(255,255,255,0.6);
   border-radius:12px;
   position:relative;
   counter-increment:grid-item;
   overflow:hidden;
-  filter:
-    drop-shadow(0 0 1px rgba(255,255,255,0.6))
-    drop-shadow(0 0 3px rgba(255,255,255,0.5));
+  filter:drop-shadow(0 0 2px rgba(255,255,255,0.5));
   box-sizing:border-box;
   width:100%;
   z-index:2;
   box-shadow:
     0 2px 8px rgba(0,0,0,0.3),
     inset 0 1px 0 rgba(255,255,255,0.1);
+  contain:layout style paint;
+  transform:translateZ(0);
+  will-change:transform;
 }
 .advent-grid-item:nth-child(3n){
   background-image:url('../assets/svg/advent/advent-gift-legendery.svg');
@@ -794,10 +598,8 @@ body.advent-locked{overflow:hidden;}
   filter:grayscale(100%) brightness(0.4);
   opacity:0.6;
   pointer-events:none;
-  background:rgba(0,0,0,0.4) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
+  background:rgba(0,0,0,0.5) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
   background-size:160%;
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
 }
 /* Открытые подарки */
 .advent-grid-item.opened{
@@ -908,10 +710,8 @@ body.advent-locked{overflow:hidden;}
   position:absolute;
   bottom:4px;
   left:50%;
-  transform:translateX(-50%);
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  transform:translateX(-50%) translateZ(0);
+  background:rgba(0,0,0,0.6);
   color:#fff;
   border:1px solid rgba(255,255,255,0.3);
   border-radius:8px;

@@ -4366,8 +4366,10 @@ function initializeAdventPanel() {
         const grid = document.querySelector('.advent-grid');
         if(!grid) return;
         
-        const items = grid.querySelectorAll('.advent-grid-item');
-        items.forEach((item, idx) => {
+        // Используем requestAnimationFrame для оптимизации рендеринга
+        requestAnimationFrame(() => {
+            const items = grid.querySelectorAll('.advent-grid-item');
+            items.forEach((item, idx) => {
             const index = idx + 1;
             const type = getGiftType(index);
             const isOpened = state.opened.includes(index);
@@ -4454,11 +4456,11 @@ function initializeAdventPanel() {
                         const now = Date.now();
                         if(now >= timerEnd){
                             clearInterval(timerInterval);
-                            renderGifts();
+                            requestAnimationFrame(() => renderGifts());
                         } else {
                             updateTimer();
                         }
-                    }, 100);
+                    }, 1000);
                 }
             } else {
                 item.classList.add('available');
@@ -4472,6 +4474,7 @@ function initializeAdventPanel() {
                 };
                 item.appendChild(claimBtn);
             }
+            });
         });
     }
     
@@ -4499,8 +4502,10 @@ function initializeAdventPanel() {
     const open = ()=>{
         panel.classList.add('show');
         document.body.classList.add('advent-locked');
-        renderGifts();
-        updateProgressBar();
+        requestAnimationFrame(() => {
+            renderGifts();
+            updateProgressBar();
+        });
         if(window.hideProfitIndicators) window.hideProfitIndicators({ suppress: true });
         
         // Показываем кнопку "назад" в Telegram Mini App

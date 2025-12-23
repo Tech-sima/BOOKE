@@ -230,11 +230,23 @@
         if (!remoteData) {
             return;
         }
+        let availableCharactersChanged = false;
         Object.entries(remoteData).forEach(([key, value]) => {
+            if (key === 'availableCharacters') {
+                availableCharactersChanged = true;
+            }
             registerKey(key);
             state.cache[key] = value;
             original.setItem.call(global.localStorage, key, value);
         });
+        // Обновляем счетчик персонажей после загрузки данных из Firebase
+        if (availableCharactersChanged && window.updateCharactersCount) {
+            setTimeout(() => {
+                if (window.updateCharactersCount) {
+                    window.updateCharactersCount();
+                }
+            }, 100);
+        }
     }
 
     function exportLocal() {
@@ -264,9 +276,19 @@
 
         Storage.prototype.setItem = function patchedSetItem(key, value) {
             const normalized = stringifyValue(value);
+            const wasAvailableCharacters = key === 'availableCharacters';
             state.cache[key] = normalized;
             queueWrite(key, normalized);
-            return original.setItem.call(this, key, normalized);
+            const result = original.setItem.call(this, key, normalized);
+            // Обновляем счетчик персонажей, если изменился список доступных персонажей
+            if (wasAvailableCharacters && window.updateCharactersCount) {
+                setTimeout(() => {
+                    if (window.updateCharactersCount) {
+                        window.updateCharactersCount();
+                    }
+                }, 50);
+            }
+            return result;
         };
 
         Storage.prototype.getItem = function patchedGetItem(key) {
@@ -342,9 +364,13 @@
             if (!remote || !remote.data) {
                 return;
             }
+            let availableCharactersChanged = false;
             Object.entries(remote.data).forEach(([key, value]) => {
                 if (state.cache[key] === value) {
                     return;
+                }
+                if (key === 'availableCharacters') {
+                    availableCharactersChanged = true;
                 }
                 state.cache[key] = value;
                 registerKey(key);
@@ -352,6 +378,10 @@
             });
             primeDerivedFromRemote(remote);
             ensureDerivedFromCache();
+            // Обновляем счетчик персонажей, если изменился список доступных персонажей
+            if (availableCharactersChanged && window.updateCharactersCount) {
+                window.updateCharactersCount();
+            }
         });
     }
 

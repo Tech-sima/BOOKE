@@ -786,12 +786,10 @@
     <!-- Предварительная загрузка изображений персонажей и сотрудников -->
     <div style="display:none;">
         <!-- Персонажи для панели персонажей -->
-        <img src="assets/svg/characters-panel/bloomi.svg" alt="Bloomi">
-        <img src="assets/svg/characters-panel/redgi.svg" alt="Redgi">
-        <img src="assets/svg/characters-panel/grinni.svg" alt="Grinni">
+        <img src="assets/svg/characters-panel/blumy.svg" alt="Blumy">
+        <img src="assets/svg/characters-panel/redjy.svg" alt="Redjy">
+        <img src="assets/svg/characters-panel/grinny.svg" alt="Grinny">
         <img src="assets/svg/characters-panel/purpe.svg" alt="Purpe">
-        <img src="assets/svg/characters-panel/pinky.svg" alt="Pinky">
-        <img src="assets/svg/characters-panel/seecret.svg" alt="Seecret">
         <!-- Сотрудники для зданий -->
         <img src="assets/svg/employees/blumy-hired.svg" alt="Blumy Hired">
         <img src="assets/svg/employees/grinni-hired.svg" alt="Grinni Hired">
@@ -845,6 +843,71 @@
 
         </div>
     </div>
+
+    <!-- Advent vibes event -->
+    <div id="advent-event" class="advent-event">
+        <button id="advent-btn" class="advent-trigger" aria-label="Advent vibes">
+            <img class="advent-img" src="assets/svg/advent/advent-book.svg" alt="Advent vibes">
+        </button>
+        <div class="advent-tag">Advent vibes</div>
+    </div>
+
+    <div id="advent-close-wrap" class="advent-close-wrap">
+        <button id="advent-close" class="advent-close" type="button">Закрыть</button>
+    </div>
+        <div id="advent-panel" class="advent-panel">
+            <div class="advent-panel-content">
+                <div class="advent-panel-slot">Advent<br>vibes</div>
+                <div class="advent-grid">
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                    <div class="advent-grid-item"></div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+    // Адвент-панель теперь инициализируется в js/main.js во время загрузки игры
+    // Этот скрипт оставлен как fallback на случай, если main.js еще не загружен
+    document.addEventListener('DOMContentLoaded', function(){
+        // Ждем, пока функция инициализации будет доступна из main.js
+        if(typeof initializeAdventPanel === 'function'){
+            initializeAdventPanel();
+        } else {
+            // Если функция еще не доступна, ждем немного и пробуем снова
+            setTimeout(function(){
+                if(typeof initializeAdventPanel === 'function'){
+                    initializeAdventPanel();
+                }
+            }, 100);
+        }
+    });
+    </script>
 
     <!-- Нижняя панель навигации -->
     <div id="bottom-nav" class="panel">

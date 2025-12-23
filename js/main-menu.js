@@ -127,6 +127,17 @@
     let hiredEmployees = JSON.parse(localStorage.getItem('hiredEmployees')) || {};
     let availableEmployees = ['grinni', 'purpe', 'redjy', 'blumy']; // Доступные сотрудники
     
+    // Функция для обновления списка доступных сотрудников (добавляет robo-blumy если получен)
+    function updateAvailableEmployees() {
+        const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+        if(availableCharacters.includes('robo-blumy') && !availableEmployees.includes('robo-blumy')){
+            availableEmployees.push('robo-blumy');
+        }
+    }
+    
+    // Обновляем список при загрузке
+    updateAvailableEmployees();
+    
     // Загружаем состояние печати при инициализации
     loadPrintState();
     
@@ -264,6 +275,12 @@
             
             // Обновляем индикаторы сотрудников
             updateProfitIndicators();
+            
+            // Обновляем панель персонажей, если она открыта
+            if (window.renderCharacters && document.getElementById('characters-panel') && document.getElementById('characters-panel').style.display !== 'none') {
+                const currentFilter = document.getElementById('char-tab-available')?.classList.contains('active') ? 'available' : 'all';
+                window.renderCharacters(currentFilter);
+            }
         }
     }
     
@@ -281,46 +298,63 @@
                     'grinni': 'Грини',
                     'purpe': 'Пёрпи',
                     'redjy': 'Реджи',
-                    'blumy': 'Блуми'
+                    'blumy': 'Блуми',
+                    'robo-blumy': 'Робо-Блуми'
                 };
                 const employeeImages = {
                     'grinni': 'assets/svg/hiring-forpanel/green.svg',
                     'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                     'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                    'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                    'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                    'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                 };
                 const employeeSkills = {
                     'grinni': 'Бухгалтер',
                     'purpe': 'Менеджер', 
                     'redjy': 'Калькулятор',
-                    'blumy': 'Аналитик'
+                    'blumy': 'Аналитик',
+                    'robo-blumy': 'Программист'
                 };
                 const employeeRarities = {
                     'grinni': 3,
                     'purpe': 4, 
                     'redjy': 4,
-                    'blumy': 5
+                    'blumy': 5,
+                    'robo-blumy': 5
                 };
+                
+                const isRoboBlumy = assignedEmployee === 'robo-blumy';
+                const cardBackground = isRoboBlumy 
+                    ? 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.3) 50%, rgba(255,215,0,0.3) 100%)'
+                    : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
+                const cardBorder = isRoboBlumy 
+                    ? '2px solid rgba(255,215,0,0.5)'
+                    : '1px solid rgba(255,255,255,0.2)';
+                const cardShadow = isRoboBlumy 
+                    ? '0 4px 12px rgba(255,215,0,0.4)'
+                    : '0 4px 12px rgba(59, 130, 246, 0.3)';
                 
                 employeeCard.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%); border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: 1px solid rgba(255,255,255,0.2); flex: 1;">
-                            <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="width: 80px; height: 80px; border-radius: 8px;">
+                        <div style="background: ${cardBackground}; border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: ${cardShadow}; border: ${cardBorder}; flex: 1;">
+                            <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="${isRoboBlumy ? 'width: 120%; height: 120%; transform: scale(1.2); object-fit: contain;' : 'width: 80px; height: 80px;'} border-radius: 8px;" onerror="this.onerror=null; this.src='assets/svg/characters-panel/robo-blumy.svg';">
+                            </div>
                             <div style="flex: 1;">
                                 <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">${employeeNames[assignedEmployee]}</div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                     <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Уровень</span>
-                                    <span style="font-size: 11px; color: #fff; font-weight: 400;">1</span>
+                                    <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">1</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                     <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Навык</span>
-                                    <span style="font-size: 11px; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
+                                    <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
                                     <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Редкость</span>
                                     <div style="display: flex; gap: 2px;">
                                         ${Array(5).fill().map((_, i) => 
-                                            `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: 11px;">★</span>`
+                                            `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: ${isRoboBlumy ? '9px' : '11px'};">★</span>`
                                         ).join('')}
                                     </div>
                                 </div>
@@ -384,8 +418,13 @@
         // Базовый доход в час с учетом работников
         const hourlyIncome = building.income * (1 + building.workers * 0.2);
         
-        // Накопленная прибыль
-        const newProfit = building.accumulatedProfit + (hourlyIncome * hoursPassed);
+        // Проверяем, есть ли robo-blumy нанят на это здание (бонус x15)
+        const hiredEmployees = JSON.parse(localStorage.getItem('hiredEmployees')) || {};
+        const assignedEmployee = Object.keys(hiredEmployees).find(emp => hiredEmployees[emp] === buildingType);
+        const roboBlumyBonus = (assignedEmployee === 'robo-blumy') ? 15 : 1;
+        
+        // Накопленная прибыль с учетом бонуса robo-blumy
+        const newProfit = building.accumulatedProfit + (hourlyIncome * hoursPassed * roboBlumyBonus);
         
         return Math.floor(newProfit);
     }
@@ -413,7 +452,14 @@
             
             if (hoursPassed > 0) {
                 const hourlyIncome = building.income * (1 + building.workers * 0.2);
-                building.accumulatedProfit += hourlyIncome * hoursPassed;
+                
+                // Проверяем, есть ли robo-blumy нанят на это здание (бонус x15)
+                const hiredEmployees = JSON.parse(localStorage.getItem('hiredEmployees')) || {};
+                const assignedEmployee = Object.keys(hiredEmployees).find(emp => hiredEmployees[emp] === buildingType);
+                const roboBlumyBonus = (assignedEmployee === 'robo-blumy') ? 15 : 1;
+                
+                // Накопленная прибыль с учетом бонуса robo-blumy
+                building.accumulatedProfit += hourlyIncome * hoursPassed * roboBlumyBonus;
                 building.lastCollectTime = currentTime;
             }
         });
@@ -817,6 +863,9 @@
                         case 'blumy':
                             employeeIcon = '<img src="assets/svg/employees/blumy-hired.svg" style="width:44px;height:44px;filter:brightness(0.9);">';
                             break;
+                        case 'robo-blumy':
+                            employeeIcon = '<img src="assets/svg/employees/robo-blumy.svg" style="width:52px;height:52px;object-fit:contain;filter:brightness(0.9);image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;">';
+                            break;
                         default:
                             // Если тип сотрудника не определен, показываем not-hired
                             employeeIcon = '<img src="assets/svg/employees/not-hired.svg" style="width:44px;height:44px;filter:brightness(0.9);">';
@@ -846,6 +895,16 @@
             circleWrapper.appendChild(progressLayer);
             circleWrapper.appendChild(innerLayer);
             circleWrapper.appendChild(avatarLayer);
+            
+            // Добавляем x15.svg для robo-blumy
+            const assignedEmployee = Object.keys(hiredEmployees).find(emp => hiredEmployees[emp] === buildingType);
+            if(assignedEmployee === 'robo-blumy'){
+                const bonusIcon = document.createElement('img');
+                bonusIcon.src = 'assets/svg/widgets/x15.svg';
+                bonusIcon.className = 'profit-bonus-icon';
+                bonusIcon.style.cssText = 'position:absolute;top:-50px;right:-50px;width:72px;height:72px;z-index:1001;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));';
+                circleWrapper.appendChild(bonusIcon);
+            }
             
             // Текущее значение накопленной прибыли
             const currentAccumulatedProfit = calculateAccumulatedProfit(buildingType);
@@ -2083,45 +2142,62 @@
                                             'grinni': 'Грини',
                                             'purpe': 'Пёрпи',
                                             'redjy': 'Реджи',
-                                            'blumy': 'Блуми'
+                                            'blumy': 'Блуми',
+                                            'robo-blumy': 'Робо-Блуми'
                                         };
                                         const employeeImages = {
                                             'grinni': 'assets/svg/hiring-forpanel/green.svg',
                                             'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                                             'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                                            'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                                         };
                                         const employeeSkills = {
                                             'grinni': 'Бухгалтер',
                                             'purpe': 'Менеджер', 
                                             'redjy': 'Калькулятор',
-                                            'blumy': 'Аналитик'
+                                            'blumy': 'Аналитик',
+                                            'robo-blumy': 'Программист'
                                         };
                                         const employeeRarities = {
                                             'grinni': 3,
                                             'purpe': 4, 
                                             'redjy': 4,
-                                            'blumy': 5
+                                            'blumy': 5,
+                                            'robo-blumy': 5
                                         };
+                                        const isRoboBlumy = assignedEmployee === 'robo-blumy';
+                                        const cardBackground = isRoboBlumy 
+                                            ? 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.3) 50%, rgba(255,215,0,0.3) 100%)'
+                                            : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
+                                        const cardBorder = isRoboBlumy 
+                                            ? '2px solid rgba(255,215,0,0.5)'
+                                            : '1px solid rgba(255,255,255,0.2)';
+                                        const cardShadow = isRoboBlumy 
+                                            ? '0 4px 12px rgba(255,215,0,0.4)'
+                                            : '0 4px 12px rgba(59, 130, 246, 0.3)';
+                                        
                                         return `
                                             <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                                                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%); border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: 1px solid rgba(255,255,255,0.2); flex: 1;">
-                                                    <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="width: 80px; height: 80px; border-radius: 8px;">
+                                                <div style="background: ${cardBackground}; border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: ${cardShadow}; border: ${cardBorder}; flex: 1;">
+                                                    <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                                        <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="${isRoboBlumy ? 'width: 120%; height: 120%; transform: scale(1.2); object-fit: contain;' : 'width: 80px; height: 80px;'} border-radius: 8px;" onerror="this.onerror=null; this.src='assets/svg/characters-panel/robo-blumy.svg';">
+                                                    </div>
                                                     <div style="flex: 1;">
                                                         <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">${employeeNames[assignedEmployee]}</div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Уровень</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">1</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">1</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Навык</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Редкость</span>
                                                             <div style="display: flex; gap: 2px;">
                                                                 ${Array(5).fill().map((_, i) => 
-                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: 11px;">★</span>`
+                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: ${isRoboBlumy ? '9px' : '11px'};">★</span>`
                                                                 ).join('')}
                                                             </div>
                                                         </div>
@@ -2390,45 +2466,62 @@
                                             'grinni': 'Грини',
                                             'purpe': 'Пёрпи',
                                             'redjy': 'Реджи',
-                                            'blumy': 'Блуми'
+                                            'blumy': 'Блуми',
+                                            'robo-blumy': 'Робо-Блуми'
                                         };
                                         const employeeImages = {
                                             'grinni': 'assets/svg/hiring-forpanel/green.svg',
                                             'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                                             'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                                            'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                                         };
                                         const employeeSkills = {
                                             'grinni': 'Бухгалтер',
                                             'purpe': 'Менеджер', 
                                             'redjy': 'Калькулятор',
-                                            'blumy': 'Аналитик'
+                                            'blumy': 'Аналитик',
+                                            'robo-blumy': 'Программист'
                                         };
                                         const employeeRarities = {
                                             'grinni': 3,
                                             'purpe': 4, 
                                             'redjy': 4,
-                                            'blumy': 5
+                                            'blumy': 5,
+                                            'robo-blumy': 5
                                         };
+                                        const isRoboBlumy = assignedEmployee === 'robo-blumy';
+                                        const cardBackground = isRoboBlumy 
+                                            ? 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.3) 50%, rgba(255,215,0,0.3) 100%)'
+                                            : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
+                                        const cardBorder = isRoboBlumy 
+                                            ? '2px solid rgba(255,215,0,0.5)'
+                                            : '1px solid rgba(255,255,255,0.2)';
+                                        const cardShadow = isRoboBlumy 
+                                            ? '0 4px 12px rgba(255,215,0,0.4)'
+                                            : '0 4px 12px rgba(59, 130, 246, 0.3)';
+                                        
                                         return `
                                             <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                                                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%); border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: 1px solid rgba(255,255,255,0.2); flex: 1;">
-                                                    <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="width: 80px; height: 80px; border-radius: 8px;">
+                                                <div style="background: ${cardBackground}; border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: ${cardShadow}; border: ${cardBorder}; flex: 1;">
+                                                    <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                                        <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="${isRoboBlumy ? 'width: 120%; height: 120%; transform: scale(1.2); object-fit: contain;' : 'width: 80px; height: 80px;'} border-radius: 8px;" onerror="this.onerror=null; this.src='assets/svg/characters-panel/robo-blumy.svg';">
+                                                    </div>
                                                     <div style="flex: 1;">
                                                         <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">${employeeNames[assignedEmployee]}</div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Уровень</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">1</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">1</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Навык</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Редкость</span>
                                                             <div style="display: flex; gap: 2px;">
                                                                 ${Array(5).fill().map((_, i) => 
-                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: 11px;">★</span>`
+                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: ${isRoboBlumy ? '9px' : '11px'};">★</span>`
                                                                 ).join('')}
                                                             </div>
                                                         </div>
@@ -2748,45 +2841,62 @@
                                             'grinni': 'Грини',
                                             'purpe': 'Пёрпи',
                                             'redjy': 'Реджи',
-                                            'blumy': 'Блуми'
+                                            'blumy': 'Блуми',
+                                            'robo-blumy': 'Робо-Блуми'
                                         };
                                         const employeeImages = {
                                             'grinni': 'assets/svg/hiring-forpanel/green.svg',
                                             'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                                             'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                                            'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                                         };
                                         const employeeSkills = {
                                             'grinni': 'Бухгалтер',
                                             'purpe': 'Менеджер', 
                                             'redjy': 'Калькулятор',
-                                            'blumy': 'Аналитик'
+                                            'blumy': 'Аналитик',
+                                            'robo-blumy': 'Программист'
                                         };
                                         const employeeRarities = {
                                             'grinni': 3,
                                             'purpe': 4, 
                                             'redjy': 4,
-                                            'blumy': 5
+                                            'blumy': 5,
+                                            'robo-blumy': 5
                                         };
+                                        const isRoboBlumy = assignedEmployee === 'robo-blumy';
+                                        const cardBackground = isRoboBlumy 
+                                            ? 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.3) 50%, rgba(255,215,0,0.3) 100%)'
+                                            : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
+                                        const cardBorder = isRoboBlumy 
+                                            ? '2px solid rgba(255,215,0,0.5)'
+                                            : '1px solid rgba(255,255,255,0.2)';
+                                        const cardShadow = isRoboBlumy 
+                                            ? '0 4px 12px rgba(255,215,0,0.4)'
+                                            : '0 4px 12px rgba(59, 130, 246, 0.3)';
+                                        
                                         return `
                                             <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                                                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%); border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: 1px solid rgba(255,255,255,0.2); flex: 1;">
-                                                    <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="width: 80px; height: 80px; border-radius: 8px;">
+                                                <div style="background: ${cardBackground}; border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: ${cardShadow}; border: ${cardBorder}; flex: 1;">
+                                                    <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                                        <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="${isRoboBlumy ? 'width: 120%; height: 120%; transform: scale(1.2); object-fit: contain;' : 'width: 80px; height: 80px;'} border-radius: 8px;" onerror="this.onerror=null; this.src='assets/svg/characters-panel/robo-blumy.svg';">
+                                                    </div>
                                                     <div style="flex: 1;">
                                                         <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">${employeeNames[assignedEmployee]}</div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Уровень</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">1</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">1</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Навык</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Редкость</span>
                                                             <div style="display: flex; gap: 2px;">
                                                                 ${Array(5).fill().map((_, i) => 
-                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: 11px;">★</span>`
+                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: ${isRoboBlumy ? '9px' : '11px'};">★</span>`
                                                                 ).join('')}
                                                             </div>
                                                         </div>
@@ -3055,45 +3165,62 @@
                                             'grinni': 'Грини',
                                             'purpe': 'Пёрпи',
                                             'redjy': 'Реджи',
-                                            'blumy': 'Блуми'
+                                            'blumy': 'Блуми',
+                                            'robo-blumy': 'Робо-Блуми'
                                         };
                                         const employeeImages = {
                                             'grinni': 'assets/svg/hiring-forpanel/green.svg',
                                             'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                                             'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                                            'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                                         };
                                         const employeeSkills = {
                                             'grinni': 'Бухгалтер',
                                             'purpe': 'Менеджер', 
                                             'redjy': 'Калькулятор',
-                                            'blumy': 'Аналитик'
+                                            'blumy': 'Аналитик',
+                                            'robo-blumy': 'Программист'
                                         };
                                         const employeeRarities = {
                                             'grinni': 3,
                                             'purpe': 4, 
                                             'redjy': 4,
-                                            'blumy': 5
+                                            'blumy': 5,
+                                            'robo-blumy': 5
                                         };
+                                        const isRoboBlumy = assignedEmployee === 'robo-blumy';
+                                        const cardBackground = isRoboBlumy 
+                                            ? 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,193,7,0.3) 50%, rgba(255,215,0,0.3) 100%)'
+                                            : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%)';
+                                        const cardBorder = isRoboBlumy 
+                                            ? '2px solid rgba(255,215,0,0.5)'
+                                            : '1px solid rgba(255,255,255,0.2)';
+                                        const cardShadow = isRoboBlumy 
+                                            ? '0 4px 12px rgba(255,215,0,0.4)'
+                                            : '0 4px 12px rgba(59, 130, 246, 0.3)';
+                                        
                                         return `
                                             <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                                                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%); border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); border: 1px solid rgba(255,255,255,0.2); flex: 1;">
-                                                    <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="width: 80px; height: 80px; border-radius: 8px;">
+                                                <div style="background: ${cardBackground}; border-radius: 12px; padding: 8px; display: flex; align-items: center; gap: 12px; box-shadow: ${cardShadow}; border: ${cardBorder}; flex: 1;">
+                                                    <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                                        <img src="${employeeImages[assignedEmployee]}" alt="${employeeNames[assignedEmployee]}" style="${isRoboBlumy ? 'width: 120%; height: 120%; transform: scale(1.2); object-fit: contain;' : 'width: 80px; height: 80px;'} border-radius: 8px;" onerror="this.onerror=null; this.src='assets/svg/characters-panel/robo-blumy.svg';">
+                                                    </div>
                                                     <div style="flex: 1;">
                                                         <div style="font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px;">${employeeNames[assignedEmployee]}</div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Уровень</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">1</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">1</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Навык</span>
-                                                            <span style="font-size: 11px; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
+                                                            <span style="font-size: ${isRoboBlumy ? '9px' : '11px'}; color: #fff; font-weight: 400;">${employeeSkills[assignedEmployee]}</span>
                                                         </div>
                                                         <div style="display: flex; justify-content: space-between; align-items: center;">
                                                             <span style="font-size: 11px; color: rgba(255,255,255,0.8);">Редкость</span>
                                                             <div style="display: flex; gap: 2px;">
                                                                 ${Array(5).fill().map((_, i) => 
-                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: 11px;">★</span>`
+                                                                    `<span style="color: ${i < employeeRarities[assignedEmployee] ? '#fff' : 'rgba(255,255,255,0.3)'}; font-size: ${isRoboBlumy ? '9px' : '11px'};">★</span>`
                                                                 ).join('')}
                                                             </div>
                                                         </div>
@@ -4026,7 +4153,8 @@
                     'grinni': 'Грини',
                     'purpe': 'Пёрпи',
                     'redjy': 'Реджи',
-                    'blumy': 'Блуми'
+                    'blumy': 'Блуми',
+                    'robo-blumy': 'Робо-Блуми'
                 };
                 window.showNotification(`Сотрудник ${employeeNames[assignedEmployee]} уже назначен к этому зданию`, 'info');
             }
@@ -4071,6 +4199,9 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         `;
+        // Обновляем список доступных сотрудников перед показом меню
+        updateAvailableEmployees();
+        
         // Получаем доступных сотрудников (не нанятых)
         const available = availableEmployees.filter(emp => !hiredEmployees[emp]);
         
@@ -4106,19 +4237,22 @@
                                 'grinni': 'Грини',
                                 'purpe': 'Пёрпи', 
                                 'redjy': 'Реджи',
-                                'blumy': 'Блуми'
+                                'blumy': 'Блуми',
+                                'robo-blumy': 'Робо-Блуми'
                             };
                             const employeeImages = {
                                 'grinni': 'assets/svg/hiring-forpanel/green.svg',
                                 'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                                 'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                                'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                                'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                                'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                             };
                             const employeeSkills = {
                                 'grinni': 'Книга',
                                 'purpe': 'Наушники',
                                 'redjy': 'Калькулятор',
-                                'blumy': 'Коробка'
+                                'blumy': 'Коробка',
+                                'robo-blumy': 'Программист'
                             };
                             
                             // Цвета для разных персонажей (для фона карточки)
@@ -4126,14 +4260,20 @@
                                 'grinni': 'rgba(76, 175, 80, 0.1)',
                                 'purpe': 'rgba(156, 39, 176, 0.1)',
                                 'redjy': 'rgba(244, 67, 54, 0.1)',
-                                'blumy': 'rgba(33, 150, 243, 0.1)'
+                                'blumy': 'rgba(33, 150, 243, 0.1)',
+                                'robo-blumy': 'linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,193,7,0.2) 100%)'
                             };
                             
+                            const isRoboBlumy = employee === 'robo-blumy';
+                            const cardBackground = isRoboBlumy ? employeeColors[employee] : employeeColors[employee];
+                            const cardBorder = isRoboBlumy ? '2px solid rgba(255,215,0,0.5)' : '1px solid rgba(255,255,255,0.1)';
+                            const cardShadow = isRoboBlumy ? '0 2px 8px rgba(255,215,0,0.3)' : 'none';
+                            
                             return `
-                                <div class="employee-card" data-employee="${employee}" style="background: ${employeeColors[employee]}; border-radius: 14px; padding: 14px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; min-height: 85px; opacity: 0; transform: translateY(20px);">
+                                <div class="employee-card" data-employee="${employee}" style="background: ${cardBackground}; border-radius: 14px; padding: 14px; border: ${cardBorder}; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; min-height: 85px; opacity: 0; transform: translateY(20px); box-shadow: ${cardShadow};">
                                     <!-- Изображение персонажа -->
-                                    <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 75px; height: 75px; padding: 3px;">
-                                        <img src="${employeeImages[employee]}" alt="${employeeNames[employee]}" style="max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: 8px; object-fit: contain;">
+                                    <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 75px; height: 75px; padding: 3px; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                        <img src="${employeeImages[employee]}" alt="${employeeNames[employee]}" style="${isRoboBlumy ? 'width: 90px; height: 90px;' : 'max-width: 100%; max-height: 100%; width: auto; height: auto;'} border-radius: 8px; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
                                     </div>
                                     
                                     <!-- Информация о персонаже -->
@@ -4152,8 +4292,14 @@
                                         
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
                                             <span style="font-size: 9px; color: rgba(255,255,255,0.6); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Редкость</span>
-                                            <span style="font-size: 10px; color: #fff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">Базовая</span>
+                                            <span style="font-size: 10px; color: #fff; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">${isRoboBlumy ? 'Уникальная' : 'Базовая'}</span>
                                         </div>
+                                        ${isRoboBlumy ? `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                                            <span style="font-size: 9px; color: rgba(255,215,0,0.8); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Бонус</span>
+                                            <span style="font-size: 10px; color: #ffd700; font-weight: 700; text-shadow: 0 0 4px rgba(255,215,0,0.5), 0 1px 2px rgba(0,0,0,0.3);">x15 к прибыли</span>
+                                        </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                             `;
@@ -5411,6 +5557,9 @@
             font-family: 'Segoe UI', Arial, sans-serif;
         `;
         
+        // Обновляем список доступных сотрудников перед показом меню
+        updateAvailableEmployees();
+        
         // Получаем доступных сотрудников (не нанятых)
         const available = availableEmployees.filter(emp => !hiredEmployees[emp]);
         
@@ -5429,19 +5578,29 @@
                             'grinni': 'Грини',
                             'purpe': 'Пёрпи', 
                             'redjy': 'Реджи',
-                            'blumy': 'Блуми'
+                            'blumy': 'Блуми',
+                            'robo-blumy': 'Робо-Блуми'
                         };
                         const employeeImages = {
                             'grinni': 'assets/svg/hiring-forpanel/green.svg',
                             'purpe': 'assets/svg/hiring-forpanel/purpe.svg',
                             'redjy': 'assets/svg/hiring-forpanel/redjy.svg',
-                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg'
+                            'blumy': 'assets/svg/hiring-forpanel/blumy.svg',
+                            'robo-blumy': 'assets/svg/hiring-forpanel/robo-blumy.svg'
                         };
                         
+                        const isRoboBlumy = employee === 'robo-blumy';
+                        const cardBackground = isRoboBlumy ? 'linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,193,7,0.2) 100%)' : 'rgba(255,255,255,0.05)';
+                        const cardBorder = isRoboBlumy ? '2px solid rgba(255,215,0,0.5)' : '1px solid rgba(255,255,255,0.1)';
+                        const cardShadow = isRoboBlumy ? '0 2px 8px rgba(255,215,0,0.3)' : 'none';
+                        
                         return `
-                            <div class="employee-card" data-employee="${employee}" style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <img src="${employeeImages[employee]}" alt="${employeeNames[employee]}" style="width: 60px; height: 60px; margin-bottom: 8px; border-radius: 8px;">
+                            <div class="employee-card" data-employee="${employee}" style="background: ${cardBackground}; border-radius: 12px; padding: 16px; border: ${cardBorder}; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: ${cardShadow};">
+                                <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; ${isRoboBlumy ? 'overflow: visible;' : ''}">
+                                    <img src="${employeeImages[employee]}" alt="${employeeNames[employee]}" style="${isRoboBlumy ? 'width: 72px; height: 72px;' : 'width: 60px; height: 60px;'} border-radius: 8px; object-fit: contain; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
+                                </div>
                                 <div style="font-size: 14px; font-weight: 600; color: #fff;">${employeeNames[employee]}</div>
+                                ${isRoboBlumy ? '<div style="font-size: 10px; color: #ffd700; font-weight: 700; margin-top: 4px; text-shadow: 0 0 4px rgba(255,215,0,0.5);">x15 к прибыли</div>' : ''}
                                 <div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 4px;">Доступен</div>
                             </div>
                         `;
@@ -5521,13 +5680,20 @@
         // Обновляем индикаторы сотрудников
         updateProfitIndicators();
         
+        // Обновляем панель персонажей, если она открыта
+        if (window.renderCharacters && document.getElementById('characters-panel') && document.getElementById('characters-panel').style.display !== 'none') {
+            const currentFilter = document.getElementById('char-tab-available')?.classList.contains('active') ? 'available' : 'all';
+            window.renderCharacters(currentFilter);
+        }
+        
         // Показываем уведомление
         if (window.showNotification) {
             const employeeNames = {
                 'grinni': 'Грини',
-                'purpe': 'Пёрпи', 
+                'purpe': 'Пёрпи',
                 'redjy': 'Реджи',
-                'blumy': 'Блуми'
+                'blumy': 'Блуми',
+                'robo-blumy': 'Робо-Блуми'
             };
             window.showNotification(`✅ ${employeeNames[employee]} назначен к зданию!`, 'success');
         }

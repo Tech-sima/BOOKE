@@ -1055,6 +1055,20 @@ function startGame(){
         } catch (error) {
             console.error('Error during city panel images preloading:', error);
         }
+        
+        // Предзагружаем изображения адвент-панели при запуске игры
+        try {
+            preloadAdventImages();
+        } catch (error) {
+            console.error('Error during advent images preloading:', error);
+        }
+        
+        // Инициализируем адвент-панель при запуске игры
+        try {
+            initializeAdventPanel();
+        } catch (error) {
+            console.error('Error during advent panel initialization:', error);
+        }
     }catch(e){
         console.error('Error starting game:', e);
     }
@@ -1832,11 +1846,32 @@ setInterval(saveFactory,1000);
 function getRefs(){return parseInt(localStorage.getItem('refs')||'0');}
 function setRefs(v){
     localStorage.setItem('refs',v);
+    // Примечание: ref-value теперь показывает количество персонажей, а не рефералов
+}
+
+// Функция для подсчета персонажей на аккаунте игрока
+function getCharactersCount(){
+    // Базовые персонажи всегда доступны: blumy, redjy, grinni, purpe (4 персонажа)
+    let count = 4;
+    
+    // Проверяем, есть ли robo-blumy в списке доступных персонажей
+    const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+    if(availableCharacters.includes('robo-blumy')){
+        count++;
+    }
+    
+    return count;
+}
+
+// Функция для обновления отображения количества персонажей в левой панели
+function updateCharactersCount(){
     const refValue = document.getElementById('ref-value');
     if(refValue) {
-        refValue.textContent=v+'/5';
+        const count = getCharactersCount();
+        refValue.textContent = count + '/5';
     }
 }
+
 // init stat values
 const bcValue = document.getElementById('bc-value');
 const rbcValue = document.getElementById('rbc-value');
@@ -1844,7 +1879,7 @@ const refValue = document.getElementById('ref-value');
 
 if(bcValue) bcValue.textContent=formatNumber(getBalance());
 if(rbcValue) rbcValue.textContent=getCredits();
-if(refValue) refValue.textContent=getRefs()+'/5';
+updateCharactersCount();
 
 // === PHONE PANEL ===
 const phonePanel=document.getElementById('phone-panel');
@@ -2661,47 +2696,170 @@ function renderCharacters(filter = 'all'){
     
     contentContainer.innerHTML = '';
     
-    if(filter === 'available') {
-        // Показываем только доступных персонажей (Блуми, Реджи и Гринни)
-        const availableCharacters = [
-            {name: 'Блуми', image: 'assets/svg/characters-panel/bloomi.svg'},
-            {name: 'Реджи', image: 'assets/svg/characters-panel/redgi.svg'},
-            {name: 'Гринни', image: 'assets/svg/characters-panel/grinni.svg'}
-        ];
-        
-        availableCharacters.forEach(char => {
-            const item = document.createElement('div');
-            item.style.cssText='display:flex;flex-direction:column;align-items:center;margin-bottom:10px;width:100%;';
-            
-            item.innerHTML = `
-                <img src="${char.image}" alt="${char.name}" style="width:100%;height:auto;max-height:400px;object-fit:contain;" onerror="this.style.display='none'">
-            `;
-            
-            contentContainer.appendChild(item);
-        });
-        return;
-    }
+    // Получаем данные о нанятых персонажах
+    const hiredEmployees = JSON.parse(localStorage.getItem('hiredEmployees')) || {};
     
-    // Список персонажей для панели
-    const characters = [
-        {name: 'Блуми', image: 'assets/svg/characters-panel/bloomi.svg'},
-        {name: 'Реджи', image: 'assets/svg/characters-panel/redgi.svg'},
-        {name: 'Гринни', image: 'assets/svg/characters-panel/grinni.svg'},
-        {name: 'Пурпе', image: 'assets/svg/characters-panel/purpe.svg'},
-        {name: 'Пинки', image: 'assets/svg/characters-panel/pinky.svg'},
-        {name: 'Секрет', image: 'assets/svg/characters-panel/seecret.svg'}
+    // Данные персонажей (4 основных + robo-blumy если получен)
+    // ID должны соответствовать ключам в hiredEmployees: 'grinni', 'purpe', 'redjy', 'blumy', 'robo-blumy'
+    const baseCharacters = [
+        {
+            id: 'blumy',
+            name: 'Блуми',
+            image: 'assets/svg/characters-panel/blumy.svg',
+            level: 1,
+            skill: 'Бегущая почта',
+            rarity: 1
+        },
+        {
+            id: 'redjy',
+            name: 'Реджи',
+            image: 'assets/svg/characters-panel/redjy.svg',
+            level: 1,
+            skill: 'Калькулятор',
+            rarity: 1
+        },
+        {
+            id: 'grinni',
+            name: 'Гринни',
+            image: 'assets/svg/characters-panel/grinny.svg', // Файл называется grinny.svg, но ID - grinni
+            level: 1,
+            skill: 'Лояльность',
+            rarity: 3
+        },
+        {
+            id: 'purpe',
+            name: 'Пёрпи',
+            image: 'assets/svg/characters-panel/purpe.svg',
+            level: 1,
+            skill: 'Менеджер',
+            rarity: 4
+        }
     ];
     
-    characters.forEach(char => {
-        const item = document.createElement('div');
-        item.style.cssText='display:flex;flex-direction:column;align-items:center;margin-bottom:10px;width:100%;';
+    // Проверяем, получен ли robo-blumy из ультра подарка
+    const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+    const charactersData = [...baseCharacters];
+    
+    if(availableCharacters.includes('robo-blumy')){
+        charactersData.push({
+            id: 'robo-blumy',
+            name: 'Робо-Блуми',
+            image: 'assets/svg/characters-panel/robo-blumy.svg',
+            level: 1,
+            skill: 'Программист',
+            rarity: 5
+        });
+    }
+    
+    // Фильтруем персонажей
+    let charactersToShow = charactersData;
+    if (filter === 'available') {
+        // Показываем только не нанятых персонажей
+        // hiredEmployees структура: { 'grinni': 'library', 'blumy': 'factory', ... }
+        charactersToShow = charactersData.filter(char => {
+            // Проверяем, не нанят ли персонаж (если его ID есть в ключах hiredEmployees)
+            return !hiredEmployees.hasOwnProperty(char.id);
+        });
+    }
+    
+    // Создаем карточки персонажей
+    charactersToShow.forEach(char => {
+        const isRoboBlumy = char.id === 'robo-blumy';
         
-        item.innerHTML = `
-            <img src="${char.image}" alt="${char.name}" style="width:100%;height:auto;max-height:400px;object-fit:contain;" onerror="this.style.display='none'">
-        `;
+        // Стили карточки
+        let cardStyle = 'background:rgba(60,60,60,0.95);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);';
+        if(isRoboBlumy){
+            cardStyle = 'background:linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,193,7,0.2) 100%);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(255,215,0,0.3);border:2px solid rgba(255,215,0,0.5);';
+        }
         
-        contentContainer.appendChild(item);
+        const card = document.createElement('div');
+        card.style.cssText = cardStyle;
+        
+        // Изображение персонажа
+        const imageDiv = document.createElement('div');
+        if(isRoboBlumy){
+            imageDiv.style.cssText = 'flex-shrink:0;width:80px;height:80px;border-radius:8px;overflow:visible;display:flex;align-items:center;justify-content:center;';
+        } else {
+            imageDiv.style.cssText = 'flex-shrink:0;width:80px;height:80px;border-radius:8px;overflow:hidden;';
+        }
+        const img = document.createElement('img');
+        img.src = char.image;
+        img.alt = char.name;
+        if(isRoboBlumy){
+            img.style.cssText = 'width:120%;height:120%;object-fit:contain;transform:scale(1.2);';
+        } else {
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+        }
+        img.onerror = function() { this.style.display='none'; };
+        imageDiv.appendChild(img);
+        
+        // Информация о персонаже
+        const infoDiv = document.createElement('div');
+        infoDiv.style.cssText = 'flex:1;display:flex;flex-direction:column;gap:4px;';
+        
+        // Имя
+        const nameDiv = document.createElement('div');
+        nameDiv.style.cssText = 'font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;';
+        nameDiv.textContent = char.name;
+        
+        // Уровень
+        const levelDiv = document.createElement('div');
+        levelDiv.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.8);display:flex;justify-content:space-between;';
+        levelDiv.innerHTML = '<span>Уровень</span><span style="color:#fff;font-weight:600;">' + char.level + '</span>';
+        
+        // Навык
+        const skillDiv = document.createElement('div');
+        skillDiv.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.8);display:flex;justify-content:space-between;';
+        skillDiv.innerHTML = '<span>Навык</span><span style="color:#fff;font-weight:600;">' + char.skill + '</span>';
+        
+        // Редкость
+        const rarityDiv = document.createElement('div');
+        rarityDiv.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.8);display:flex;justify-content:space-between;align-items:center;';
+        const rarityLabel = document.createElement('span');
+        rarityLabel.textContent = 'Редкость';
+        const rarityText = document.createElement('span');
+        if(isRoboBlumy){
+            rarityText.textContent = 'Уникальный';
+            rarityText.style.cssText = 'color:#fff;font-size:11px;font-weight:700;';
+        } else {
+            rarityText.textContent = 'Базовая';
+            rarityText.style.cssText = 'color:#fff;font-size:11px;';
+        }
+        rarityDiv.appendChild(rarityLabel);
+        rarityDiv.appendChild(rarityText);
+        
+        // Бонус для robo-blumy
+        if(isRoboBlumy){
+            const bonusDiv = document.createElement('div');
+            bonusDiv.style.cssText = 'font-size:11px;color:rgba(255,215,0,0.9);display:flex;justify-content:space-between;align-items:center;margin-top:4px;';
+            const bonusLabel = document.createElement('span');
+            bonusLabel.textContent = 'Бонус';
+            const bonusText = document.createElement('span');
+            bonusText.textContent = 'x15 к прибыли';
+            bonusText.style.cssText = 'color:#ffd700;font-size:11px;font-weight:700;text-shadow:0 0 4px rgba(255,215,0,0.5);';
+            bonusDiv.appendChild(bonusLabel);
+            bonusDiv.appendChild(bonusText);
+            infoDiv.appendChild(bonusDiv);
+        }
+        
+        infoDiv.appendChild(nameDiv);
+        infoDiv.appendChild(levelDiv);
+        infoDiv.appendChild(skillDiv);
+        infoDiv.appendChild(rarityDiv);
+        
+        card.appendChild(imageDiv);
+        card.appendChild(infoDiv);
+        
+        contentContainer.appendChild(card);
     });
+    
+    // Если нет персонажей для отображения
+    if (charactersToShow.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.style.cssText = 'text-align:center;padding:40px 20px;color:rgba(255,255,255,0.6);font-size:14px;';
+        emptyDiv.textContent = filter === 'available' ? 'Все персонажи наняты' : 'Нет персонажей';
+        contentContainer.appendChild(emptyDiv);
+    }
 }
 
 // Tab switching for characters
@@ -2742,6 +2900,10 @@ function switchCharacterTab(filter) {
 
 // Делаем функцию глобально доступной
 window.switchCharacterTab = switchCharacterTab;
+
+// Делаем функцию обновления счетчика персонажей глобально доступной
+window.updateCharactersCount = updateCharactersCount;
+window.getCharactersCount = getCharactersCount;
 
 // Делаем переменные глобально доступными
 window.upgradesCount = upgradesCount;
@@ -4005,12 +4167,10 @@ function preloadShopImages() {
 function preloadCharacterImages() {
     const characterImages = [
         // Персонажи для панели персонажей
-        'assets/svg/characters-panel/bloomi.svg',
-        'assets/svg/characters-panel/redgi.svg',
-        'assets/svg/characters-panel/grinni.svg',
+        'assets/svg/characters-panel/blumy.svg',
+        'assets/svg/characters-panel/redjy.svg',
+        'assets/svg/characters-panel/grinny.svg',
         'assets/svg/characters-panel/purpe.svg',
-        'assets/svg/characters-panel/pinky.svg',
-        'assets/svg/characters-panel/seecret.svg',
         // Сотрудники для зданий
         'assets/svg/employees/blumy-hired.svg',
         'assets/svg/employees/grinni-hired.svg',
@@ -4038,6 +4198,325 @@ function preloadCharacterImages() {
     
 
 }
+
+// Предварительная загрузка всех ресурсов адвент-панели
+function preloadAdventImages() {
+    const adventImages = [
+        'assets/svg/advent/advent-book.svg',
+        'assets/svg/advent/advent-background.svg',
+        'assets/svg/advent/advent-uzor.svg',
+        'assets/svg/advent/advent-gift-rare.svg',
+        'assets/svg/advent/advent-gift-rare-opened.svg',
+        'assets/svg/advent/advent-gift-legendery.svg',
+        'assets/svg/advent/advent-gift-legendery-opened.svg',
+        'assets/svg/advent/advent-gift-ultra.svg',
+        'assets/svg/advent/advent-gift-ultra-opened.svg',
+        'assets/svg/characters-panel/robo-blumy.svg',
+        'assets/svg/money-icon.svg',
+        'assets/svg/rbc-icon.svg'
+    ];
+    
+    adventImages.forEach(imagePath => {
+        const img = new Image();
+        img.src = imagePath;
+        img.onload = () => {
+            // Изображение загружено
+        };
+        img.onerror = () => {
+            console.warn(`⚠️ Failed to load advent image: ${imagePath}`);
+        };
+    });
+}
+
+// Флаг для отслеживания инициализации адвент-панели
+let adventInitialized = false;
+
+// Инициализация адвент-панели
+function initializeAdventPanel() {
+    if (adventInitialized) {
+        return;
+    }
+    
+    const btn = document.getElementById('advent-btn');
+    const panel = document.getElementById('advent-panel');
+    const closeWrap = document.getElementById('advent-close-wrap');
+    const closeBtn = document.getElementById('advent-close');
+    const panelContent = document.querySelector('.advent-panel-content');
+    
+    if (!btn || !panel || !closeWrap || !closeBtn) {
+        return;
+    }
+    
+    // Функции для работы с состоянием подарков
+    function getAdventState(){
+        const saved = localStorage.getItem('adventState');
+        if(saved) return JSON.parse(saved);
+        return {
+            opened: [], // Изначально все закрыты
+            rewards: {},
+            timers: {},
+            lastOpened: 0
+        };
+    }
+    function saveAdventState(state){
+        localStorage.setItem('adventState', JSON.stringify(state));
+    }
+    
+    // Функция получения типа подарка
+    function getGiftType(index){
+        if(index === 28) return 'ultra';
+        if(index % 3 === 0) return 'legendary';
+        return 'rare';
+    }
+    
+    // Функция генерации награды
+    function generateReward(type){
+        if(type === 'rare'){
+            return {
+                money: Math.floor(Math.random() * (1500 - 500 + 1)) + 500,
+                diamonds: Math.floor(Math.random() * (100 - 50 + 1)) + 50
+            };
+        } else if(type === 'legendary'){
+            return {
+                money: Math.floor(Math.random() * (15000 - 4000 + 1)) + 4000,
+                diamonds: Math.floor(Math.random() * (700 - 200 + 1)) + 200
+            };
+        } else if(type === 'ultra'){
+            return {
+                character: 'robo-blumy'
+            };
+        }
+        return null;
+    }
+    
+    // Функция проверки доступности подарка
+    function isGiftAvailable(index, state){
+        if(state.opened.includes(index)) return false; // Уже открыт
+        if(index === 1) return true; // Первый всегда доступен
+        const prevIndex = index - 1;
+        if(!state.opened.includes(prevIndex)) return false; // Предыдущий не открыт
+        
+        // Проверяем таймер
+        if(state.timers[index]){
+            const timerEnd = state.timers[index];
+            if(Date.now() < timerEnd) return false; // Таймер еще не истек
+        }
+        return true;
+    }
+    
+    // Функция проверки, заблокирован ли подарок
+    function isGiftLocked(index, state){
+        if(state.opened.includes(index)) return false; // Открыт - не заблокирован
+        if(index === 1) return false; // Первый не заблокирован
+        const prevIndex = index - 1;
+        if(!state.opened.includes(prevIndex)) return true; // Предыдущий не открыт - заблокирован
+        // Проверяем таймер
+        if(state.timers[index]){
+            const timerEnd = state.timers[index];
+            if(Date.now() < timerEnd) return true; // Таймер еще не истек - заблокирован
+        }
+        return false; // Доступен
+    }
+    
+    // Функция открытия подарка
+    function openGift(index){
+        const state = getAdventState();
+        if(!isGiftAvailable(index, state)) return;
+        
+        const type = getGiftType(index);
+        const reward = generateReward(type);
+        
+        // Сохраняем награду
+        state.rewards[index] = reward;
+        state.opened.push(index);
+        state.lastOpened = index;
+        
+        // Устанавливаем таймер для следующего подарка
+        if(index < 28){
+            const nextIndex = index + 1;
+            state.timers[nextIndex] = Date.now() + 10000; // 10 секунд
+        }
+        
+        // Если ультра подарок - добавляем персонажа
+        if(type === 'ultra' && reward.character === 'robo-blumy'){
+            // Добавляем персонажа в список доступных
+            const characters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+            if(!characters.includes('robo-blumy')){
+                characters.push('robo-blumy');
+                localStorage.setItem('availableCharacters', JSON.stringify(characters));
+                // Обновляем счетчик персонажей в левой панели
+                if(window.updateCharactersCount){
+                    window.updateCharactersCount();
+                }
+            }
+        }
+        
+        // Добавляем награды к балансу
+        if(reward.money && window.setBalance && window.getBalance){
+            window.setBalance(window.getBalance() + reward.money);
+        }
+        if(reward.diamonds && window.setCredits && window.getCredits){
+            window.setCredits(window.getCredits() + reward.diamonds);
+        }
+        
+        saveAdventState(state);
+        renderGifts();
+        
+        // Обновляем персонажей если нужно
+        if(type === 'ultra' && window.renderCharacters){
+            setTimeout(() => window.renderCharacters(), 100);
+        }
+    }
+    
+    // Функция рендеринга подарков
+    function renderGifts(){
+        const state = getAdventState();
+        const grid = document.querySelector('.advent-grid');
+        if(!grid) return;
+        
+        const items = grid.querySelectorAll('.advent-grid-item');
+        items.forEach((item, idx) => {
+            const index = idx + 1;
+            const type = getGiftType(index);
+            const isOpened = state.opened.includes(index);
+            const isAvailable = isGiftAvailable(index, state);
+            const isLocked = isGiftLocked(index, state);
+            const reward = state.rewards[index];
+            
+            // Очищаем содержимое
+            item.innerHTML = '';
+            item.className = 'advent-grid-item';
+            
+            // Устанавливаем тип подарка для правильного фона
+            if(type === 'legendary'){
+                item.classList.add('legendary');
+            } else if(type === 'ultra'){
+                item.classList.add('ultra');
+            }
+            
+            // Устанавливаем состояние
+            if(isOpened){
+                // Для ультра подарка с персонажем не добавляем класс opened (чтобы не показывать открытый подарок)
+                if(type === 'ultra' && reward && reward.character){
+                    item.classList.add('ultra-character');
+                    // Показываем только SVG персонажа
+                    const rewardDiv = document.createElement('div');
+                    rewardDiv.className = 'advent-reward';
+                    rewardDiv.innerHTML = `<div class="advent-reward-character"><img src="assets/svg/characters-panel/robo-blumy.svg" class="advent-reward-character-img" alt="robo-blumy"></div>`;
+                    item.appendChild(rewardDiv);
+                } else {
+                    item.classList.add('opened');
+                    // Показываем награду
+                    if(reward){
+                        const rewardDiv = document.createElement('div');
+                        rewardDiv.className = 'advent-reward';
+                        if(reward.character){
+                            rewardDiv.innerHTML = `<div class="advent-reward-character"><img src="assets/svg/characters-panel/robo-blumy.svg" class="advent-reward-character-img" alt="robo-blumy"></div>`;
+                        } else {
+                            if(reward.money){
+                                rewardDiv.innerHTML += `<div class="advent-reward-item"><img src="assets/svg/money-icon.svg" class="advent-reward-icon" alt="money">${reward.money.toLocaleString()}</div>`;
+                            }
+                            if(reward.diamonds){
+                                rewardDiv.innerHTML += `<div class="advent-reward-item"><img src="assets/svg/rbc-icon.svg" class="advent-reward-icon" alt="diamonds">${reward.diamonds.toLocaleString()}</div>`;
+                            }
+                        }
+                        item.appendChild(rewardDiv);
+                    }
+                }
+            } else if(isLocked){
+                item.classList.add('locked');
+                // Добавляем таймер если есть
+                if(state.timers[index]){
+                    const timerEnd = state.timers[index];
+                    const timerDiv = document.createElement('div');
+                    timerDiv.className = 'advent-timer';
+                    item.appendChild(timerDiv);
+                    
+                    const updateTimer = () => {
+                        const now = Date.now();
+                        const remaining = Math.max(0, timerEnd - now);
+                        if(remaining <= 0){
+                            timerDiv.remove();
+                            renderGifts();
+                            return;
+                        }
+                        const seconds = Math.ceil(remaining / 1000);
+                        timerDiv.textContent = seconds;
+                    };
+                    updateTimer();
+                    const timerInterval = setInterval(() => {
+                        if(!item.parentNode){
+                            clearInterval(timerInterval);
+                            return;
+                        }
+                        const now = Date.now();
+                        if(now >= timerEnd){
+                            clearInterval(timerInterval);
+                            renderGifts();
+                        } else {
+                            updateTimer();
+                        }
+                    }, 100);
+                }
+            } else {
+                item.classList.add('available');
+                // Добавляем кнопку "забрать"
+                const claimBtn = document.createElement('button');
+                claimBtn.className = 'advent-claim-btn';
+                claimBtn.textContent = 'Забрать';
+                claimBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    openGift(index);
+                };
+                item.appendChild(claimBtn);
+            }
+        });
+    }
+    
+    // Делаем renderGifts доступной глобально для обновления при открытии панели
+    window.renderAdventGifts = renderGifts;
+    
+    const updateClosePos = ()=>{
+        const rect = panel.getBoundingClientRect();
+        const offset = 12;
+        const bottom = Math.max(0, (window.innerHeight - rect.top) + offset);
+        closeWrap.style.bottom = bottom + 'px';
+    };
+    const open = ()=>{
+        panel.classList.add('show');
+        closeWrap.classList.add('show');
+        document.body.classList.add('advent-locked');
+        updateClosePos();
+        renderGifts();
+        if(window.hideProfitIndicators) window.hideProfitIndicators({ suppress: true });
+    };
+    const close = ()=>{
+        panel.classList.remove('show');
+        closeWrap.classList.remove('show');
+        document.body.classList.remove('advent-locked');
+        if(window.showProfitIndicators) window.showProfitIndicators({ force: true });
+    };
+    btn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    window.addEventListener('resize', ()=>{
+        if(panel.classList.contains('show')){
+            updateClosePos();
+        }
+    });
+    ['click','touchstart','touchend'].forEach(evt=>{
+        panel.addEventListener(evt, ev=>ev.stopPropagation());
+        closeBtn.addEventListener(evt, ev=>ev.stopPropagation());
+        if(panelContent) panelContent.addEventListener(evt, ev=>ev.stopPropagation());
+    });
+    
+    // Инициализация при загрузке - рендерим подарки сразу
+    renderGifts();
+    
+    adventInitialized = true;
+}
+
+// Делаем функцию доступной глобально
+window.initializeAdventPanel = initializeAdventPanel;
 
 // Флаг для отслеживания инициализации игры
 let gameInitialized = false;
@@ -4075,6 +4554,20 @@ document.addEventListener('DOMContentLoaded', () => {
             preloadCharacterImages();
         } catch (error) {
             console.error('Error during character/employee images preloading:', error);
+        }
+        
+        // Предварительно загружаем изображения адвент-панели
+        try {
+            preloadAdventImages();
+        } catch (error) {
+            console.error('Error during advent images preloading:', error);
+        }
+        
+        // Инициализируем адвент-панель во время загрузки игры
+        try {
+            initializeAdventPanel();
+        } catch (error) {
+            console.error('Error during advent panel initialization:', error);
         }
         
         // Предварительно загружаем изображения магазина и ждем их загрузки

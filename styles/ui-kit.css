@@ -287,29 +287,268 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Advent overlay */
 .advent-panel{
   position:fixed;
+  top:0;
   left:0;
   right:0;
   bottom:0;
-  height:var(--advent-panel-height);
-  max-height:calc(100vh - 40px);
+  width:100vw;
+  height:100vh;
+  max-width:100vw;
   background:#000;
-  border-radius:18px 18px 0 0;
-  border:2px solid rgba(0,0,0,0.85);
-  box-shadow:0 -6px 18px rgba(0,0,0,0.6);
-  padding:8px 4px 18px 4px;
-  overflow:visible;
+  border:none;
+  box-shadow:none;
+  padding:16px;
+  overflow:hidden;
   touch-action:none;
   display:none;
   z-index:1500;
+  box-sizing:border-box;
 }
+
+/* Золотые лучи из центра */
+.advent-panel::before{
+  content:'';
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:200%;
+  height:200%;
+  background:
+    radial-gradient(
+      circle at center,
+      transparent 0%,
+      transparent 15%,
+      rgba(255,215,0,0.1) 20%,
+      rgba(255,215,0,0.05) 30%,
+      transparent 40%
+    ),
+    conic-gradient(
+      from 0deg at center,
+      transparent 0deg,
+      transparent 7deg,
+      rgba(255,215,0,0.2) 7deg,
+      rgba(255,215,0,0.5) 8deg,
+      rgba(255,215,0,0.65) 9deg,
+      rgba(255,215,0,0.5) 10deg,
+      rgba(255,215,0,0.2) 11deg,
+      transparent 12deg,
+      transparent 19deg,
+      rgba(220,53,69,0.18) 19deg,
+      rgba(220,53,69,0.48) 20deg,
+      rgba(220,53,69,0.62) 21deg,
+      rgba(220,53,69,0.48) 22deg,
+      rgba(220,53,69,0.18) 23deg,
+      transparent 24deg,
+      transparent 31deg,
+      rgba(255,215,0,0.15) 31deg,
+      rgba(255,215,0,0.45) 32deg,
+      rgba(255,215,0,0.6) 33deg,
+      rgba(255,215,0,0.45) 34deg,
+      rgba(255,215,0,0.15) 35deg,
+      transparent 36deg,
+      transparent 43deg,
+      rgba(220,53,69,0.12) 43deg,
+      rgba(220,53,69,0.42) 44deg,
+      rgba(220,53,69,0.58) 45deg,
+      rgba(220,53,69,0.42) 46deg,
+      rgba(220,53,69,0.12) 47deg,
+      transparent 48deg,
+      transparent 55deg,
+      rgba(255,215,0,0.2) 55deg,
+      rgba(255,215,0,0.6) 56deg,
+      rgba(255,215,0,0.8) 57deg,
+      rgba(255,215,0,0.6) 58deg,
+      rgba(255,215,0,0.2) 59deg,
+      transparent 60deg,
+      transparent 67deg,
+      rgba(220,53,69,0.25) 67deg,
+      rgba(220,53,69,0.65) 68deg,
+      rgba(220,53,69,0.85) 69deg,
+      rgba(220,53,69,0.65) 70deg,
+      rgba(220,53,69,0.25) 71deg,
+      transparent 72deg,
+      transparent 79deg,
+      rgba(255,215,0,0.3) 79deg,
+      rgba(255,215,0,0.7) 80deg,
+      rgba(255,215,0,0.9) 81deg,
+      rgba(255,215,0,0.7) 82deg,
+      rgba(255,215,0,0.3) 83deg,
+      transparent 84deg,
+      transparent 91deg,
+      rgba(220,53,69,0.25) 91deg,
+      rgba(220,53,69,0.65) 92deg,
+      rgba(220,53,69,0.85) 93deg,
+      rgba(220,53,69,0.65) 94deg,
+      rgba(220,53,69,0.25) 95deg,
+      transparent 96deg,
+      transparent 103deg,
+      rgba(255,215,0,0.2) 103deg,
+      rgba(255,215,0,0.6) 104deg,
+      rgba(255,215,0,0.8) 105deg,
+      rgba(255,215,0,0.6) 106deg,
+      rgba(255,215,0,0.2) 107deg,
+      transparent 108deg,
+      transparent 115deg,
+      rgba(220,53,69,0.15) 115deg,
+      rgba(220,53,69,0.55) 116deg,
+      rgba(220,53,69,0.75) 117deg,
+      rgba(220,53,69,0.55) 118deg,
+      rgba(220,53,69,0.15) 119deg,
+      transparent 120deg,
+      transparent 127deg,
+      rgba(255,215,0,0.2) 127deg,
+      rgba(255,215,0,0.6) 128deg,
+      rgba(255,215,0,0.8) 129deg,
+      rgba(255,215,0,0.6) 130deg,
+      rgba(255,215,0,0.2) 131deg,
+      transparent 132deg,
+      transparent 139deg,
+      rgba(220,53,69,0.25) 139deg,
+      rgba(220,53,69,0.65) 140deg,
+      rgba(220,53,69,0.85) 141deg,
+      rgba(220,53,69,0.65) 142deg,
+      rgba(220,53,69,0.25) 143deg,
+      transparent 144deg,
+      transparent 151deg,
+      rgba(255,215,0,0.3) 151deg,
+      rgba(255,215,0,0.7) 152deg,
+      rgba(255,215,0,0.9) 153deg,
+      rgba(255,215,0,0.7) 154deg,
+      rgba(255,215,0,0.3) 155deg,
+      transparent 156deg,
+      transparent 163deg,
+      rgba(220,53,69,0.25) 163deg,
+      rgba(220,53,69,0.65) 164deg,
+      rgba(220,53,69,0.85) 165deg,
+      rgba(220,53,69,0.65) 166deg,
+      rgba(220,53,69,0.25) 167deg,
+      transparent 168deg,
+      transparent 175deg,
+      rgba(255,215,0,0.2) 175deg,
+      rgba(255,215,0,0.6) 176deg,
+      rgba(255,215,0,0.8) 177deg,
+      rgba(255,215,0,0.6) 178deg,
+      rgba(255,215,0,0.2) 179deg,
+      transparent 180deg,
+      transparent 187deg,
+      rgba(220,53,69,0.15) 187deg,
+      rgba(220,53,69,0.55) 188deg,
+      rgba(220,53,69,0.75) 189deg,
+      rgba(220,53,69,0.55) 190deg,
+      rgba(220,53,69,0.15) 191deg,
+      transparent 192deg,
+      transparent 199deg,
+      rgba(255,215,0,0.2) 199deg,
+      rgba(255,215,0,0.6) 200deg,
+      rgba(255,215,0,0.8) 201deg,
+      rgba(255,215,0,0.6) 202deg,
+      rgba(255,215,0,0.2) 203deg,
+      transparent 204deg,
+      transparent 211deg,
+      rgba(220,53,69,0.25) 211deg,
+      rgba(220,53,69,0.65) 212deg,
+      rgba(220,53,69,0.85) 213deg,
+      rgba(220,53,69,0.65) 214deg,
+      rgba(220,53,69,0.25) 215deg,
+      transparent 216deg,
+      transparent 223deg,
+      rgba(255,215,0,0.3) 223deg,
+      rgba(255,215,0,0.7) 224deg,
+      rgba(255,215,0,0.9) 225deg,
+      rgba(255,215,0,0.7) 226deg,
+      rgba(255,215,0,0.3) 227deg,
+      transparent 228deg,
+      transparent 235deg,
+      rgba(220,53,69,0.25) 235deg,
+      rgba(220,53,69,0.65) 236deg,
+      rgba(220,53,69,0.85) 237deg,
+      rgba(220,53,69,0.65) 238deg,
+      rgba(220,53,69,0.25) 239deg,
+      transparent 240deg,
+      transparent 247deg,
+      rgba(255,215,0,0.2) 247deg,
+      rgba(255,215,0,0.6) 248deg,
+      rgba(255,215,0,0.8) 249deg,
+      rgba(255,215,0,0.6) 250deg,
+      rgba(255,215,0,0.2) 251deg,
+      transparent 252deg,
+      transparent 259deg,
+      rgba(220,53,69,0.15) 259deg,
+      rgba(220,53,69,0.55) 260deg,
+      rgba(220,53,69,0.75) 261deg,
+      rgba(220,53,69,0.55) 262deg,
+      rgba(220,53,69,0.15) 263deg,
+      transparent 264deg,
+      transparent 271deg,
+      rgba(255,215,0,0.2) 271deg,
+      rgba(255,215,0,0.6) 272deg,
+      rgba(255,215,0,0.8) 273deg,
+      rgba(255,215,0,0.6) 274deg,
+      rgba(255,215,0,0.2) 275deg,
+      transparent 276deg,
+      transparent 283deg,
+      rgba(220,53,69,0.25) 283deg,
+      rgba(220,53,69,0.65) 284deg,
+      rgba(220,53,69,0.85) 285deg,
+      rgba(220,53,69,0.65) 286deg,
+      rgba(220,53,69,0.25) 287deg,
+      transparent 288deg,
+      transparent 295deg,
+      rgba(255,215,0,0.3) 295deg,
+      rgba(255,215,0,0.7) 296deg,
+      rgba(255,215,0,0.9) 297deg,
+      rgba(255,215,0,0.7) 298deg,
+      rgba(255,215,0,0.3) 299deg,
+      transparent 300deg,
+      transparent 307deg,
+      rgba(220,53,69,0.25) 307deg,
+      rgba(220,53,69,0.65) 308deg,
+      rgba(220,53,69,0.85) 309deg,
+      rgba(220,53,69,0.65) 310deg,
+      rgba(220,53,69,0.25) 311deg,
+      transparent 312deg,
+      transparent 319deg,
+      rgba(255,215,0,0.2) 319deg,
+      rgba(255,215,0,0.6) 320deg,
+      rgba(255,215,0,0.8) 321deg,
+      rgba(255,215,0,0.6) 322deg,
+      rgba(255,215,0,0.2) 323deg,
+      transparent 324deg,
+      transparent 331deg,
+      rgba(220,53,69,0.15) 331deg,
+      rgba(220,53,69,0.55) 332deg,
+      rgba(220,53,69,0.75) 333deg,
+      rgba(220,53,69,0.55) 334deg,
+      rgba(220,53,69,0.15) 335deg,
+      transparent 336deg,
+      transparent 343deg,
+      rgba(255,215,0,0.2) 343deg,
+      rgba(255,215,0,0.6) 344deg,
+      rgba(255,215,0,0.8) 345deg,
+      rgba(255,215,0,0.6) 346deg,
+      rgba(255,215,0,0.2) 347deg,
+      transparent 348deg,
+      transparent 355deg,
+      rgba(220,53,69,0.25) 355deg,
+      rgba(220,53,69,0.65) 356deg,
+      rgba(220,53,69,0.85) 357deg,
+      rgba(220,53,69,0.65) 358deg,
+      rgba(220,53,69,0.25) 359deg,
+      transparent 360deg
+    );
+  pointer-events:none;
+  z-index:-1;
+  filter:drop-shadow(0 0 6px rgba(255,215,0,0.4)) drop-shadow(0 0 12px rgba(255,215,0,0.3)) drop-shadow(0 0 18px rgba(255,215,0,0.2)) drop-shadow(0 0 6px rgba(220,53,69,0.4)) drop-shadow(0 0 12px rgba(220,53,69,0.3)) drop-shadow(0 0 18px rgba(220,53,69,0.2));
+}
+
 .advent-panel.show{
   display:block;
 }
 .advent-close-wrap{
   position:fixed;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:calc(var(--advent-panel-height) + 12px);
+  top:16px;
+  right:16px;
   z-index:1501;
   display:none;
   pointer-events:none;
@@ -342,62 +581,196 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   flex-direction:column;
   gap:0;
   height:100%;
+  max-height:100vh;
   overflow-y:auto;
-  overflow-x:visible;
-  padding-bottom:160px;
+  overflow-x:hidden;
+  padding:0;
+  padding-top:20px;
+  padding-bottom:20px;
   overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;
   touch-action:pan-y;
+  box-sizing:border-box;
+  width:100%;
+  position:relative;
+  z-index:1;
 }
 .advent-panel-content::-webkit-scrollbar{width:0;height:0;}
 .advent-panel-content{scrollbar-width:none;}
 body.advent-locked{overflow:hidden;}
-.advent-panel-slot{
+.advent-header-box{
   flex:0 0 auto;
   width:100%;
+  max-width:100%;
   box-sizing:border-box;
-  min-height:42px;
-  padding:12px 40px 12px 16px;
-  border-radius:14px;
-  background:#000 url('../assets/svg/advent/advent-uzor.svg') no-repeat right 0px center;
-  background-size:160px auto;
-  border:1px solid #fff;
-  box-shadow:none;
+  margin:0 0 24px 0;
+  padding:20px 16px;
+  background:rgba(0,0,0,0.4);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:2px solid rgba(255,255,255,0.8);
+  border-radius:16px;
+  position:relative;
+  z-index:2;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.advent-title{
+  flex:0 0 auto;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  margin:0;
+  padding:0 0 12px 0;
+  text-align:center;
   color:#fff;
   font-family:"Cinzel","Playfair Display","Georgia","serif";
   font-weight:800;
-  font-size:24px;
+  font-size:48px;
   line-height:1.2;
-  letter-spacing:0.72px;
+  letter-spacing:1.8px;
   text-transform:uppercase;
   white-space:normal;
-  text-align:left;
   text-shadow:
-    0 0 4px rgba(255,215,0,0.8),
-    0 0 8px rgba(255,215,0,0.7),
-    0 0 12px rgba(255,215,0,0.6);
+    0 0 15px rgba(255,255,255,1),
+    0 0 30px rgba(255,255,255,1),
+    0 0 45px rgba(255,255,255,0.95),
+    0 0 60px rgba(255,255,255,0.9),
+    0 0 75px rgba(255,255,255,0.85),
+    0 0 90px rgba(255,255,255,0.8),
+    0 2px 4px rgba(0,0,0,0.5);
+  position:relative;
+}
+.advent-title::after{
+  content:'';
+  position:absolute;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:60%;
+  height:2px;
+  background:linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255,255,255,0.3) 10%,
+    rgba(255,255,255,0.8) 20%,
+    rgba(255,255,255,1) 50%,
+    rgba(255,255,255,0.8) 80%,
+    rgba(255,255,255,0.3) 90%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 8px rgba(255,255,255,0.6),
+    0 0 16px rgba(255,255,255,0.4);
+}
+.advent-subtitle{
+  flex:0 0 auto;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  text-align:center;
+  color:#fff;
+  font-family:"Cinzel","Playfair Display","Georgia","serif";
+  font-weight:400;
+  font-size:16px;
+  line-height:1.4;
+  letter-spacing:0.5px;
+  text-transform:none;
+  white-space:normal;
+  text-shadow:
+    0 0 12px rgba(255,255,255,1),
+    0 0 24px rgba(255,255,255,1),
+    0 0 36px rgba(255,255,255,0.95),
+    0 0 48px rgba(255,255,255,0.9),
+    0 0 60px rgba(255,255,255,0.85),
+    0 0 72px rgba(255,255,255,0.8),
+    0 2px 4px rgba(0,0,0,0.5);
+}
+.advent-progress-container{
+  flex:0 0 auto;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  margin:0;
+  padding:0 16px 20px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  position:relative;
+  z-index:2;
+}
+.advent-progress-label{
+  text-align:center;
+  color:#fff;
+  font-family:"Cinzel","Playfair Display","Georgia","serif";
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0.5px;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.8),
+    0 0 16px rgba(255,255,255,0.6),
+    0 2px 4px rgba(0,0,0,0.5);
+}
+.advent-progress-bar{
+  width:100%;
+  height:24px;
+  background:rgba(0,0,0,0.6);
+  border:2px solid rgba(255,255,255,0.5);
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,0.3),
+    0 0 8px rgba(255,255,255,0.3);
+}
+.advent-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.9) 100%);
+  border-radius:10px;
+  width:0%;
+  transition:width 0.5s ease;
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.8),
+    0 0 20px rgba(255,255,255,0.6),
+    inset 0 0 10px rgba(255,255,255,0.3);
 }
 .advent-grid{
   flex:0 0 auto;
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
   padding:12px 0 0 0;
   margin-top:0;
   counter-reset:grid-item;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  position:relative;
+  z-index:2;
 }
 .advent-grid-item{
   aspect-ratio:1/1;
-  background:transparent url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
-  background-size:150%;
-  border:1px solid #fff;
-  border-radius:6px;
+  background:rgba(0,0,0,0.4) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
+  background-size:160%;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.6);
+  border-radius:12px;
   position:relative;
   counter-increment:grid-item;
   overflow:hidden;
   filter:
     drop-shadow(0 0 1px rgba(255,255,255,0.6))
     drop-shadow(0 0 3px rgba(255,255,255,0.5));
+  box-sizing:border-box;
+  width:100%;
+  z-index:2;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
 }
 .advent-grid-item:nth-child(3n){
   background-image:url('../assets/svg/advent/advent-gift-legendery.svg');
@@ -453,6 +826,10 @@ body.advent-locked{overflow:hidden;}
   filter:grayscale(100%) brightness(0.4);
   opacity:0.6;
   pointer-events:none;
+  background:rgba(0,0,0,0.4) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
+  background-size:160%;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
 /* Открытые подарки */
 .advent-grid-item.opened{
@@ -478,12 +855,12 @@ body.advent-locked{overflow:hidden;}
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:4px;
+  gap:6px;
   z-index:10;
   pointer-events:none;
 }
 .advent-reward-item{
-  font-size:11px;
+  font-size:14px;
   font-weight:700;
   color:#fff;
   text-shadow:
@@ -492,11 +869,11 @@ body.advent-locked{overflow:hidden;}
   white-space:nowrap;
   display:flex;
   align-items:center;
-  gap:4px;
+  gap:5px;
 }
 .advent-reward-icon{
-  width:14px;
-  height:14px;
+  width:18px;
+  height:18px;
   flex-shrink:0;
 }
 .advent-reward-character{
@@ -515,8 +892,8 @@ body.advent-locked{overflow:hidden;}
   justify-content:center;
 }
 .advent-reward-character-img{
-  width:80px;
-  height:80px;
+  width:100px;
+  height:100px;
   object-fit:contain;
   image-rendering:auto;
   -ms-interpolation-mode:bicubic;
@@ -527,6 +904,12 @@ body.advent-locked{overflow:hidden;}
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
   filter:contrast(1.05) brightness(1.02);
+}
+/* Увеличенный размер персонажа для последнего подарка */
+.advent-grid-item:last-child .advent-reward-character-img,
+.advent-grid-item.ultra-character .advent-reward-character-img{
+  width:130px;
+  height:130px;
 }
 /* Таймер */
 .advent-timer{
@@ -540,8 +923,8 @@ body.advent-locked{overflow:hidden;}
   color:#fff;
   border:1px solid rgba(255,255,255,0.3);
   border-radius:8px;
-  padding:3px 8px;
-  font-size:9px;
+  padding:4px 10px;
+  font-size:10px;
   font-weight:700;
   font-family:"Segoe UI",Arial,sans-serif;
   z-index:10;
@@ -549,6 +932,8 @@ body.advent-locked{overflow:hidden;}
   box-shadow:0 2px 4px rgba(0,0,0,0.2);
   filter:none !important;
   opacity:1 !important;
+  white-space:nowrap;
+  letter-spacing:0.5px;
 }
 /* Кнопка "Забрать" */
 .advent-claim-btn{
@@ -580,6 +965,216 @@ body.advent-locked{overflow:hidden;}
 }
 .advent-claim-btn:active{
   transform:translateX(-50%) scale(0.95);
+}
+
+/* Адаптивные стили для полноэкранного адвента */
+@media (max-width: 768px) {
+  .advent-panel{
+    padding:12px;
+  }
+  .advent-close-wrap{
+    top:12px;
+    right:12px;
+  }
+  .advent-close{
+    padding:6px 12px;
+    font-size:11px;
+  }
+  .advent-panel-content{
+    padding-top:16px;
+    padding-bottom:16px;
+  }
+  .advent-header-box{
+    padding:16px 12px;
+    border-radius:14px;
+    margin-bottom:20px;
+  }
+  .advent-title{
+    font-size:40px;
+    padding:0 0 10px 0;
+    letter-spacing:1.4px;
+  }
+  .advent-subtitle{
+    font-size:16px;
+    padding:0;
+    letter-spacing:0.4px;
+  }
+  .advent-progress-container{
+    padding:0 12px 16px 12px;
+    gap:6px;
+  }
+  .advent-progress-label{
+    font-size:13px;
+  }
+  .advent-progress-bar{
+    height:20px;
+  }
+  .advent-grid{
+    grid-template-columns:repeat(5,1fr);
+    gap:5px;
+    padding:10px 0 0 0;
+  }
+  .advent-grid-item{
+    background-size:150%;
+  }
+  .advent-reward-item{
+    font-size:13px;
+  }
+  .advent-reward-icon{
+    width:16px;
+    height:16px;
+  }
+  .advent-reward-character-img{
+    width:90px;
+    height:90px;
+  }
+  .advent-grid-item:last-child .advent-reward-character-img,
+  .advent-grid-item.ultra-character .advent-reward-character-img{
+    width:115px;
+    height:115px;
+  }
+}
+
+@media (max-width: 480px) {
+  .advent-panel{
+    padding:8px;
+  }
+  .advent-close-wrap{
+    top:8px;
+    right:8px;
+  }
+  .advent-close{
+    padding:5px 10px;
+    font-size:10px;
+  }
+  .advent-panel-content{
+    padding-top:14px;
+    padding-bottom:12px;
+  }
+  .advent-header-box{
+    padding:14px 10px;
+    border-radius:12px;
+    margin-bottom:18px;
+  }
+  .advent-title{
+    font-size:34px;
+    padding:0 0 8px 0;
+    letter-spacing:1.2px;
+  }
+  .advent-subtitle{
+    font-size:14px;
+    padding:0;
+    letter-spacing:0.3px;
+  }
+  .advent-progress-container{
+    padding:0 10px 14px 10px;
+    gap:5px;
+  }
+  .advent-progress-label{
+    font-size:12px;
+  }
+  .advent-progress-bar{
+    height:18px;
+  }
+  .advent-grid{
+    grid-template-columns:repeat(4,1fr);
+    gap:4px;
+    padding:8px 0 0 0;
+  }
+  .advent-grid-item{
+    border-radius:10px;
+    background-size:140%;
+  }
+  .advent-reward-item{
+    font-size:12px;
+  }
+  .advent-reward-icon{
+    width:15px;
+    height:15px;
+  }
+  .advent-reward-character-img{
+    width:85px;
+    height:85px;
+  }
+  .advent-grid-item:last-child .advent-reward-character-img,
+  .advent-grid-item.ultra-character .advent-reward-character-img{
+    width:110px;
+    height:110px;
+  }
+}
+
+@media (max-width: 360px) {
+  .advent-panel{
+    padding:6px;
+  }
+  .advent-close-wrap{
+    top:6px;
+    right:6px;
+  }
+  .advent-close{
+    padding:4px 8px;
+    font-size:9px;
+  }
+  .advent-panel-content{
+    padding-top:12px;
+    padding-bottom:10px;
+  }
+  .advent-header-box{
+    padding:12px 8px;
+    border-radius:10px;
+    margin-bottom:16px;
+  }
+  .advent-title{
+    font-size:28px;
+    padding:0 0 6px 0;
+    letter-spacing:1px;
+  }
+  .advent-subtitle{
+    font-size:12px;
+    padding:0;
+    letter-spacing:0.2px;
+  }
+  .advent-progress-container{
+    padding:0 8px 12px 8px;
+    gap:4px;
+  }
+  .advent-progress-label{
+    font-size:11px;
+  }
+  .advent-progress-bar{
+    height:16px;
+  }
+  .advent-grid{
+    grid-template-columns:repeat(4,1fr);
+    gap:3px;
+    padding:6px 0 0 0;
+  }
+  .advent-grid-item{
+    background-size:130%;
+  }
+  .advent-reward-item{
+    font-size:11px;
+  }
+  .advent-reward-icon{
+    width:14px;
+    height:14px;
+  }
+  .advent-reward-character-img{
+    width:75px;
+    height:75px;
+  }
+  .advent-grid-item:last-child .advent-reward-character-img,
+  .advent-grid-item.ultra-character .advent-reward-character-img{
+    width:95px;
+    height:95px;
+  }
+}
+
+/* Адаптивная сетка для очень маленьких экранов */
+@media (max-width: 320px) {
+  .advent-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
 }
 
 /* push body down below header */
@@ -654,9 +1249,6 @@ body.advent-locked{overflow:hidden;}
 }
 
 /* Кнопки разработки для Telegram Mini App */
-.telegram-mini-app #reset-data {
-    top: 75px !important; /* 5px + 70px Telegram offset */
-}
 
 .telegram-mini-app #add-money-test {
     top: 105px !important; /* 35px + 70px Telegram offset */
@@ -669,7 +1261,6 @@ body.advent-locked{overflow:hidden;}
     .telegram-mini-app .news-corner { top: 70px !important; }
     .telegram-mini-app .app-header { height: 156px !important; padding-top: 72px !important; }
     .telegram-mini-app #three-canvas { margin-top: 156px !important; }
-    .telegram-mini-app #reset-data { top: 65px !important; }
     .telegram-mini-app #add-money-test { top: 95px !important; }
 }
 

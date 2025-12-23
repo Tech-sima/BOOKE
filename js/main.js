@@ -64,7 +64,6 @@ function adaptUIForTelegram() {
     const sideBar = document.querySelector('.side-bar');
     const newsCorner = document.querySelector('.news-corner');
     const appHeader = document.querySelector('.app-header');
-    const resetDataBtn = document.getElementById('reset-data');
     const addMoneyBtn = document.getElementById('add-money-test');
     
     if (infoPanel) {
@@ -85,12 +84,6 @@ function adaptUIForTelegram() {
     if (appHeader) {
         appHeader.style.height = `${96 + telegramTopOffset}px`;
         appHeader.style.paddingTop = `${12 + telegramTopOffset}px`;
-    }
-    
-    // Обновляем позиционирование кнопок разработки
-    if (resetDataBtn) {
-        resetDataBtn.style.top = `${5 + telegramTopOffset}px`;
-
     }
     
     if (addMoneyBtn) {
@@ -4334,7 +4327,7 @@ function initializeAdventPanel() {
         // Устанавливаем таймер для следующего подарка
         if(index < 28){
             const nextIndex = index + 1;
-            state.timers[nextIndex] = Date.now() + 10000; // 10 секунд
+            state.timers[nextIndex] = Date.now() + (12 * 60 * 60 * 1000); // 12 часов
         }
         
         // Если ультра подарок - добавляем персонажа
@@ -4361,6 +4354,7 @@ function initializeAdventPanel() {
         
         saveAdventState(state);
         renderGifts();
+        updateProgressBar();
         
         // Обновляем персонажей если нужно
         if(type === 'ultra' && window.renderCharacters){
@@ -4440,8 +4434,18 @@ function initializeAdventPanel() {
                             renderGifts();
                             return;
                         }
-                        const seconds = Math.ceil(remaining / 1000);
-                        timerDiv.textContent = seconds;
+                        // Форматируем время в часы:минуты:секунды
+                        const totalSeconds = Math.floor(remaining / 1000);
+                        const hours = Math.floor(totalSeconds / 3600);
+                        const minutes = Math.floor((totalSeconds % 3600) / 60);
+                        const seconds = totalSeconds % 60;
+                        
+                        // Форматируем с ведущими нулями
+                        const hoursStr = hours.toString().padStart(2, '0');
+                        const minutesStr = minutes.toString().padStart(2, '0');
+                        const secondsStr = seconds.toString().padStart(2, '0');
+                        
+                        timerDiv.textContent = `${hoursStr}:${minutesStr}:${secondsStr}`;
                     };
                     updateTimer();
                     const timerInterval = setInterval(() => {
@@ -4473,21 +4477,33 @@ function initializeAdventPanel() {
         });
     }
     
+    // Функция обновления прогресс-бара
+    function updateProgressBar(){
+        const state = getAdventState();
+        const openedCount = state.opened.length;
+        const totalCount = 28;
+        const percentage = (openedCount / totalCount) * 100;
+        
+        const progressFill = document.getElementById('advent-progress-fill');
+        const progressText = document.getElementById('advent-progress-text');
+        
+        if(progressFill){
+            progressFill.style.width = percentage + '%';
+        }
+        if(progressText){
+            progressText.textContent = `${openedCount} / ${totalCount}`;
+        }
+    }
+    
     // Делаем renderGifts доступной глобально для обновления при открытии панели
     window.renderAdventGifts = renderGifts;
     
-    const updateClosePos = ()=>{
-        const rect = panel.getBoundingClientRect();
-        const offset = 12;
-        const bottom = Math.max(0, (window.innerHeight - rect.top) + offset);
-        closeWrap.style.bottom = bottom + 'px';
-    };
     const open = ()=>{
         panel.classList.add('show');
         closeWrap.classList.add('show');
         document.body.classList.add('advent-locked');
-        updateClosePos();
         renderGifts();
+        updateProgressBar();
         if(window.hideProfitIndicators) window.hideProfitIndicators({ suppress: true });
     };
     const close = ()=>{
@@ -4498,11 +4514,6 @@ function initializeAdventPanel() {
     };
     btn.addEventListener('click', open);
     closeBtn.addEventListener('click', close);
-    window.addEventListener('resize', ()=>{
-        if(panel.classList.contains('show')){
-            updateClosePos();
-        }
-    });
     ['click','touchstart','touchend'].forEach(evt=>{
         panel.addEventListener(evt, ev=>ev.stopPropagation());
         closeBtn.addEventListener(evt, ev=>ev.stopPropagation());
@@ -4511,12 +4522,14 @@ function initializeAdventPanel() {
     
     // Инициализация при загрузке - рендерим подарки сразу
     renderGifts();
+    updateProgressBar();
     
     adventInitialized = true;
 }
 
 // Делаем функцию доступной глобально
 window.initializeAdventPanel = initializeAdventPanel;
+
 
 // Флаг для отслеживания инициализации игры
 let gameInitialized = false;

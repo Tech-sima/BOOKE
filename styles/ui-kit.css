@@ -585,8 +585,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   overflow-y:auto;
   overflow-x:hidden;
   padding:0;
-  padding-top:20px;
-  padding-bottom:20px;
+  padding-top:90px;
   overscroll-behavior:contain;
   -webkit-overflow-scrolling:touch;
   touch-action:pan-y;
@@ -981,7 +980,7 @@ body.advent-locked{overflow:hidden;}
     font-size:11px;
   }
   .advent-panel-content{
-    padding-top:16px;
+    padding-top:80px;
     padding-bottom:16px;
   }
   .advent-header-box{
@@ -1048,7 +1047,7 @@ body.advent-locked{overflow:hidden;}
     font-size:10px;
   }
   .advent-panel-content{
-    padding-top:14px;
+    padding-top:75px;
     padding-bottom:12px;
   }
   .advent-header-box{
@@ -1116,7 +1115,7 @@ body.advent-locked{overflow:hidden;}
     font-size:9px;
   }
   .advent-panel-content{
-    padding-top:12px;
+    padding-top:70px;
     padding-bottom:10px;
   }
   .advent-header-box{

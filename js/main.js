@@ -4232,11 +4232,9 @@ function initializeAdventPanel() {
     
     const btn = document.getElementById('advent-btn');
     const panel = document.getElementById('advent-panel');
-    const closeWrap = document.getElementById('advent-close-wrap');
-    const closeBtn = document.getElementById('advent-close');
     const panelContent = document.querySelector('.advent-panel-content');
     
-    if (!btn || !panel || !closeWrap || !closeBtn) {
+    if (!btn || !panel) {
         return;
     }
     
@@ -4500,23 +4498,30 @@ function initializeAdventPanel() {
     
     const open = ()=>{
         panel.classList.add('show');
-        closeWrap.classList.add('show');
         document.body.classList.add('advent-locked');
         renderGifts();
         updateProgressBar();
         if(window.hideProfitIndicators) window.hideProfitIndicators({ suppress: true });
+        
+        // Показываем кнопку "назад" в Telegram Mini App
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+            window.Telegram.WebApp.BackButton.show();
+            window.Telegram.WebApp.BackButton.onClick(close);
+        }
     };
     const close = ()=>{
         panel.classList.remove('show');
-        closeWrap.classList.remove('show');
         document.body.classList.remove('advent-locked');
         if(window.showProfitIndicators) window.showProfitIndicators({ force: true });
+        
+        // Скрываем кнопку "назад" в Telegram Mini App
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+            window.Telegram.WebApp.BackButton.hide();
+        }
     };
     btn.addEventListener('click', open);
-    closeBtn.addEventListener('click', close);
     ['click','touchstart','touchend'].forEach(evt=>{
         panel.addEventListener(evt, ev=>ev.stopPropagation());
-        closeBtn.addEventListener(evt, ev=>ev.stopPropagation());
         if(panelContent) panelContent.addEventListener(evt, ev=>ev.stopPropagation());
     });
     

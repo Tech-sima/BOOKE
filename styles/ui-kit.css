@@ -545,37 +545,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .advent-panel.show{
   display:block;
 }
-.advent-close-wrap{
-  position:fixed;
-  top:16px;
-  right:16px;
-  z-index:1501;
-  display:none;
-  pointer-events:none;
-}
-.advent-close-wrap.show{display:flex;}
-.advent-close{
-  pointer-events:auto;
-  padding:8px 16px;
-  background:#1a1a1a;
-  color:#fff;
-  border:1px solid rgba(246,217,181,0.25);
-  border-radius:999px;
-  cursor:pointer;
-  font-family:"Cinzel","Playfair Display","Georgia","serif";
-  font-weight:700;
-  font-size:12px;
-  letter-spacing:0.5px;
-  box-shadow:0 6px 16px rgba(0,0,0,0.35);
-  transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-.advent-close:hover{
-  background:#242424;
-  box-shadow:0 8px 20px rgba(0,0,0,0.4);
-}
-.advent-close:active{
-  transform:scale(0.97);
-}
 .advent-panel-content{
   display:flex;
   flex-direction:column;
@@ -971,14 +940,6 @@ body.advent-locked{overflow:hidden;}
   .advent-panel{
     padding:12px;
   }
-  .advent-close-wrap{
-    top:12px;
-    right:12px;
-  }
-  .advent-close{
-    padding:6px 12px;
-    font-size:11px;
-  }
   .advent-panel-content{
     padding-top:80px;
     padding-bottom:16px;
@@ -1037,14 +998,6 @@ body.advent-locked{overflow:hidden;}
 @media (max-width: 480px) {
   .advent-panel{
     padding:8px;
-  }
-  .advent-close-wrap{
-    top:8px;
-    right:8px;
-  }
-  .advent-close{
-    padding:5px 10px;
-    font-size:10px;
   }
   .advent-panel-content{
     padding-top:75px;
@@ -1105,14 +1058,6 @@ body.advent-locked{overflow:hidden;}
 @media (max-width: 360px) {
   .advent-panel{
     padding:6px;
-  }
-  .advent-close-wrap{
-    top:6px;
-    right:6px;
-  }
-  .advent-close{
-    padding:4px 8px;
-    font-size:9px;
   }
   .advent-panel-content{
     padding-top:70px;

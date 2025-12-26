@@ -322,27 +322,27 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
       circle at center,
       transparent 0%,
       transparent 15%,
-      rgba(255,215,0,0.08) 20%,
+      rgba(255,215,0,0.06) 20%,
       transparent 40%
     ),
     repeating-conic-gradient(
       from 0deg at center,
       transparent 0deg,
       transparent 7deg,
-      rgba(255,215,0,0.3) 7deg,
-      rgba(255,215,0,0.6) 8deg,
-      rgba(255,215,0,0.3) 9deg,
+      rgba(255,215,0,0.25) 7deg,
+      rgba(255,215,0,0.5) 8deg,
+      rgba(255,215,0,0.25) 9deg,
       transparent 10deg,
       transparent 17deg,
-      rgba(220,53,69,0.25) 17deg,
-      rgba(220,53,69,0.55) 18deg,
-      rgba(220,53,69,0.25) 19deg,
+      rgba(220,53,69,0.22) 17deg,
+      rgba(220,53,69,0.48) 18deg,
+      rgba(220,53,69,0.22) 19deg,
       transparent 20deg
     );
   pointer-events:none;
   z-index:-1;
   will-change:transform;
-  filter:drop-shadow(0 0 8px rgba(255,215,0,0.5)) drop-shadow(0 0 8px rgba(220,53,69,0.5));
+  filter:drop-shadow(0 0 8px rgba(255,215,0,0.4)) drop-shadow(0 0 8px rgba(220,53,69,0.4));
 }
 
 .advent-panel.show{

@@ -3440,9 +3440,20 @@ function buyCharacter() {
     const rewards = Math.floor(baseReward + Math.random() * baseReward * 0.5);
     setBalance(getBalance() + rewards);
     
-    alert(`Набор ${item.character} куплен! +${formatNumber(rewards)}$`);
+    // Начисляем XP за покупку набора (зависит от редкости)
+    const setXP = item.rarity * 5; // 5 XP за каждую звезду редкости
+    addXP(setXP);
     
-
+    // Показываем панель наград
+    showRewardPanel('characters', {
+        money: rewards,
+        xp: setXP
+    });
+    
+    // Проверяем, был ли куплен диван (если это набор с диваном)
+    if (item.character && item.character.toLowerCase().includes('диван') && window.onSofaBought) {
+        window.onSofaBought();
+    }
 }
 
 // Переключение между сундуками
@@ -3619,11 +3630,11 @@ function handleShopPurchase(itemType) {
             const setXP = item.rarity * 5; // 5 XP за каждую звезду редкости
             addXP(setXP);
             
-            // Показываем красивое уведомление о покупке набора
-            showPurchaseNotification(`${item.character} куплен!`, {
+            // Показываем панель наград
+            showRewardPanel('characters', {
                 money: rewards,
                 xp: setXP
-            }, 'sets');
+            });
             
             // Проверяем, был ли куплен диван (если это набор с диваном)
             if (item.character && item.character.toLowerCase().includes('диван') && window.onSofaBought) {
@@ -3981,64 +3992,49 @@ window.showPurchaseNotification = showPurchaseNotification;
 // Функция показа панели наград для сейфов и сундуков
 function showRewardPanel(itemType, rewards) {
     const panel = document.getElementById('reward-panel');
-    const itemImage = document.getElementById('reward-item-image');
-    const title = document.getElementById('reward-title');
-    const rewardItems = document.getElementById('reward-items');
+    const rewardIcon = document.getElementById('reward-icon');
+    const rewardQuantity = document.getElementById('reward-quantity');
+    const okBtn = document.getElementById('reward-ok-btn');
     
-    // Устанавливаем изображение в зависимости от типа
-    if (itemType === 'safes') {
-        itemImage.src = 'assets/svg/rewards/safe-opened.svg';
-        title.textContent = 'Сейф открыт!';
-    } else if (itemType === 'chests') {
-        itemImage.src = 'assets/svg/rewards/chest-opened.svg';
-        title.textContent = 'Сундук открыт!';
-    }
+    // Определяем тип награды и устанавливаем иконку и количество
+    let rewardIconSrc = '';
+    let quantityText = '';
     
-    // Создаем HTML для наград
-    let rewardsHTML = '';
-    
+    // Приоритет: money > credits > coins > xp
     if (rewards.money) {
-        rewardsHTML += `
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
-                <img src="assets/svg/money-icon.svg" alt="Деньги" style="width:24px;height:24px;">
-                <span style="font-size:16px;font-weight:600;color:#fff;">+${formatNumber(rewards.money)}</span>
-            </div>
-        `;
+        rewardIconSrc = 'assets/svg/money-icon.svg';
+        quantityText = `+${formatNumber(rewards.money)}`;
+    } else if (rewards.credits) {
+        rewardIconSrc = 'assets/svg/rbc-icon.svg';
+        quantityText = `+${rewards.credits}`;
+    } else if (rewards.coins) {
+        rewardIconSrc = 'assets/svg/money-icon.svg';
+        quantityText = `+${rewards.coins}`;
+    } else if (rewards.xp) {
+        rewardIconSrc = 'assets/svg/clock-icon.svg';
+        quantityText = `+${rewards.xp} XP`;
     }
     
-    if (rewards.credits) {
-        rewardsHTML += `
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
-                <img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:24px;height:24px;">
-                <span style="font-size:16px;font-weight:600;color:#fff;">+${rewards.credits}</span>
-            </div>
-        `;
+    // Устанавливаем иконку и количество
+    if (rewardIconSrc) {
+        rewardIcon.src = rewardIconSrc;
+        rewardQuantity.textContent = quantityText;
     }
     
-    if (rewards.xp) {
-        rewardsHTML += `
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
-                <img src="assets/svg/clock-icon.svg" alt="XP" style="width:24px;height:24px;">
-                <span style="font-size:16px;font-weight:600;color:#fff;">+${rewards.xp} XP</span>
-            </div>
-        `;
+    // Сбрасываем анимацию
+    rewardIcon.style.opacity = '0';
+    rewardIcon.style.transform = 'translateY(0)';
+    rewardQuantity.style.opacity = '0';
+    rewardQuantity.style.transform = 'translateY(0)';
+    if (okBtn) {
+        okBtn.style.opacity = '0';
+        okBtn.style.transform = 'translateY(10px)';
     }
-    
-    if (rewards.coins) {
-        rewardsHTML += `
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.1);">
-                <img src="assets/svg/money-icon.svg" alt="Монеты" style="width:24px;height:24px;">
-                <span style="font-size:16px;font-weight:600;color:#fff;">+${rewards.coins}</span>
-            </div>
-        `;
-    }
-    
-    rewardItems.innerHTML = rewardsHTML;
     
     // Показываем панель с анимацией
     panel.style.display = 'flex';
     
-    // Запускаем анимацию появления
+    // Запускаем анимацию появления панели
     setTimeout(() => {
         const panelContent = document.getElementById('reward-panel-content');
         if (panelContent) {
@@ -4047,11 +4043,43 @@ function showRewardPanel(itemType, rewards) {
         }
     }, 10);
     
-    // Добавляем обработчики событий
-    const closeBtn = document.getElementById('reward-close');
-    const okBtn = document.getElementById('reward-ok-btn');
+    // Запускаем анимацию появления награды (медленно)
+    setTimeout(() => {
+        // Анимация иконки награды
+        rewardIcon.style.transition = 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        rewardIcon.style.opacity = '1';
+        rewardIcon.style.transform = 'translateY(0) scale(1)';
+        
+        // Анимация количества (с небольшой задержкой)
+        setTimeout(() => {
+            rewardQuantity.style.transition = 'all 1s ease-out';
+            rewardQuantity.style.opacity = '1';
+            rewardQuantity.style.transform = 'translateY(0)';
+            
+            // Анимация появления кнопки после окончания анимации награды
+            setTimeout(() => {
+                if (okBtn) {
+                    okBtn.style.opacity = '1';
+                    okBtn.style.transform = 'translateY(0)';
+                }
+            }, 500);
+        }, 300);
+    }, 500);
     
+    // Добавляем обработчики событий
     const closePanel = () => {
+        // Сбрасываем анимацию награды
+        rewardIcon.style.transition = 'all 0.3s ease-in';
+        rewardIcon.style.opacity = '0';
+        rewardIcon.style.transform = 'translateY(0)';
+        rewardQuantity.style.transition = 'all 0.3s ease-in';
+        rewardQuantity.style.opacity = '0';
+        rewardQuantity.style.transform = 'translateY(0)';
+        if (okBtn) {
+            okBtn.style.opacity = '0';
+            okBtn.style.transform = 'translateY(10px)';
+        }
+        
         const panelContent = document.getElementById('reward-panel-content');
         if (panelContent) {
             panelContent.style.transform = 'scale(0.8)';
@@ -4063,20 +4091,9 @@ function showRewardPanel(itemType, rewards) {
         }, 400);
     };
     
-    if (closeBtn) {
-        closeBtn.onclick = closePanel;
-    }
-    
     if (okBtn) {
         okBtn.onclick = closePanel;
     }
-    
-    // Закрытие по клику вне панели
-    panel.onclick = (e) => {
-        if (e.target === panel) {
-            closePanel();
-        }
-    };
 }
 
 // Делаем функцию глобально доступной

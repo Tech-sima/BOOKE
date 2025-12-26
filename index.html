@@ -1118,43 +1118,25 @@
     
     <!-- Панель наград для сейфов и сундуков -->
     <div id="reward-panel" class="modal" style="display:none;position:fixed;inset:0;z-index:2000;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
-        <div id="reward-panel-content" style="background:linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,20,0.95) 100%);border-radius:20px;padding:16px;position:relative;box-shadow:0 25px 50px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.05);backdrop-filter:blur(25px);border:2px solid rgba(255,255,255,0.1);max-width:420px;width:90%;transform:scale(0.8);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);">
+        <div id="reward-panel-content" style="position:relative;max-width:420px;width:90%;transform:scale(0.8);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);display:flex;flex-direction:column;align-items:center;justify-content:center;">
             
-            <!-- HTML/CSS панель наград -->
-            <div style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
-                
-                <!-- Кнопка закрытия -->
-                <button id="reward-close" style="position:absolute;top:-2px;right:2px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s ease;z-index:10;" onmouseover="this.style.background='rgba(255,255,255,0.2)';this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.transform='scale(1)'">✕</button>
+            <!-- Контейнер с черным стеклянным фоном -->
+            <div id="reward-container" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.3);border-radius:30px;padding:30px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
                 
                 <!-- Заголовок -->
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:2px solid rgba(255,255,255,0.1);padding-bottom:15px;">
-                    <div style="display:flex;align-items:center;gap:12px;">
-                        <div style="width:28px;height:28px;background:linear-gradient(135deg, #1a237e, #283593);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,35,126,0.4);">
-                            <i class="fa-solid fa-gift" style="font-size:14px;color:#fff;"></i>
-                        </div>
-                        <h2 id="reward-title" style="margin:0;font-size:18px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Сейф открыт!</h2>
-                    </div>
+                <h2 id="reward-title" style="margin:0 0 30px;font-size:24px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8);text-align:center;letter-spacing:0.5px;">Награда получена!</h2>
+                
+                <!-- Анимированная награда -->
+                <div id="reward-animation-container" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:30px;">
+                    <img id="reward-icon" src="" alt="Награда" style="width:60px;height:60px;object-fit:contain;display:block;opacity:0;transform:translateY(0);">
+                    <div id="reward-quantity" style="font-size:20px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8);margin-top:8px;opacity:0;transform:translateY(0);"></div>
                 </div>
                 
-                <!-- SVG изображение сейфа/сундука -->
-                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1);">
-                    <img id="reward-item-image" src="" alt="Предмет" style="width:180px;height:180px;object-fit:contain;margin:0 auto;display:block;">
-                </div>
-                
-                <!-- Секция наград -->
-                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1);">
-                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Получено</h3>
-                    
-                    <!-- Награды -->
-                    <div id="reward-items" style="display:grid;gap:8px;">
-                        <!-- Награды будут добавляться динамически -->
-                    </div>
-                </div>
-                
-                <!-- Кнопка закрытия -->
-                <button id="reward-ok-btn" style="width:100%;background:linear-gradient(135deg, #4caf50 0%, #45a049 100%);border:none;border-radius:12px;color:white;padding:16px;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(76,175,80,0.3);transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(76,175,80,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(76,175,80,0.3)'">
-                    Отлично!
+                <!-- Кнопка "Забрать" -->
+                <button id="reward-ok-btn" style="background:#000;border:1px solid #fff;border-radius:50px;color:white;padding:8px 32px;font-size:14px;font-weight:600;cursor:pointer;opacity:0;transform:translateY(10px);transition:all 0.8s ease-out;" onmouseover="this.style.background='rgba(0,0,0,0.8)';this.style.transform='scale(1.05)'" onmouseout="this.style.background='#000';this.style.transform='scale(1)'">
+                    Забрать
                 </button>
+                
             </div>
         </div>
     </div>

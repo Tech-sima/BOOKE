@@ -204,11 +204,15 @@ function updateInvestmentsUI() {
     const panel = document.getElementById('bottom-banner-panel');
     if (!panel) return;
     
+    // Обновляем только панель "Постройки"
+    const buildingsContent = panel.querySelector('.banner-panel-content[data-tab-content="buildings"]');
+    if (!buildingsContent || buildingsContent.style.display === 'none') return;
+    
     const data = getInvestmentsData();
     
     INVESTMENTS_CONFIG.buildings.forEach((building, index) => {
         const buildingData = data[building.id] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
-        const item = panel.querySelector(`.banner-item[data-building-id="${building.id}"]`);
+        const item = buildingsContent.querySelector(`.banner-item[data-building-id="${building.id}"]`);
         if (!item) return;
         
         const icon = item.querySelector('.banner-item-icon');
@@ -294,8 +298,13 @@ function initInvestmentsEvents() {
     const panel = document.getElementById('bottom-banner-panel');
     if (!panel) return;
     
+    // Получаем контейнер с постройками
+    const buildingsContent = panel.querySelector('.banner-panel-content[data-tab-content="buildings"]');
+    if (!buildingsContent) return;
+    
+    // Обработчики для кнопок зданий
     INVESTMENTS_CONFIG.buildings.forEach(building => {
-        const item = panel.querySelector(`.banner-item[data-building-id="${building.id}"]`);
+        const item = buildingsContent.querySelector(`.banner-item[data-building-id="${building.id}"]`);
         if (!item) return;
         
         const button = item.querySelector('.banner-buy-btn');
@@ -312,6 +321,48 @@ function initInvestmentsEvents() {
             }
         });
     });
+    
+    // Обработчики для кнопок переключения вкладок
+    const tabButtons = panel.querySelectorAll('.banner-tab-btn');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.getAttribute('data-tab');
+            switchInvestmentsTab(tab);
+        });
+    });
+}
+
+// Переключение вкладок
+function switchInvestmentsTab(tabName) {
+    const panel = document.getElementById('bottom-banner-panel');
+    if (!panel) return;
+    
+    // Обновляем активную кнопку
+    const tabButtons = panel.querySelectorAll('.banner-tab-btn');
+    tabButtons.forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabName) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Скрываем все панели контента
+    const allContents = panel.querySelectorAll('.banner-panel-content');
+    allContents.forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Показываем выбранную панель
+    const selectedContent = panel.querySelector(`.banner-panel-content[data-tab-content="${tabName}"]`);
+    if (selectedContent) {
+        selectedContent.style.display = 'flex';
+    }
+    
+    // Обновляем UI только для вкладки "Постройки"
+    if (tabName === 'buildings') {
+        updateInvestmentsUI();
+    }
 }
 
 // Автоматическое обновление дохода

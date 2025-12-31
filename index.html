@@ -925,8 +925,15 @@
         <div class="banner-panel-header">
             <h2 class="banner-panel-title">ИНВЕСТИЦИИ</h2>
             <p class="banner-panel-subtitle">Развивай свой капитал, инвестируя в новые предметы и здания</p>
+            <div class="banner-tabs">
+                <button class="banner-tab-btn active" data-tab="buildings">Постройки</button>
+                <button class="banner-tab-btn" data-tab="items">Предметы</button>
+                <button class="banner-tab-btn" data-tab="transport">Транспорт</button>
+            </div>
         </div>
-        <div class="banner-panel-content">
+        
+        <!-- Панель "Постройки" -->
+        <div class="banner-panel-content" data-tab-content="buildings" style="display:flex;">
             <div class="banner-item" data-building-id="bloomie-house">
                 <img src="assets/svg/construction/Bloomie's-house.svg" alt="Дом Блуми" class="banner-item-icon">
                 <div class="banner-item-content">
@@ -1012,6 +1019,16 @@
                     <button class="banner-buy-btn">Купить</button>
                 </div>
             </div>
+        </div>
+        
+        <!-- Панель "Предметы" -->
+        <div class="banner-panel-content" data-tab-content="items" style="display:none;">
+            <!-- Пустая панель, контент будет добавлен позже -->
+        </div>
+        
+        <!-- Панель "Транспорт" -->
+        <div class="banner-panel-content" data-tab-content="transport" style="display:none;">
+            <!-- Пустая панель, контент будет добавлен позже -->
         </div>
     </div>
 

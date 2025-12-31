@@ -917,6 +917,104 @@
     });
     </script>
 
+    <!-- Прямоугольник над нижней навигацией -->
+    <div id="bottom-banner" class="panel"></div>
+
+    <!-- Панель bottom-banner -->
+    <div id="bottom-banner-panel" class="panel modal">
+        <div class="banner-panel-header">
+            <h2 class="banner-panel-title">ИНВЕСТИЦИИ</h2>
+            <p class="banner-panel-subtitle">Развивай свой капитал, инвестируя в новые предметы и здания</p>
+        </div>
+        <div class="banner-panel-content">
+            <div class="banner-item" data-building-id="bloomie-house">
+                <img src="assets/svg/construction/Bloomie's-house.svg" alt="Дом Блуми" class="banner-item-icon">
+                <div class="banner-item-content">
+                    <div class="banner-item-title">Дом Блуми</div>
+                    <div class="banner-stats">
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Lvl</span>
+                            <span class="banner-stat-value">0</span>
+                        </div>
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Доход/5с</span>
+                            <span class="banner-stat-value">0/5с</span>
+                        </div>
+                    </div>
+                    <button class="banner-buy-btn">Купить</button>
+                </div>
+            </div>
+            <div class="banner-item" data-building-id="cafe">
+                <img src="assets/svg/construction/cafe.svg" alt="Кафе" class="banner-item-icon">
+                <div class="banner-item-content">
+                    <div class="banner-item-title">Кафе</div>
+                    <div class="banner-stats">
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Lvl</span>
+                            <span class="banner-stat-value">0</span>
+                        </div>
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Доход/5с</span>
+                            <span class="banner-stat-value">0/5с</span>
+                        </div>
+                    </div>
+                    <button class="banner-buy-btn">Купить</button>
+                </div>
+            </div>
+            <div class="banner-item" data-building-id="forest-house">
+                <img src="assets/svg/construction/forest-house.svg" alt="Лесной дом" class="banner-item-icon">
+                <div class="banner-item-content">
+                    <div class="banner-item-title">Лесной дом</div>
+                    <div class="banner-stats">
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Lvl</span>
+                            <span class="banner-stat-value">0</span>
+                        </div>
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Доход/5с</span>
+                            <span class="banner-stat-value">0/5с</span>
+                        </div>
+                    </div>
+                    <button class="banner-buy-btn">Купить</button>
+                </div>
+            </div>
+            <div class="banner-item" data-building-id="mansion">
+                <img src="assets/svg/construction/mansion.svg" alt="Особняк" class="banner-item-icon">
+                <div class="banner-item-content">
+                    <div class="banner-item-title">Особняк</div>
+                    <div class="banner-stats">
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Lvl</span>
+                            <span class="banner-stat-value">0</span>
+                        </div>
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Доход/5с</span>
+                            <span class="banner-stat-value">0/5с</span>
+                        </div>
+                    </div>
+                    <button class="banner-buy-btn">Купить</button>
+                </div>
+            </div>
+            <div class="banner-item" data-building-id="museum">
+                <img src="assets/svg/construction/museum.svg" alt="Музей" class="banner-item-icon">
+                <div class="banner-item-content">
+                    <div class="banner-item-title">Музей</div>
+                    <div class="banner-stats">
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Lvl</span>
+                            <span class="banner-stat-value">0</span>
+                        </div>
+                        <div class="banner-stat-cell">
+                            <span class="banner-stat-label">Доход/5с</span>
+                            <span class="banner-stat-value">0/5с</span>
+                        </div>
+                    </div>
+                    <button class="banner-buy-btn">Купить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Нижняя панель навигации -->
     <div id="bottom-nav" class="panel">
         <button>
@@ -1892,5 +1990,20 @@
     <script src="js/statistics.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/employee-levels.js"></script>
+    <script src="js/investments.js"></script>
+    <script>
+        // Инициализация системы инвестиций после загрузки страницы
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                if (typeof setupInvestments === 'function') {
+                    setupInvestments();
+                }
+            });
+        } else {
+            if (typeof setupInvestments === 'function') {
+                setupInvestments();
+            }
+        }
+    </script>
 </body>
 </html> 

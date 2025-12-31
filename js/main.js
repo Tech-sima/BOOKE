@@ -545,6 +545,7 @@ function isAnyPanelOpen() {
         'tasks-panel',
         'profile-panel',
         'friends-panel',
+        'bottom-banner-panel',
 
         'game-tasks-panel',
         'statistics-panel',
@@ -637,47 +638,66 @@ document.body.appendChild(incomeBank);
 
 // Функция для начального позиционирования кругов
 function initializeCirclePositions() {
-    // Позиционируем кружки над библиотекой
-    const cube = scene.getObjectByName('library');
-    if(cube){
-        // позиция вершины куба (верхний центр)
-        const topWorld = cube.position.clone();
-        const halfH = (cube.geometry.parameters.height * cube.scale.y) / 2;
-        topWorld.y += halfH;
-        topWorld.project(camera);
-        const sx = ( topWorld.x * 0.5 + 0.5) * window.innerWidth;
-        const sy = ( -topWorld.y * 0.5 + 0.5) * window.innerHeight;
-        incomeProgress.style.left = (sx-35)+'px'; // ширина 70 => радиус 35
-        incomeProgress.style.top  = (sy-85)+'px'; // подняли на 50px выше
-        incomeBank.style.left = (sx-35)+'px';
-        incomeBank.style.top  = (sy-160)+'px'; // ещё выше над прогрессом
-    }
-
-    // Позиционируем кружки над заводом (только если не на главной карте)
-    const mapContainer = document.getElementById('map-container');
-    const isOnMainMenu = mapContainer && mapContainer.style.display !== 'none';
+    // Проверяем, открыта ли панель bottom-banner
+    const isBottomBannerOpen = (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
     
-    if (!isOnMainMenu) {
-        const factoryObjRef = scene.getObjectByName('factory');
-        if(factoryObjRef && factoryProgressDiv && factoryBankDiv){
-            const top2=factoryObjRef.position.clone();
-            const halfH2=(factoryObjRef.geometry.parameters.height*factoryObjRef.scale.y)/2;
-            top2.y+=halfH2;
-            top2.project(camera);
-            let sx2=(top2.x*0.5+0.5)*window.innerWidth;
-            let sy2=(-top2.y*0.5+0.5)*window.innerHeight;
-
-            factoryProgressDiv.style.left=(sx2-35)+'px';
-            factoryProgressDiv.style.top =(sy2-85)+'px';
-            factoryBankDiv.style.left=(sx2-35)+'px';
-            factoryBankDiv.style.top =(sy2-160)+'px';
+    // Позиционируем кружки над библиотекой (только если панель не открыта)
+    if (!isBottomBannerOpen) {
+        const cube = scene.getObjectByName('library');
+        if(cube){
+            // позиция вершины куба (верхний центр)
+            const topWorld = cube.position.clone();
+            const halfH = (cube.geometry.parameters.height * cube.scale.y) / 2;
+            topWorld.y += halfH;
+            topWorld.project(camera);
+            const sx = ( topWorld.x * 0.5 + 0.5) * window.innerWidth;
+            const sy = ( -topWorld.y * 0.5 + 0.5) * window.innerHeight;
+            if (incomeProgress) {
+                incomeProgress.style.left = (sx-35)+'px'; // ширина 70 => радиус 35
+                incomeProgress.style.top  = (sy-85)+'px'; // подняли на 50px выше
+            }
+            if (incomeBank) {
+                incomeBank.style.left = (sx-35)+'px';
+                incomeBank.style.top  = (sy-160)+'px'; // ещё выше над прогрессом
+            }
         }
     } else {
-        // На главной карте скрываем 3D круги завода
-        if(factoryProgressDiv && factoryBankDiv){
-            factoryProgressDiv.style.display='none';
-            factoryBankDiv.style.display='none';
+        // Скрываем круги когда панель открыта
+        if (incomeProgress) incomeProgress.style.visibility = 'hidden';
+        if (incomeBank) incomeBank.style.visibility = 'hidden';
+    }
+
+    // Позиционируем кружки над заводом (только если не на главной карте и панель не открыта)
+    if (!isBottomBannerOpen) {
+        const mapContainer = document.getElementById('map-container');
+        const isOnMainMenu = mapContainer && mapContainer.style.display !== 'none';
+        
+        if (!isOnMainMenu) {
+            const factoryObjRef = scene.getObjectByName('factory');
+            if(factoryObjRef && factoryProgressDiv && factoryBankDiv){
+                const top2=factoryObjRef.position.clone();
+                const halfH2=(factoryObjRef.geometry.parameters.height*factoryObjRef.scale.y)/2;
+                top2.y+=halfH2;
+                top2.project(camera);
+                let sx2=(top2.x*0.5+0.5)*window.innerWidth;
+                let sy2=(-top2.y*0.5+0.5)*window.innerHeight;
+
+                factoryProgressDiv.style.left=(sx2-35)+'px';
+                factoryProgressDiv.style.top =(sy2-85)+'px';
+                factoryBankDiv.style.left=(sx2-35)+'px';
+                factoryBankDiv.style.top =(sy2-160)+'px';
+            }
+        } else {
+            // На главной карте скрываем 3D круги завода
+            if(factoryProgressDiv && factoryBankDiv){
+                factoryProgressDiv.style.display='none';
+                factoryBankDiv.style.display='none';
+            }
         }
+    } else {
+        // Скрываем круги завода когда панель открыта
+        if (factoryProgressDiv) factoryProgressDiv.style.visibility = 'hidden';
+        if (factoryBankDiv) factoryBankDiv.style.visibility = 'hidden';
     }
 
     // Позиционируем кружок над хранилищем
@@ -920,9 +940,10 @@ function animate() {
     const isSettingsOpen = window.isSettingsPanelOpen || (document.getElementById('settings-panel') && document.getElementById('settings-panel').style.display !== 'none');
     const isStatisticsOpen = window.isStatisticsPanelOpen || (document.getElementById('statistics-panel') && document.getElementById('statistics-panel').style.display !== 'none');
     const isPhoneOpen = window.isPhonePanelOpen || (document.getElementById('phone-panel') && document.getElementById('phone-panel').style.display !== 'none');
+    const isBottomBannerOpen = (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
     
     // Если любая из панелей открыта, скрываем индикаторы прибыли
-    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen) && window.hideProfitIndicators) {
+    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen || isBottomBannerOpen) && window.hideProfitIndicators) {
         window.hideProfitIndicators();
         // Принудительно очищаем все индикаторы прибыли
         if (window.clearAllProfitIndicators) {
@@ -930,47 +951,68 @@ function animate() {
         }
     }
 
-    // позиционируем кружки над кубом
-    const cube = scene.getObjectByName('library');
-    if(cube){
-        // позиция вершины куба (верхний центр)
-        const topWorld = cube.position.clone();
-        const halfH = (cube.geometry.parameters.height * cube.scale.y) / 2;
-        topWorld.y += halfH;
-        topWorld.project(camera);
-        const sx = ( topWorld.x * 0.5 + 0.5) * window.innerWidth;
-        const sy = ( -topWorld.y * 0.5 + 0.5) * window.innerHeight;
-        incomeProgress.style.left = (sx-35)+'px'; // ширина 70 => радиус 35
-        incomeProgress.style.top  = (sy-85)+'px'; // подняли на 50px выше
-        incomeBank.style.left = (sx-35)+'px';
-        incomeBank.style.top  = (sy-160)+'px'; // ещё выше над прогрессом
-    }
-
-    // позиционируем кружки над заводом (только если не на главной карте)
-    const mapContainer = document.getElementById('map-container');
-    const isOnMainMenu = mapContainer && mapContainer.style.display !== 'none';
-    
-    if (!isOnMainMenu) {
-        const factoryObjRef = scene.getObjectByName('factory');
-        if(factoryObjRef && factoryProgressDiv && factoryBankDiv){
-            const top2=factoryObjRef.position.clone();
-            const halfH2=(factoryObjRef.geometry.parameters.height*factoryObjRef.scale.y)/2;
-            top2.y+=halfH2;
-            top2.project(camera);
-            let sx2=(top2.x*0.5+0.5)*window.innerWidth;
-            let sy2=(-top2.y*0.5+0.5)*window.innerHeight;
-
-            factoryProgressDiv.style.left=(sx2-35)+'px';
-            factoryProgressDiv.style.top =(sy2-85)+'px';
-            factoryBankDiv.style.left=(sx2-35)+'px';
-            factoryBankDiv.style.top =(sy2-160)+'px';
+    // позиционируем кружки над кубом (только если панель bottom-banner не открыта)
+    if (!isBottomBannerOpen) {
+        const cube = scene.getObjectByName('library');
+        if(cube){
+            // позиция вершины куба (верхний центр)
+            const topWorld = cube.position.clone();
+            const halfH = (cube.geometry.parameters.height * cube.scale.y) / 2;
+            topWorld.y += halfH;
+            topWorld.project(camera);
+            const sx = ( topWorld.x * 0.5 + 0.5) * window.innerWidth;
+            const sy = ( -topWorld.y * 0.5 + 0.5) * window.innerHeight;
+            if (incomeProgress) {
+                incomeProgress.style.left = (sx-35)+'px'; // ширина 70 => радиус 35
+                incomeProgress.style.top  = (sy-85)+'px'; // подняли на 50px выше
+                incomeProgress.style.visibility = incomeProgress.style.visibility === 'hidden' ? '' : incomeProgress.style.visibility;
+            }
+            if (incomeBank) {
+                incomeBank.style.left = (sx-35)+'px';
+                incomeBank.style.top  = (sy-160)+'px'; // ещё выше над прогрессом
+                incomeBank.style.visibility = incomeBank.style.visibility === 'hidden' ? '' : incomeBank.style.visibility;
+            }
         }
     } else {
-        // На главной карте скрываем 3D круги завода
-        if(factoryProgressDiv && factoryBankDiv){
-            factoryProgressDiv.style.display='none';
-            factoryBankDiv.style.display='none';
+        // Скрываем круги когда панель открыта
+        if (incomeProgress) incomeProgress.style.visibility = 'hidden';
+        if (incomeBank) incomeBank.style.visibility = 'hidden';
+    }
+
+    // позиционируем кружки над заводом (только если не на главной карте и панель не открыта)
+    if (!isBottomBannerOpen) {
+        const mapContainer = document.getElementById('map-container');
+        const isOnMainMenu = mapContainer && mapContainer.style.display !== 'none';
+        
+        if (!isOnMainMenu) {
+            const factoryObjRef = scene.getObjectByName('factory');
+            if(factoryObjRef && factoryProgressDiv && factoryBankDiv){
+                const top2=factoryObjRef.position.clone();
+                const halfH2=(factoryObjRef.geometry.parameters.height*factoryObjRef.scale.y)/2;
+                top2.y+=halfH2;
+                top2.project(camera);
+                let sx2=(top2.x*0.5+0.5)*window.innerWidth;
+                let sy2=(-top2.y*0.5+0.5)*window.innerHeight;
+
+                factoryProgressDiv.style.left=(sx2-35)+'px';
+                factoryProgressDiv.style.top =(sy2-85)+'px';
+                factoryBankDiv.style.left=(sx2-35)+'px';
+                factoryBankDiv.style.top =(sy2-160)+'px';
+                // Показываем круги если они были скрыты
+                factoryProgressDiv.style.visibility = factoryProgressDiv.style.visibility === 'hidden' ? '' : factoryProgressDiv.style.visibility;
+                factoryBankDiv.style.visibility = factoryBankDiv.style.visibility === 'hidden' ? '' : factoryBankDiv.style.visibility;
+            }
+        } else {
+            // На главной карте скрываем 3D круги завода
+            if(factoryProgressDiv && factoryBankDiv){
+                factoryProgressDiv.style.display='none';
+                factoryBankDiv.style.display='none';
+            }
         }
+    } else {
+        // Скрываем круги завода когда панель открыта
+        if (factoryProgressDiv) factoryProgressDiv.style.visibility = 'hidden';
+        if (factoryBankDiv) factoryBankDiv.style.visibility = 'hidden';
     }
 
     // позиционируем кружок над хранилищем
@@ -3049,6 +3091,16 @@ document.querySelector('#bottom-nav button:nth-child(5)').addEventListener('clic
 
 // Удаляем дублирующий обработчик для кнопки профиля
 
+// === BOTTOM BANNER HANDLER ===
+// Обработчик клика на bottom-banner
+const bottomBanner = document.getElementById('bottom-banner');
+if (bottomBanner) {
+    bottomBanner.addEventListener('click', () => {
+        if (isAnyPanelOpen()) return; // Блокируем если открыта любая панель
+        showPanelWithAnimation('bottom-banner-panel');
+    });
+}
+
 // === PANEL CLOSE HANDLERS ===
 // Закрытие панелей сбрасывает активное состояние
 safeAddEventListener('shop-close', 'click', () => {
@@ -3079,6 +3131,10 @@ safeAddEventListener('profile-close', 'click', () => {
     hidePanelWithAnimation('profile-panel', () => {
     setActiveNavButton(0); // сбрасываем активное состояние
     });
+});
+
+safeAddEventListener('bottom-banner-close', 'click', () => {
+    hidePanelWithAnimation('bottom-banner-panel');
 });
 
 // === INVENTORY SYSTEM REMOVED ===
@@ -3799,6 +3855,9 @@ function showPanelWithAnimation(panelId) {
     if (panelId === 'phone-panel') {
         window.isPhonePanelOpen = true;
     }
+    if (panelId === 'bottom-banner-panel') {
+        // Панель открыта
+    }
     
     // Показываем панель
     panel.style.display = 'flex';
@@ -3842,6 +3901,9 @@ function hidePanelWithAnimation(panelId, callback = null) {
         }
         if (panelId === 'phone-panel') {
             window.isPhonePanelOpen = false;
+        }
+        if (panelId === 'bottom-banner-panel') {
+            // Панель закрыта
         }
         
         // Показываем индикаторы прибыли после закрытия панели

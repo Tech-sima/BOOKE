@@ -240,7 +240,7 @@ function updateInvestmentsUI() {
         if (incomeValue) {
             const income = getBuildingIncome(buildingData.level);
             if (income > 0) {
-                incomeValue.innerHTML = `${income}/5с <img src="assets/svg/money-icon.svg" style="width:10px;height:10px;vertical-align:middle;margin-left:2px;">`;
+                incomeValue.innerHTML = `${income}/5с <img src="assets/svg/money-icon.svg" style="width:11px;height:11px;vertical-align:middle;margin-left:2px;">`;
             } else {
                 incomeValue.textContent = '0/5с';
             }
@@ -262,7 +262,7 @@ function updateInvestmentsUI() {
                     button.style.opacity = '0.5';
                     button.style.cursor = 'not-allowed';
                 } else {
-                    button.innerHTML = `Купить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:12px;height:12px;vertical-align:middle;margin-left:3px;">`;
+                    button.innerHTML = `Купить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;">`;
                     button.disabled = !canAfford;
                     button.style.opacity = canAfford ? '1' : '0.5';
                     button.style.cursor = canAfford ? 'pointer' : 'not-allowed';
@@ -279,7 +279,7 @@ function updateInvestmentsUI() {
                     const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
                     const canAfford = currentRBC >= cost;
                     
-                    button.innerHTML = `Улучшить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:12px;height:12px;vertical-align:middle;margin-left:3px;">`;
+                    button.innerHTML = `Улучшить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;">`;
                     button.disabled = !canAfford;
                     button.style.opacity = canAfford ? '1' : '0.5';
                     button.style.cursor = canAfford ? 'pointer' : 'not-allowed';
@@ -348,6 +348,24 @@ function setupCreditsInterceptor() {
     }
 }
 
+// Функция закрытия панели инвестиций
+function closeInvestmentsPanel() {
+    const panel = document.getElementById('bottom-banner-panel');
+    if (!panel) return;
+    
+    // Используем существующую функцию hidePanelWithAnimation если доступна
+    if (typeof hidePanelWithAnimation === 'function') {
+        hidePanelWithAnimation('bottom-banner-panel');
+    } else {
+        panel.style.display = 'none';
+    }
+    
+    // Скрываем кнопку "назад" в Telegram Mini App
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+        window.Telegram.WebApp.BackButton.hide();
+    }
+}
+
 // Инициализация системы инвестиций
 function setupInvestments() {
     initInvestments();
@@ -367,12 +385,26 @@ function setupInvestments() {
         }
     }, 1000);
     
-    // Обновляем UI при открытии панели
+    // Обновляем UI при открытии панели и настраиваем Telegram BackButton
     const panel = document.getElementById('bottom-banner-panel');
     if (panel) {
         const observer = new MutationObserver(() => {
-            if (panel.style.display !== 'none') {
+            const isOpen = panel.style.display !== 'none';
+            if (isOpen) {
                 updateInvestmentsUI();
+                
+                // Показываем кнопку "назад" в Telegram Mini App
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+                    window.Telegram.WebApp.BackButton.show();
+                    // Удаляем предыдущие обработчики и добавляем новый
+                    window.Telegram.WebApp.BackButton.offClick(closeInvestmentsPanel);
+                    window.Telegram.WebApp.BackButton.onClick(closeInvestmentsPanel);
+                }
+            } else {
+                // Скрываем кнопку "назад" в Telegram Mini App
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+                    window.Telegram.WebApp.BackButton.hide();
+                }
             }
         });
         observer.observe(panel, { attributes: true, attributeFilter: ['style'] });
@@ -383,6 +415,12 @@ function setupInvestments() {
             bottomBanner.addEventListener('click', () => {
                 setTimeout(() => {
                     updateInvestmentsUI();
+                    // Показываем кнопку "назад" в Telegram Mini App
+                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+                        window.Telegram.WebApp.BackButton.show();
+                        window.Telegram.WebApp.BackButton.offClick(closeInvestmentsPanel);
+                        window.Telegram.WebApp.BackButton.onClick(closeInvestmentsPanel);
+                    }
                 }, 100);
             });
         }

@@ -194,11 +194,11 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   margin-top:-15px;
 }
 .banner-item[data-building-id="town-hall"] .banner-item-icon{
-  transform:scale(1.2);
+  transform:scale(1.2) translateX(-20px);
   transform-origin:left center;
 }
 .banner-item[data-building-id="forest-village"] .banner-item-icon{
-  transform:scale(1.2);
+  transform:scale(1.2) translateX(-20px);
   transform-origin:left center;
 }
 .banner-item[data-building-id="village-technology-2"] .banner-item-icon{

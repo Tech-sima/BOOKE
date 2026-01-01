@@ -160,8 +160,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   display:flex;
   align-items:center;
   gap:16px;
-  padding:0 20px 0 0;
-  overflow:visible;
+  padding:0 20px 0 45px;
+  overflow:hidden;
 }
 .banner-item-icon{
   width:200px;
@@ -184,6 +184,32 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .banner-item-icon svg rect{
   display:none;
 }
+
+/* Индивидуальные стили для зданий */
+.banner-item[data-building-id="bloomie-house"] .banner-item-icon{
+  margin-top:-15px;
+}
+.banner-item[data-building-id="mansion"] .banner-item-icon{
+  margin-top:-15px;
+}
+.banner-item[data-building-id="biologist-house"] .banner-item-icon{
+  margin-top:-15px;
+}
+.banner-item[data-building-id="mountain-house"] .banner-item-icon{
+  margin-top:-15px;
+}
+.banner-item[data-building-id="town-hall"] .banner-item-icon{
+  width:240px;
+  height:240px;
+}
+.banner-item[data-building-id="forest-village"] .banner-item-icon{
+  width:240px;
+  height:240px;
+}
+.banner-item[data-building-id="village-technology-2"] .banner-item-icon{
+  margin-top:-15px;
+}
+
 .banner-item-content{
   flex:1;
   display:flex;
@@ -222,6 +248,9 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   align-items:center;
   gap:5px;
   margin:0;
+  min-height:32px;
+  height:32px;
+  box-sizing:border-box;
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
 }

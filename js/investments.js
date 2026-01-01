@@ -263,7 +263,7 @@ function updateInvestmentsUI() {
         if (incomeValue) {
             const income = getBuildingIncome(buildingData.level);
             if (income > 0) {
-                incomeValue.innerHTML = `${income}/5с <img src="assets/svg/money-icon.svg" style="width:11px;height:11px;vertical-align:middle;margin-left:2px;">`;
+                incomeValue.textContent = `${income}/5с`;
             } else {
                 incomeValue.textContent = '0/5с';
             }

@@ -62,11 +62,21 @@
         Object.keys(buildingNodes).forEach(function(key){
             if(key === 'library'){
                 setOwnedUI('library');
+                // Убеждаемся, что круг библиотеки создан и виден
+                var libCircle = ensureCircle('library');
+                if(libCircle){
+                    libCircle.style.display = '';
+                }
                 return;
             }
             var owned = !!(data[key] && data[key].isOwned === true);
             if(owned){
                 setOwnedUI(key);
+                // Убеждаемся, что круг создан и виден
+                var circle = ensureCircle(key);
+                if(circle){
+                    circle.style.display = '';
+                }
             }else{
                 buildingNodes[key].style.display = 'none';
                 if(circleNodes[key]) circleNodes[key].style.display = 'none';
@@ -157,7 +167,15 @@
 
     // Экспортируем API для мгновенного показа после покупки
     window.pureMap = {
-        showBuilding: function(key){ setOwnedUI(key); },
+        showBuilding: function(key){ 
+            setOwnedUI(key); 
+            // Убеждаемся, что круг создан и виден
+            var circle = ensureCircle(key);
+            if(circle){
+                circle.style.display = '';
+            }
+        },
+        refreshVisibility: function(){ applyVisibility(); },
         getBuildingPosition: getBuildingScreenPosition,
         getBuildingsConfig: function(){ return buildingsConfig; },
         getState: function(){ return state; },

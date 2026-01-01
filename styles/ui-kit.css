@@ -194,17 +194,15 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   margin-top:-15px;
 }
 .banner-item[data-building-id="town-hall"] .banner-item-icon{
-  width:240px;
-  height:240px;
-  margin-left:-40px;
+  transform:scale(1.2);
+  transform-origin:left center;
 }
 .banner-item[data-building-id="forest-village"] .banner-item-icon{
-  width:240px;
-  height:240px;
-  margin-left:-40px;
+  transform:scale(1.2);
+  transform-origin:left center;
 }
 .banner-item[data-building-id="village-technology-2"] .banner-item-icon{
-  margin-top:-15px;
+  margin-top:-10px;
 }
 .banner-item[data-building-id="biologist-house"] .banner-item-icon{
   margin-top:-15px;

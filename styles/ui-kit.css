@@ -160,8 +160,9 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   display:flex;
   align-items:center;
   gap:16px;
-  padding:0 20px 0 45px;
+  padding:0 20px 0 0;
   overflow:hidden;
+  position:relative;
 }
 .banner-item-icon{
   width:200px;
@@ -186,13 +187,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 /* Индивидуальные стили для зданий */
-.banner-item[data-building-id="bloomie-house"] .banner-item-icon{
-  margin-top:-15px;
-}
 .banner-item[data-building-id="mansion"] .banner-item-icon{
-  margin-top:-15px;
-}
-.banner-item[data-building-id="biologist-house"] .banner-item-icon{
   margin-top:-15px;
 }
 .banner-item[data-building-id="mountain-house"] .banner-item-icon{
@@ -201,12 +196,20 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .banner-item[data-building-id="town-hall"] .banner-item-icon{
   width:240px;
   height:240px;
+  margin-left:-40px;
 }
 .banner-item[data-building-id="forest-village"] .banner-item-icon{
   width:240px;
   height:240px;
+  margin-left:-40px;
 }
 .banner-item[data-building-id="village-technology-2"] .banner-item-icon{
+  margin-top:-15px;
+}
+.banner-item[data-building-id="biologist-house"] .banner-item-icon{
+  margin-top:-15px;
+}
+.banner-item[data-building-id="bloomie-house"] .banner-item-icon{
   margin-top:-15px;
 }
 

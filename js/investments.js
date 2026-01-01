@@ -3,19 +3,19 @@ const INVESTMENTS_CONFIG = {
     buildings: [
         // Дома
         { id: 'bloomie-house', name: 'Дом Блуми', icon: "assets/svg/construction/Bloomie's-house.svg" },
-        { id: 'cafe', name: 'Кафе', icon: 'assets/svg/construction/cafe.svg' },
+        { id: 'cafe', name: 'Уютное кафе', icon: 'assets/svg/construction/cafe.svg' },
         { id: 'forest-house', name: 'Лесной дом', icon: 'assets/svg/construction/forest-house.svg' },
-        { id: 'mansion', name: 'Особняк', icon: 'assets/svg/construction/mansion.svg' },
-        { id: 'museum', name: 'Музей', icon: 'assets/svg/construction/museum.svg' },
+        { id: 'mansion', name: 'Особняк основателя', icon: 'assets/svg/construction/mansion.svg' },
+        { id: 'museum', name: 'Музей коллекционера', icon: 'assets/svg/construction/museum.svg' },
         { id: 'biologist-house', name: 'Дом биолога', icon: "assets/svg/construction/The biologist's house.svg" },
         { id: 'blumi-estate', name: 'Поместье Блуми', icon: "assets/svg/construction/The blumi Estate.svg" },
         { id: 'fisherman-estate', name: 'Поместье рыбака', icon: "assets/svg/construction/The Fisherman's Estate.svg" },
-        { id: 'house-of-traitors', name: 'Дом предателей', icon: "assets/svg/construction/The House of Traitors.svg" },
+        { id: 'house-of-traitors', name: 'Дом представителей', icon: "assets/svg/construction/The House of Traitors.svg" },
         { id: 'mountain-house', name: 'Горный дом', icon: 'assets/svg/construction/Mountain House.svg' },
-        { id: 'high-tech-office', name: 'Хай-тек офис', icon: 'assets/svg/construction/High-tech office.svg' },
+        { id: 'high-tech-office', name: 'Технологичный офис', icon: 'assets/svg/construction/High-tech office.svg' },
         { id: 'skyscraper-finance', name: 'Небоскреб финансов', icon: 'assets/svg/construction/Skyscraper of Finance.svg' },
         { id: 'conqueror-castle', name: 'Замок завоевателя', icon: "assets/svg/construction/The Conqueror's Castle.svg" },
-        { id: 'town-hall', name: 'Ратуша', icon: 'assets/svg/construction/The Town Hall.svg' },
+        { id: 'town-hall', name: 'Городская ратуша', icon: 'assets/svg/construction/The Town Hall.svg' },
         // Деревни
         { id: 'forest-village', name: 'Лесная деревня', icon: 'assets/svg/construction/Forest Village.svg' },
         { id: 'mountain-village', name: 'Горная деревня', icon: 'assets/svg/construction/Mountain-Village.svg' },
@@ -23,8 +23,8 @@ const INVESTMENTS_CONFIG = {
         { id: 'village-technology', name: 'Деревня технологий', icon: 'assets/svg/construction/The Village of Technology.svg' },
         { id: 'village-technology-2', name: 'Деревня технологий 2', icon: 'assets/svg/construction/The-Village-of-Technology.svg' },
         // Города
-        { id: 'high-tech-city', name: 'Хай-тек город', icon: 'assets/svg/construction/A-high-tech-city.svg' },
-        { id: 'kingdom', name: 'Королевство', icon: 'assets/svg/construction/Kingdom.svg' }
+        { id: 'high-tech-city', name: 'Город технологий', icon: 'assets/svg/construction/A-high-tech-city.svg' },
+        { id: 'kingdom', name: 'Книжное королевство', icon: 'assets/svg/construction/Kingdom.svg' }
     ],
     basePurchaseCost: 150, // Первое здание
     purchaseCostIncrement: 100, // Увеличение стоимости каждого следующего

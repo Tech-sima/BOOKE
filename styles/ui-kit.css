@@ -161,7 +161,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   align-items:center;
   gap:16px;
   padding:0 20px 0 0;
-  overflow:hidden;
+  overflow:visible;
 }
 .banner-item-icon{
   width:200px;
@@ -190,18 +190,21 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   flex-direction:column;
   gap:4px;
   position:relative;
+  overflow:visible;
 }
 .banner-item-title{
   color:#fff;
   font-size:20px;
   font-weight:800;
   text-align:left;
-  margin-left:0;
+  margin-left:-35px;
   margin-top:0;
   margin-bottom:0;
   position:absolute;
   top:0;
   left:0;
+  white-space:nowrap;
+  overflow:visible;
 }
 .banner-stats{
   display:flex;
@@ -255,12 +258,15 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   padding:7px 20px;
   cursor:pointer;
   transition:background 0.2s ease;
-  width:fit-content;
+  width:calc(100% + 35px);
+  max-width:calc(100% + 35px);
   margin-left:-35px;
   margin-top:8px;
   margin-bottom:0;
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
+  text-align:center;
+  justify-content:center;
 }
 .banner-buy-btn img{
   width:14px !important;

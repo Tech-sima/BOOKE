@@ -171,20 +171,23 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   flex-direction:row;
   align-items:center;
   justify-content:space-between;
-  padding:10px 24px;
+  padding:6px 20px;
   gap:12px;
   margin-bottom:8px;
   box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  white-space:nowrap;
 }
 .banner-total-profit-label{
   color:rgba(255,255,255,0.8);
-  font-size:12px;
+  font-size:11px;
   font-weight:600;
   text-transform:uppercase;
-  letter-spacing:1px;
+  letter-spacing:0.8px;
   font-family:"Segoe UI",Arial,sans-serif;
-  white-space:nowrap;
+  white-space:normal;
+  word-break:break-word;
+  flex:1;
+  min-width:0;
+  line-height:1.2;
 }
 .banner-total-profit-value-wrapper{
   display:flex;

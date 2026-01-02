@@ -26,6 +26,20 @@ const INVESTMENTS_CONFIG = {
         { id: 'high-tech-city', name: 'Город технологий', icon: 'assets/svg/construction/A-high-tech-city.svg' },
         { id: 'kingdom', name: 'Книжное королевство', icon: 'assets/svg/construction/Kingdom.svg' }
     ],
+    transport: [
+        { id: 'bmw-m8', name: 'BMW M8', icon: 'assets/svg/transport/BMW M8.svg' },
+        { id: 'bugatti-tourbillon', name: 'Bugatti Tourbillon', icon: 'assets/svg/transport/Bugatti Tourbillon.svg' },
+        { id: 'lamborghini-aventador', name: 'Lamborghini Aventador', icon: 'assets/svg/transport/Lamborghini Aventador.svg' },
+        { id: 'mercedes-g-class', name: 'Mercedes-Benz G-Class', icon: 'assets/svg/transport/Mercedes-Benz G-Class.svg' },
+        { id: 'rolls-royce-cullinan', name: 'Rolls-Royce Cullinan', icon: 'assets/svg/transport/Rolls-Royce Cullinan.svg' }
+    ],
+    // Конфигурация для транспорта
+    transportBasePurchaseCost: 500, // Первый транспорт
+    transportPurchaseCostIncrement: 250, // Увеличение стоимости каждого следующего
+    transportBaseUpgradeCost: 400, // Базовая стоимость улучшения транспорта
+    transportUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
+    transportBaseIncome: 1, // Доход на 1 уровне (алмазы)
+    transportIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
     basePurchaseCost: 150, // Первое здание
     purchaseCostIncrement: 100, // Увеличение стоимости каждого следующего
     baseUpgradeCost: 50, // Базовая стоимость улучшения
@@ -43,6 +57,13 @@ function initInvestments() {
         const defaultData = {};
         INVESTMENTS_CONFIG.buildings.forEach((building, index) => {
             defaultData[building.id] = {
+                purchased: false,
+                level: 0,
+                lastIncomeTime: Date.now()
+            };
+        });
+        INVESTMENTS_CONFIG.transport.forEach((vehicle, index) => {
+            defaultData[vehicle.id] = {
                 purchased: false,
                 level: 0,
                 lastIncomeTime: Date.now()
@@ -79,6 +100,23 @@ function getBuildingUpgradeCost(level) {
 function getBuildingIncome(level) {
     if (level === 0) return 0;
     return INVESTMENTS_CONFIG.baseIncome + (level - 1);
+}
+
+// Получить стоимость покупки транспорта
+function getTransportPurchaseCost(vehicleIndex) {
+    return INVESTMENTS_CONFIG.transportBasePurchaseCost + (vehicleIndex * INVESTMENTS_CONFIG.transportPurchaseCostIncrement);
+}
+
+// Получить стоимость улучшения транспорта
+function getTransportUpgradeCost(level) {
+    if (level >= INVESTMENTS_CONFIG.maxLevel) return Infinity;
+    return INVESTMENTS_CONFIG.transportBaseUpgradeCost + (level * INVESTMENTS_CONFIG.transportUpgradeCostIncrement);
+}
+
+// Получить доход транспорта за интервал (алмазы)
+function getTransportIncome(level) {
+    if (level === 0) return 0;
+    return INVESTMENTS_CONFIG.transportBaseIncome + (level - 1);
 }
 
 // Проверить, доступно ли здание для покупки
@@ -177,6 +215,102 @@ function upgradeBuilding(buildingId) {
     return true;
 }
 
+// Проверить, доступен ли транспорт для покупки
+function isTransportAvailable(vehicleIndex) {
+    if (vehicleIndex === 0) return true; // Первый транспорт всегда доступен
+    
+    const data = getInvestmentsData();
+    const prevVehicle = INVESTMENTS_CONFIG.transport[vehicleIndex - 1];
+    const prevData = data[prevVehicle.id];
+    
+    if (!prevData || !prevData.purchased) return false;
+    return prevData.level >= INVESTMENTS_CONFIG.unlockLevel;
+}
+
+// Получить название предыдущего транспорта для недоступных
+function getRequiredTransportName(vehicleIndex) {
+    if (vehicleIndex === 0) return null;
+    return INVESTMENTS_CONFIG.transport[vehicleIndex - 1].name;
+}
+
+// Покупка транспорта
+function purchaseTransport(vehicleId) {
+    const data = getInvestmentsData();
+    const vehicleIndex = INVESTMENTS_CONFIG.transport.findIndex(v => v.id === vehicleId);
+    
+    if (vehicleIndex === -1) return false;
+    
+    const vehicleData = data[vehicleId] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
+    
+    if (vehicleData.purchased) return false; // Уже куплено
+    
+    if (!isTransportAvailable(vehicleIndex)) {
+        alert(`Необходимо прокачать "${getRequiredTransportName(vehicleIndex)}" до ${INVESTMENTS_CONFIG.unlockLevel} уровня`);
+        return false;
+    }
+    
+    const cost = getTransportPurchaseCost(vehicleIndex);
+    const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+    
+    if (currentRBC < cost) {
+        alert('Недостаточно RBC');
+        return false;
+    }
+    
+    // Списываем RBC
+    if (typeof setCredits === 'function') {
+        setCredits(currentRBC - cost);
+    } else {
+        localStorage.setItem('credits', (currentRBC - cost).toString());
+        const rbcValue = document.getElementById('rbc-value');
+        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+    }
+    
+    // Покупаем транспорт
+    vehicleData.purchased = true;
+    vehicleData.level = 1;
+    vehicleData.lastIncomeTime = Date.now();
+    data[vehicleId] = vehicleData;
+    saveInvestmentsData(data);
+    
+    updateInvestmentsUI();
+    return true;
+}
+
+// Улучшение транспорта
+function upgradeTransport(vehicleId) {
+    const data = getInvestmentsData();
+    const vehicleData = data[vehicleId];
+    
+    if (!vehicleData || !vehicleData.purchased) return false;
+    if (vehicleData.level >= INVESTMENTS_CONFIG.maxLevel) return false;
+    
+    const cost = getTransportUpgradeCost(vehicleData.level);
+    const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+    
+    if (currentRBC < cost) {
+        alert('Недостаточно RBC');
+        return false;
+    }
+    
+    // Списываем RBC
+    if (typeof setCredits === 'function') {
+        setCredits(currentRBC - cost);
+    } else {
+        localStorage.setItem('credits', (currentRBC - cost).toString());
+        const rbcValue = document.getElementById('rbc-value');
+        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+    }
+    
+    // Улучшаем транспорт
+    vehicleData.level++;
+    data[vehicleId] = vehicleData;
+    saveInvestmentsData(data);
+    
+    updateInvestmentsUI();
+    return true;
+}
+
 // Начисление дохода от всех зданий
 function processInvestmentsIncome() {
     const data = getInvestmentsData();
@@ -199,10 +333,28 @@ function processInvestmentsIncome() {
         }
     });
     
+    // Обрабатываем доход от транспорта (алмазы)
+    let totalDiamonds = 0;
+    INVESTMENTS_CONFIG.transport.forEach(vehicle => {
+        const vehicleData = data[vehicle.id];
+        if (!vehicleData || !vehicleData.purchased || vehicleData.level === 0) return;
+        
+        const incomePerInterval = getTransportIncome(vehicleData.level);
+        const timePassed = currentTime - (vehicleData.lastIncomeTime || currentTime);
+        const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.transportIncomeInterval);
+        
+        if (intervalsPassed > 0) {
+            const income = incomePerInterval * intervalsPassed;
+            totalDiamonds += income;
+            vehicleData.lastIncomeTime = currentTime - (timePassed % INVESTMENTS_CONFIG.transportIncomeInterval);
+            data[vehicle.id] = vehicleData;
+        }
+    });
+    
     if (totalIncome > 0) {
         saveInvestmentsData(data);
         
-        // Добавляем доход к балансу
+        // Добавляем доход к балансу (деньги от зданий)
         if (typeof getBalance === 'function' && typeof setBalance === 'function') {
             const currentBalance = getBalance();
             setBalance(currentBalance + totalIncome);
@@ -213,6 +365,24 @@ function processInvestmentsIncome() {
             const moneyAmount = document.getElementById('money-amount');
             if (moneyAmount) {
                 moneyAmount.textContent = typeof formatNumber === 'function' ? formatNumber(newBalance) : newBalance.toLocaleString();
+            }
+        }
+    }
+    
+    if (totalDiamonds > 0) {
+        saveInvestmentsData(data);
+        
+        // Добавляем алмазы от транспорта
+        if (typeof getCredits === 'function' && typeof setCredits === 'function') {
+            const currentCredits = getCredits();
+            setCredits(currentCredits + totalDiamonds);
+        } else {
+            const currentCredits = parseInt(localStorage.getItem('credits') || '0');
+            const newCredits = currentCredits + totalDiamonds;
+            localStorage.setItem('credits', newCredits.toString());
+            const creditsAmount = document.getElementById('credits-amount');
+            if (creditsAmount) {
+                creditsAmount.textContent = typeof formatNumber === 'function' ? formatNumber(newCredits) : newCredits.toLocaleString();
             }
         }
     }
@@ -233,16 +403,31 @@ function getTotalBuildingsProfit() {
     return totalProfit;
 }
 
+// Получить общую прибыль от всего транспорта (алмазы)
+function getTotalTransportProfit() {
+    const data = getInvestmentsData();
+    let totalProfit = 0;
+    
+    INVESTMENTS_CONFIG.transport.forEach(vehicle => {
+        const vehicleData = data[vehicle.id] || { purchased: false, level: 0 };
+        if (vehicleData.purchased && vehicleData.level > 0) {
+            totalProfit += getTransportIncome(vehicleData.level);
+        }
+    });
+    
+    return totalProfit;
+}
+
 // Обновление UI панели инвестиций
 function updateInvestmentsUI() {
     const panel = document.getElementById('bottom-banner-panel');
     if (!panel) return;
     
-    // Обновляем только панель "Постройки"
-    const buildingsContent = panel.querySelector('.banner-panel-content[data-tab-content="buildings"]');
-    if (!buildingsContent || buildingsContent.style.display === 'none') return;
-    
     const data = getInvestmentsData();
+    
+    // Обновляем панель "Постройки"
+    const buildingsContent = panel.querySelector('.banner-panel-content[data-tab-content="buildings"]');
+    if (buildingsContent && buildingsContent.style.display !== 'none') {
     
     // Обновляем овальную ячейку с общей прибылью
     const totalProfitCell = buildingsContent.querySelector('.banner-total-profit-cell');
@@ -335,6 +520,97 @@ function updateInvestmentsUI() {
             }
         }
     });
+    }
+    
+    // Обновляем панель "Транспорт"
+    const transportContent = panel.querySelector('.banner-panel-content[data-tab-content="transport"]');
+    if (transportContent && transportContent.style.display !== 'none') {
+        // Обновляем овальную ячейку с общей прибылью транспорта
+        const totalProfitCell = transportContent.querySelector('.banner-total-profit-cell');
+        if (totalProfitCell) {
+            const totalProfitValue = totalProfitCell.querySelector('.banner-total-profit-value');
+            if (totalProfitValue) {
+                const totalProfit = getTotalTransportProfit();
+                totalProfitValue.textContent = `${totalProfit}/1мин`;
+            }
+        }
+        
+        INVESTMENTS_CONFIG.transport.forEach((vehicle, index) => {
+            const vehicleData = data[vehicle.id] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
+            const item = transportContent.querySelector(`.banner-item[data-vehicle-id="${vehicle.id}"]`);
+            if (!item) return;
+            
+            const icon = item.querySelector('.banner-item-icon');
+            const levelValue = item.querySelector('.banner-stat-cell:first-child .banner-stat-value');
+            const incomeValue = item.querySelector('.banner-stat-cell:last-child .banner-stat-value');
+            const button = item.querySelector('.banner-buy-btn');
+            
+            // Обновляем стиль иконки
+            if (icon) {
+                if (!vehicleData.purchased) {
+                    icon.style.filter = 'brightness(0.5) grayscale(1)';
+                } else {
+                    icon.style.filter = 'drop-shadow(0 0 8px rgba(255,255,255,0.6))';
+                }
+            }
+            
+            // Обновляем уровень
+            if (levelValue) {
+                levelValue.textContent = vehicleData.purchased ? vehicleData.level : '0';
+            }
+            
+            // Обновляем доходность (алмазы/1мин)
+            if (incomeValue) {
+                const income = getTransportIncome(vehicleData.level);
+                if (income > 0) {
+                    incomeValue.textContent = `${income}/1мин`;
+                } else {
+                    incomeValue.textContent = '0/1мин';
+                }
+            }
+            
+            // Обновляем кнопку
+            if (button) {
+                if (!vehicleData.purchased) {
+                    // Кнопка покупки
+                    const cost = getTransportPurchaseCost(index);
+                    const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+                    const canAfford = currentRBC >= cost;
+                    const isAvailable = isTransportAvailable(index);
+                    
+                    if (!isAvailable) {
+                        const requiredVehicle = getRequiredTransportName(index);
+                        button.textContent = `Необходимо "${requiredVehicle}" ${INVESTMENTS_CONFIG.unlockLevel} уровня`;
+                        button.disabled = true;
+                        button.style.opacity = '0.5';
+                        button.style.cursor = 'not-allowed';
+                    } else {
+                        button.innerHTML = `Купить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;">`;
+                        button.disabled = !canAfford;
+                        button.style.opacity = canAfford ? '1' : '0.5';
+                        button.style.cursor = canAfford ? 'pointer' : 'not-allowed';
+                    }
+                } else {
+                    // Кнопка улучшения
+                    if (vehicleData.level >= INVESTMENTS_CONFIG.maxLevel) {
+                        button.textContent = 'Макс. уровень';
+                        button.disabled = true;
+                        button.style.opacity = '0.5';
+                        button.style.cursor = 'not-allowed';
+                    } else {
+                        const cost = getTransportUpgradeCost(vehicleData.level);
+                        const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+                        const canAfford = currentRBC >= cost;
+                        
+                        button.innerHTML = `Улучшить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;">`;
+                        button.disabled = !canAfford;
+                        button.style.opacity = canAfford ? '1' : '0.5';
+                        button.style.cursor = canAfford ? 'pointer' : 'not-allowed';
+                    }
+                }
+            }
+        });
+    }
 }
 
 // Инициализация обработчиков событий
@@ -365,6 +641,30 @@ function initInvestmentsEvents() {
             }
         });
     });
+    
+    // Получаем контейнер с транспортом
+    const transportContent = panel.querySelector('.banner-panel-content[data-tab-content="transport"]');
+    if (transportContent) {
+        // Обработчики для кнопок транспорта
+        INVESTMENTS_CONFIG.transport.forEach(vehicle => {
+            const item = transportContent.querySelector(`.banner-item[data-vehicle-id="${vehicle.id}"]`);
+            if (!item) return;
+            
+            const button = item.querySelector('.banner-buy-btn');
+            if (!button) return;
+            
+            button.addEventListener('click', () => {
+                const data = getInvestmentsData();
+                const vehicleData = data[vehicle.id] || { purchased: false, level: 0 };
+                
+                if (!vehicleData.purchased) {
+                    purchaseTransport(vehicle.id);
+                } else {
+                    upgradeTransport(vehicle.id);
+                }
+            });
+        });
+    }
     
     // Обработчики для кнопок переключения вкладок
     const tabButtons = panel.querySelectorAll('.banner-tab-btn');
@@ -403,8 +703,8 @@ function switchInvestmentsTab(tabName) {
         selectedContent.style.display = 'flex';
     }
     
-    // Обновляем UI только для вкладки "Постройки"
-    if (tabName === 'buildings') {
+    // Обновляем UI для активной вкладки
+    if (tabName === 'buildings' || tabName === 'transport') {
         updateInvestmentsUI();
     }
 }

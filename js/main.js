@@ -1121,6 +1121,22 @@ renderTasks();
 // credits plus click demo
 safeAddEventListener('credits-plus', 'click', () => {
     alert('Открыть магазин кредитов');
+});
+
+// Обработчик кнопки +200к RBC
+safeAddEventListener('add-rbc-btn', 'click', () => {
+    const currentCredits = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+    const newCredits = currentCredits + 200000;
+    
+    if (typeof setCredits === 'function') {
+        setCredits(newCredits);
+    } else {
+        localStorage.setItem('credits', newCredits.toString());
+        const creditsAmount = document.getElementById('credits-amount');
+        if (creditsAmount) {
+            creditsAmount.textContent = typeof formatNumber === 'function' ? formatNumber(newCredits) : newCredits.toLocaleString();
+        }
+    }
 }); 
 
 // Удаляем старый обработчик кнопки магазина (дублирует новый)

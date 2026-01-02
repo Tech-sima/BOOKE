@@ -218,6 +218,21 @@ function processInvestmentsIncome() {
     }
 }
 
+// Получить общую прибыль от всех построек
+function getTotalBuildingsProfit() {
+    const data = getInvestmentsData();
+    let totalProfit = 0;
+    
+    INVESTMENTS_CONFIG.buildings.forEach(building => {
+        const buildingData = data[building.id] || { purchased: false, level: 0 };
+        if (buildingData.purchased && buildingData.level > 0) {
+            totalProfit += getBuildingIncome(buildingData.level);
+        }
+    });
+    
+    return totalProfit;
+}
+
 // Обновление UI панели инвестиций
 function updateInvestmentsUI() {
     const panel = document.getElementById('bottom-banner-panel');
@@ -228,6 +243,16 @@ function updateInvestmentsUI() {
     if (!buildingsContent || buildingsContent.style.display === 'none') return;
     
     const data = getInvestmentsData();
+    
+    // Обновляем овальную ячейку с общей прибылью
+    const totalProfitCell = buildingsContent.querySelector('.banner-total-profit-cell');
+    if (totalProfitCell) {
+        const totalProfitValue = totalProfitCell.querySelector('.banner-total-profit-value');
+        if (totalProfitValue) {
+            const totalProfit = getTotalBuildingsProfit();
+            totalProfitValue.textContent = `${totalProfit}/5с`;
+        }
+    }
     
     INVESTMENTS_CONFIG.buildings.forEach((building, index) => {
         const buildingData = data[building.id] || { purchased: false, level: 0, lastIncomeTime: Date.now() };

@@ -1121,7 +1121,7 @@ renderTasks();
 // credits plus click demo
 safeAddEventListener('credits-plus', 'click', () => {
     alert('Открыть магазин кредитов');
-});
+}); 
 
 // Обработчик кнопки +200к RBC
 safeAddEventListener('add-rbc-btn', 'click', () => {

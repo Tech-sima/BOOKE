@@ -940,10 +940,10 @@ function animate() {
     const isSettingsOpen = window.isSettingsPanelOpen || (document.getElementById('settings-panel') && document.getElementById('settings-panel').style.display !== 'none');
     const isStatisticsOpen = window.isStatisticsPanelOpen || (document.getElementById('statistics-panel') && document.getElementById('statistics-panel').style.display !== 'none');
     const isPhoneOpen = window.isPhonePanelOpen || (document.getElementById('phone-panel') && document.getElementById('phone-panel').style.display !== 'none');
-    const isBottomBannerOpen = window.isBottomBannerOpen || (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
+    const isBottomBannerOpen = (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
     
     // Если любая из панелей открыта, скрываем индикаторы прибыли
-    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen || isBottomBannerOpen) && window.hideProfitIndicators) {
+    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen) && window.hideProfitIndicators) {
         window.hideProfitIndicators();
         // Принудительно очищаем все индикаторы прибыли
         if (window.clearAllProfitIndicators) {
@@ -3873,9 +3873,13 @@ function showPanelWithAnimation(panelId) {
     }
     if (panelId === 'bottom-banner-panel') {
         window.isBottomBannerOpen = true;
-        // Скрываем индикаторы прибыли при открытии панели инвестиций
+        // Скрываем индикаторы прибыли сразу при открытии панели инвестиций
         if (window.hideProfitIndicators) {
             window.hideProfitIndicators({ suppress: true });
+        }
+        // Принудительно очищаем все индикаторы прибыли сразу
+        if (window.clearAllProfitIndicators) {
+            window.clearAllProfitIndicators();
         }
     }
     
@@ -3895,10 +3899,10 @@ function hidePanelWithAnimation(panelId, callback = null) {
     const panel = document.getElementById(panelId);
     if (!panel) return;
     
-    // Для панели инвестиций сразу устанавливаем флаг закрытия и показываем индикаторы
+    // Для панели инвестиций сразу показываем круги и сбрасываем флаг
     if (panelId === 'bottom-banner-panel') {
         window.isBottomBannerOpen = false;
-        // Показываем индикаторы прибыли сразу при начале закрытия
+        // Показываем индикаторы прибыли сразу при закрытии панели инвестиций
         if (window.showProfitIndicators) {
             window.showProfitIndicators({ force: true });
         }

@@ -468,11 +468,11 @@ function updateInvestmentsUI() {
         // Обновляем стиль иконки
         if (icon) {
             if (!buildingData.purchased) {
-                // Некупленное здание - ярко-серый
-                icon.style.filter = 'brightness(0.5) grayscale(1)';
+                // Некупленное здание - светло-серый (ближе к белому)
+                icon.style.filter = 'brightness(0.85) grayscale(1)';
             } else if (!isBuildingAvailable(index)) {
                 // Купленное, но недоступное (не должно быть такого случая)
-                icon.style.filter = 'brightness(0.5) grayscale(1)';
+                icon.style.filter = 'brightness(0.85) grayscale(1)';
             } else {
                 // Купленное и доступное - нормальный цвет
                 icon.style.filter = 'drop-shadow(0 0 8px rgba(255,255,255,0.6))';
@@ -563,7 +563,7 @@ function updateInvestmentsUI() {
             // Обновляем стиль иконки
             if (icon) {
                 if (!vehicleData.purchased) {
-                    icon.style.filter = 'brightness(0.5) grayscale(1)';
+                    icon.style.filter = 'brightness(0.85) grayscale(1)';
                 } else {
                     icon.style.filter = 'drop-shadow(0 0 8px rgba(255,255,255,0.6))';
                 }

@@ -943,7 +943,7 @@ function animate() {
     const isBottomBannerOpen = (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
     
     // Если любая из панелей открыта, скрываем индикаторы прибыли
-    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen || isBottomBannerOpen) && window.hideProfitIndicators) {
+    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen) && window.hideProfitIndicators) {
         window.hideProfitIndicators();
         // Принудительно очищаем все индикаторы прибыли
         if (window.clearAllProfitIndicators) {
@@ -3872,7 +3872,11 @@ function showPanelWithAnimation(panelId) {
         window.isPhonePanelOpen = true;
     }
     if (panelId === 'bottom-banner-panel') {
-        // Панель открыта
+        window.isBottomBannerOpen = true;
+        // Скрываем индикаторы прибыли при открытии панели инвестиций
+        if (window.hideProfitIndicators) {
+            window.hideProfitIndicators({ suppress: true });
+        }
     }
     
     // Показываем панель
@@ -3919,22 +3923,28 @@ function hidePanelWithAnimation(panelId, callback = null) {
             window.isPhonePanelOpen = false;
         }
         if (panelId === 'bottom-banner-panel') {
-            // Панель закрыта
+            window.isBottomBannerOpen = false;
+            // Показываем индикаторы прибыли после закрытия панели инвестиций
+            if (window.showProfitIndicators) {
+                window.showProfitIndicators({ force: true });
+            }
         }
         
-        // Показываем индикаторы прибыли после закрытия панели
-        if (window.updateProfitIndicators) {
+        // Показываем индикаторы прибыли после закрытия панели (только если это не панель инвестиций)
+        if (panelId !== 'bottom-banner-panel' && window.updateProfitIndicators) {
             setTimeout(() => {
                 window.updateProfitIndicators();
             }, 100);
         }
         
-        // Дополнительная проверка через 200ms для надежности
-        setTimeout(() => {
-            if (window.updateProfitIndicators) {
-                window.updateProfitIndicators();
-            }
-        }, 200);
+        // Дополнительная проверка через 200ms для надежности (только если это не панель инвестиций)
+        if (panelId !== 'bottom-banner-panel') {
+            setTimeout(() => {
+                if (window.updateProfitIndicators) {
+                    window.updateProfitIndicators();
+                }
+            }, 200);
+        }
         
         if (callback) callback();
     }, 300);

@@ -977,22 +977,15 @@ function setupCreditsInterceptor() {
         window.setCredits._investmentsWrapped = true;
     }
 }
-
 // Функция закрытия панели инвестиций
 function closeInvestmentsPanel() {
-    const panel = document.getElementById('bottom-banner-panel');
-    if (!panel) return;
-    
-    // Используем существующую функцию hidePanelWithAnimation если доступна
     if (typeof hidePanelWithAnimation === 'function') {
         hidePanelWithAnimation('bottom-banner-panel');
     } else {
-        panel.style.display = 'none';
-    }
-    
-    // Скрываем кнопку "назад" в Telegram Mini App
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
-        window.Telegram.WebApp.BackButton.hide();
+        const panel = document.getElementById('bottom-banner-panel');
+        if (panel) {
+            panel.style.display = 'none';
+        }
     }
 }
 
@@ -1018,6 +1011,7 @@ function setupInvestments() {
     // Обновляем UI при открытии панели и настраиваем Telegram BackButton
     const panel = document.getElementById('bottom-banner-panel');
     if (panel) {
+        // Используем MutationObserver для отслеживания открытия/закрытия панели
         const observer = new MutationObserver(() => {
             const isOpen = panel.style.display !== 'none';
             if (isOpen) {
@@ -1039,7 +1033,7 @@ function setupInvestments() {
         });
         observer.observe(panel, { attributes: true, attributeFilter: ['style'] });
         
-        // Также обновляем при клике на кнопку открытия панели
+        // Обновляем при клике на кнопку открытия панели
         const bottomBanner = document.getElementById('bottom-banner');
         if (bottomBanner) {
             bottomBanner.addEventListener('click', () => {

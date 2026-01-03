@@ -31,7 +31,22 @@ const INVESTMENTS_CONFIG = {
         { id: 'bugatti-tourbillon', name: 'Bugatti Tourbillon', icon: 'assets/svg/transport/Bugatti Tourbillon.svg' },
         { id: 'lamborghini-aventador', name: 'Lamborghini Aventador', icon: 'assets/svg/transport/Lamborghini Aventador.svg' },
         { id: 'mercedes-g-class', name: 'Mercedes-Benz G-Class', icon: 'assets/svg/transport/Mercedes-Benz G-Class.svg' },
-        { id: 'rolls-royce-cullinan', name: 'Rolls-Royce Cullinan', icon: 'assets/svg/transport/Rolls-Royce Cullinan.svg' }
+        { id: 'rolls-royce-cullinan', name: 'Rolls-Royce Cullinan', icon: 'assets/svg/transport/Rolls-Royce Cullinan.svg' },
+        { id: 'bentley-continental', name: 'Bentley Continental', icon: 'assets/svg/transport/Bentley Continental.svg' },
+        { id: 'koenigsegg-gemera', name: 'Koenigsegg Gemera', icon: 'assets/svg/transport/Koenigsegg Gemera.svg' },
+        { id: 'mercedes-maybach', name: 'Mercedes-Maybach', icon: 'assets/svg/transport/Mercedes-Maybach.svg' },
+        { id: 'rolls-royce-phantom', name: 'Rolls-Royce Phantom', icon: 'assets/svg/transport/Rolls-Royce Phantom.svg' },
+        { id: 'formula-one', name: 'Formula 1', icon: 'assets/svg/transport/Formula One car.svg' },
+        { id: 'buldog', name: 'Buldog', icon: 'assets/svg/transport/Buldog.svg' },
+        { id: 'ah-64', name: 'AH-64', icon: 'assets/svg/transport/AH-64.svg' },
+        { id: 'bell-206b-jet-ranger', name: 'Bell 206B Jet Ranger', icon: 'assets/svg/transport/Bell 206B Jet Ranger.svg' },
+        { id: 'airbus', name: 'Airbus', icon: 'assets/svg/transport/Airbus.svg' },
+        { id: 'cheny', name: 'Cheny', icon: 'assets/svg/transport/Cheny.svg' },
+        { id: 'embraer-legacy', name: 'Embraer Legacy', icon: 'assets/svg/transport/Embraer Legacy.svg' },
+        { id: 'go-fast-boat', name: 'Go-fast-boat', icon: 'assets/svg/transport/Go-fast-boat.svg' },
+        { id: 'star-flyer', name: 'Star Flyer', icon: 'assets/svg/transport/Star Flyer.svg' },
+        { id: 'ocean-victory', name: 'Ocean Victory', icon: 'assets/svg/transport/Ocean Victory.svg' },
+        { id: 'harmony-of-the-seas', name: 'Harmony of the Seas', icon: 'assets/svg/transport/Harmony of the Seas.svg' }
     ],
     // Конфигурация для транспорта
     transportBasePurchaseCost: 500, // Первый транспорт

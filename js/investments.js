@@ -84,14 +84,15 @@ const INVESTMENTS_CONFIG = {
     jewelryUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
     jewelryBaseIncome: 1, // Доход на 1 уровне (алмазы)
     jewelryIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
-    basePurchaseCost: 150, // Первое здание
-    purchaseCostIncrement: 100, // Увеличение стоимости каждого следующего
-    baseUpgradeCost: 50, // Базовая стоимость улучшения
-    upgradeCostIncrement: 20, // Увеличение стоимости улучшения за уровень
+    // Конфигурация для построек (аналогично транспорту и драгоценностям)
+    buildingsBasePurchaseCost: 500, // Первое здание
+    buildingsPurchaseCostIncrement: 250, // Увеличение стоимости каждого следующего
+    buildingsBaseUpgradeCost: 400, // Базовая стоимость улучшения зданий
+    buildingsUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
+    buildingsBaseIncome: 1, // Доход на 1 уровне (алмазы)
+    buildingsIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
     maxLevel: 100,
-    unlockLevel: 5, // Уровень для разблокировки следующего здания
-    baseIncome: 1, // Доход на 1 уровне
-    incomeInterval: 5000 // Интервал начисления дохода (5 секунд)
+    unlockLevel: 5 // Уровень для разблокировки следующего здания
 };
 
 // Инициализация данных инвестиций
@@ -138,19 +139,19 @@ function saveInvestmentsData(data) {
 
 // Получить стоимость покупки здания
 function getBuildingPurchaseCost(buildingIndex) {
-    return INVESTMENTS_CONFIG.basePurchaseCost + (buildingIndex * INVESTMENTS_CONFIG.purchaseCostIncrement);
+    return INVESTMENTS_CONFIG.buildingsBasePurchaseCost + (buildingIndex * INVESTMENTS_CONFIG.buildingsPurchaseCostIncrement);
 }
 
 // Получить стоимость улучшения здания
 function getBuildingUpgradeCost(level) {
     if (level >= INVESTMENTS_CONFIG.maxLevel) return Infinity;
-    return INVESTMENTS_CONFIG.baseUpgradeCost + (level * INVESTMENTS_CONFIG.upgradeCostIncrement);
+    return INVESTMENTS_CONFIG.buildingsBaseUpgradeCost + (level * INVESTMENTS_CONFIG.buildingsUpgradeCostIncrement);
 }
 
-// Получить доход здания за интервал
+// Получить доход здания за интервал (алмазы)
 function getBuildingIncome(level) {
     if (level === 0) return 0;
-    return INVESTMENTS_CONFIG.baseIncome + (level - 1);
+    return INVESTMENTS_CONFIG.buildingsBaseIncome + (level - 1);
 }
 
 // Получить стоимость покупки транспорта
@@ -479,26 +480,26 @@ function upgradeJewelry(itemId) {
 function processInvestmentsIncome() {
     const data = getInvestmentsData();
     const currentTime = Date.now();
-    let totalIncome = 0;
     
+    // Обрабатываем доход от построек (алмазы)
+    let totalDiamonds = 0;
     INVESTMENTS_CONFIG.buildings.forEach(building => {
         const buildingData = data[building.id];
         if (!buildingData || !buildingData.purchased || buildingData.level === 0) return;
         
         const incomePerInterval = getBuildingIncome(buildingData.level);
         const timePassed = currentTime - (buildingData.lastIncomeTime || currentTime);
-        const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.incomeInterval);
+        const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.buildingsIncomeInterval);
         
         if (intervalsPassed > 0) {
             const income = incomePerInterval * intervalsPassed;
-            totalIncome += income;
-            buildingData.lastIncomeTime = currentTime - (timePassed % INVESTMENTS_CONFIG.incomeInterval);
+            totalDiamonds += income;
+            buildingData.lastIncomeTime = currentTime - (timePassed % INVESTMENTS_CONFIG.buildingsIncomeInterval);
             data[building.id] = buildingData;
         }
     });
     
     // Обрабатываем доход от транспорта (алмазы)
-    let totalDiamonds = 0;
     INVESTMENTS_CONFIG.transport.forEach(vehicle => {
         const vehicleData = data[vehicle.id];
         if (!vehicleData || !vehicleData.purchased || vehicleData.level === 0) return;
@@ -532,28 +533,10 @@ function processInvestmentsIncome() {
         }
     });
     
-    if (totalIncome > 0) {
-        saveInvestmentsData(data);
-        
-        // Добавляем доход к балансу (деньги от зданий)
-        if (typeof getBalance === 'function' && typeof setBalance === 'function') {
-            const currentBalance = getBalance();
-            setBalance(currentBalance + totalIncome);
-        } else {
-            const currentBalance = parseFloat(localStorage.getItem('balance') || '10000');
-            const newBalance = currentBalance + totalIncome;
-            localStorage.setItem('balance', newBalance);
-            const moneyAmount = document.getElementById('money-amount');
-            if (moneyAmount) {
-                moneyAmount.textContent = typeof formatNumber === 'function' ? formatNumber(newBalance) : newBalance.toLocaleString();
-            }
-        }
-    }
-    
     if (totalDiamonds > 0) {
         saveInvestmentsData(data);
         
-        // Добавляем алмазы от транспорта
+        // Добавляем алмазы от построек, транспорта и драгоценностей
         if (typeof getCredits === 'function' && typeof setCredits === 'function') {
             const currentCredits = getCredits();
             setCredits(currentCredits + totalDiamonds);
@@ -612,13 +595,13 @@ function updateInvestmentsUI() {
             levelValue.textContent = buildingData.purchased ? buildingData.level : '0';
         }
         
-        // Обновляем доходность
+        // Обновляем доходность (алмазы/1м)
         if (incomeValue) {
             const income = getBuildingIncome(buildingData.level);
             if (income > 0) {
-                incomeValue.textContent = `${income}/5с`;
+                incomeValue.textContent = `${income}/1м`;
             } else {
-                incomeValue.textContent = '0/5с';
+                incomeValue.textContent = '0/1м';
             }
         }
         
@@ -969,7 +952,7 @@ function startInvestmentsIncome() {
     
     investmentsIncomeInterval = setInterval(() => {
         processInvestmentsIncome();
-    }, INVESTMENTS_CONFIG.incomeInterval);
+    }, INVESTMENTS_CONFIG.buildingsIncomeInterval);
 }
 
 function stopInvestmentsIncome() {

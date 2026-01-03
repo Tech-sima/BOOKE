@@ -3899,19 +3899,6 @@ function hidePanelWithAnimation(panelId, callback = null) {
     const panel = document.getElementById(panelId);
     if (!panel) return;
     
-    // Для панели инвестиций сразу показываем круги и сбрасываем флаг
-    if (panelId === 'bottom-banner-panel') {
-        window.isBottomBannerOpen = false;
-        // Показываем индикаторы прибыли сразу при закрытии панели инвестиций
-        if (window.showProfitIndicators) {
-            window.showProfitIndicators({ force: true });
-        }
-        // Обновляем индикаторы прибыли сразу
-        if (window.updateProfitIndicators) {
-            window.updateProfitIndicators();
-        }
-    }
-    
     // Добавляем класс для анимации закрытия
     panel.classList.add('slide-out');
     
@@ -3938,6 +3925,17 @@ function hidePanelWithAnimation(panelId, callback = null) {
         }
         if (panelId === 'phone-panel') {
             window.isPhonePanelOpen = false;
+        }
+        if (panelId === 'bottom-banner-panel') {
+            window.isBottomBannerOpen = false;
+            // Показываем индикаторы прибыли после окончательного закрытия панели инвестиций (после анимации)
+            if (window.showProfitIndicators) {
+                window.showProfitIndicators({ force: true });
+            }
+            // Обновляем индикаторы прибыли после закрытия
+            if (window.updateProfitIndicators) {
+                window.updateProfitIndicators();
+            }
         }
         
         // Показываем индикаторы прибыли после закрытия панели (только если это не панель инвестиций)

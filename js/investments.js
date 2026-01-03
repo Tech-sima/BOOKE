@@ -546,7 +546,7 @@ function updateInvestmentsUI() {
             const totalProfitValue = totalProfitCell.querySelector('.banner-total-profit-value');
             if (totalProfitValue) {
                 const totalProfit = getTotalTransportProfit();
-                totalProfitValue.textContent = `${totalProfit}/1мин`;
+                totalProfitValue.textContent = `${totalProfit}/1м`;
             }
         }
         
@@ -574,13 +574,13 @@ function updateInvestmentsUI() {
                 levelValue.textContent = vehicleData.purchased ? vehicleData.level : '0';
             }
             
-            // Обновляем доходность (алмазы/1мин)
+            // Обновляем доходность (алмазы/1м)
             if (incomeValue) {
                 const income = getTransportIncome(vehicleData.level);
                 if (income > 0) {
-                    incomeValue.textContent = `${income}/1мин`;
+                    incomeValue.textContent = `${income}/1м`;
                 } else {
-                    incomeValue.textContent = '0/1мин';
+                    incomeValue.textContent = '0/1м';
                 }
             }
             

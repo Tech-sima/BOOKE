@@ -381,11 +381,11 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   vertical-align:middle;
 }
 
-/* Исправление для транспорта - кнопки не должны уходить в правый край */
+/* Фиксированная ширина кнопки для транспорта */
 .banner-panel-content[data-tab-content="transport"] .banner-buy-btn{
-  width:auto;
-  max-width:none;
-  margin-left:0;
+  width:calc(100% + 35px);
+  max-width:calc(100% + 35px);
+  min-width:auto;
 }
 
 /* Стили для недоступных зданий */

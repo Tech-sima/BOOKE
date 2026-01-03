@@ -2,29 +2,29 @@
 const INVESTMENTS_CONFIG = {
     buildings: [
         // Дома
-        { id: 'bloomie-house', name: 'Дом Блуми', icon: "assets/svg/construction/Bloomie's-house.svg" },
-        { id: 'cafe', name: 'Уютное кафе', icon: 'assets/svg/construction/cafe.svg' },
-        { id: 'forest-house', name: 'Лесной дом', icon: 'assets/svg/construction/forest-house.svg' },
-        { id: 'mansion', name: 'Особняк основателя', icon: 'assets/svg/construction/mansion.svg' },
-        { id: 'museum', name: 'Музей чудес', icon: 'assets/svg/construction/museum.svg' },
-        { id: 'biologist-house', name: 'Дом биолога', icon: "assets/svg/construction/The biologist's house.svg" },
-        { id: 'blumi-estate', name: 'Поместье Блуми', icon: "assets/svg/construction/The blumi Estate.svg" },
-        { id: 'fisherman-estate', name: 'Поместье рыбака', icon: "assets/svg/construction/The Fisherman's Estate.svg" },
-        { id: 'house-of-traitors', name: 'Дом основателей', icon: "assets/svg/construction/The House of Traitors.svg" },
-        { id: 'mountain-house', name: 'Горный дом', icon: 'assets/svg/construction/Mountain House.svg' },
-        { id: 'high-tech-office', name: 'Техно-офис', icon: 'assets/svg/construction/High-tech office.svg' },
-        { id: 'skyscraper-finance', name: 'Небоскреб финансов', icon: 'assets/svg/construction/Skyscraper of Finance.svg' },
-        { id: 'conqueror-castle', name: 'Замок завоевателя', icon: "assets/svg/construction/The Conqueror's Castle.svg" },
-        { id: 'town-hall', name: 'Городская ратуша', icon: 'assets/svg/construction/The Town Hall.svg' },
+        { id: 'bloomie-house', name: "Bloomie's House", icon: "assets/svg/construction/Bloomie's-house.svg" },
+        { id: 'cafe', name: 'Cozy Cafe', icon: 'assets/svg/construction/cafe.svg' },
+        { id: 'forest-house', name: 'Forest House', icon: 'assets/svg/construction/forest-house.svg' },
+        { id: 'mansion', name: "Founder's Mansion", icon: 'assets/svg/construction/mansion.svg' },
+        { id: 'museum', name: 'Museum of Wonders', icon: 'assets/svg/construction/museum.svg' },
+        { id: 'biologist-house', name: "Biologist's House", icon: "assets/svg/construction/The biologist's house.svg" },
+        { id: 'blumi-estate', name: "Bloomie's Estate", icon: "assets/svg/construction/The blumi Estate.svg" },
+        { id: 'fisherman-estate', name: "Fisherman's Estate", icon: "assets/svg/construction/The Fisherman's Estate.svg" },
+        { id: 'house-of-traitors', name: "Founders' House", icon: "assets/svg/construction/The House of Traitors.svg" },
+        { id: 'mountain-house', name: 'Mountain House', icon: 'assets/svg/construction/Mountain House.svg' },
+        { id: 'high-tech-office', name: 'Tech Office', icon: 'assets/svg/construction/High-tech office.svg' },
+        { id: 'skyscraper-finance', name: 'Finance Skyscraper', icon: 'assets/svg/construction/Skyscraper of Finance.svg' },
+        { id: 'conqueror-castle', name: "Conqueror's Castle", icon: "assets/svg/construction/The Conqueror's Castle.svg" },
+        { id: 'town-hall', name: 'Town Hall', icon: 'assets/svg/construction/The Town Hall.svg' },
         // Деревни
-        { id: 'forest-village', name: 'Лесная деревня', icon: 'assets/svg/construction/Forest Village.svg' },
-        { id: 'mountain-village', name: 'Горная деревня', icon: 'assets/svg/construction/Mountain-Village.svg' },
-        { id: 'village-grinny', name: 'Деревня Гринни', icon: "assets/svg/construction/The village of Grinny.svg" },
-        { id: 'village-technology', name: 'Деревня технологий', icon: 'assets/svg/construction/The Village of Technology.svg' },
-        { id: 'village-technology-2', name: 'Техно-парк', icon: 'assets/svg/construction/The-Village-of-Technology.svg' },
+        { id: 'forest-village', name: 'Forest Village', icon: 'assets/svg/construction/Forest Village.svg' },
+        { id: 'mountain-village', name: 'Mountain Village', icon: 'assets/svg/construction/Mountain-Village.svg' },
+        { id: 'village-grinny', name: 'Grinny Village', icon: "assets/svg/construction/The village of Grinny.svg" },
+        { id: 'village-technology', name: 'Technology Village', icon: 'assets/svg/construction/The Village of Technology.svg' },
+        { id: 'village-technology-2', name: 'Tech Park', icon: 'assets/svg/construction/The-Village-of-Technology.svg' },
         // Города
-        { id: 'high-tech-city', name: 'Город технологий', icon: 'assets/svg/construction/A-high-tech-city.svg' },
-        { id: 'kingdom', name: 'Королевство книг', icon: 'assets/svg/construction/Kingdom.svg' }
+        { id: 'high-tech-city', name: 'Technology City', icon: 'assets/svg/construction/A-high-tech-city.svg' },
+        { id: 'kingdom', name: 'Kingdom of Books', icon: 'assets/svg/construction/Kingdom.svg' }
     ],
     transport: [
         { id: 'bmw-m8', name: 'BMW M8', icon: 'assets/svg/transport/BMW M8.svg' },
@@ -48,6 +48,28 @@ const INVESTMENTS_CONFIG = {
         { id: 'ocean-victory', name: 'Ocean Victory', icon: 'assets/svg/transport/Ocean Victory.svg' },
         { id: 'harmony-of-the-seas', name: 'Harmony of the Seas', icon: 'assets/svg/transport/Harmony of the Seas.svg' }
     ],
+    jewelry: [
+        { id: 'black-prince', name: 'Black Prince', icon: 'assets/svg/Jewelry/Black Prince.svg' },
+        { id: 'the-secret-of-the-dragon', name: 'The Secret of the Dragon', icon: 'assets/svg/Jewelry/The Secret of the Dragon.svg' },
+        { id: 'golden-truth', name: 'Golden Truth', icon: 'assets/svg/Jewelry/Golden Truth.svg' },
+        { id: 'bohemia-of-goodness', name: 'Bohemia of Goodness', icon: 'assets/svg/Jewelry/Bohemia of Goodness.svg' },
+        { id: 'dark-elite', name: 'Dark Elite', icon: 'assets/svg/Jewelry/Dark Elite.svg' },
+        { id: 'the-golden-ring', name: 'The golden ring', icon: 'assets/svg/Jewelry/The golden ring.svg' },
+        { id: 'the-precious-ring', name: 'The precious Ring', icon: 'assets/svg/Jewelry/The precious Ring.svg' },
+        { id: 'the-dragons-ring', name: "The Dragon's Ring", icon: "assets/svg/Jewelry/The Dragon's Ring.svg" },
+        { id: 'the-cartier-ring', name: 'The Cartier Ring', icon: 'assets/svg/Jewelry/The Cartier Ring.svg' },
+        { id: 'cartier-ultima', name: 'Cartier Ultima', icon: 'assets/svg/Jewelry/Cartier Ultima.svg' },
+        { id: 'classic-watches', name: 'Classic watches', icon: 'assets/svg/Jewelry/Classic watches.svg' },
+        { id: 'sapphire-watches', name: 'Sapphire Watches', icon: 'assets/svg/Jewelry/Sapphire Watches.svg' },
+        { id: 'gold-watch', name: 'Gold Watch', icon: 'assets/svg/Jewelry/Gold Watch.svg' },
+        { id: 'cartier-watches', name: 'Cartier watches', icon: 'assets/svg/Jewelry/Cartier watches.svg' },
+        { id: 'breguet-grande', name: 'Breguet Grande', icon: 'assets/svg/Jewelry/Breguet Grande.svg' },
+        { id: 'mona-lisa', name: 'Mona Lisa', icon: 'assets/svg/Jewelry/Mona Lisa.svg' },
+        { id: 'athena', name: 'Athena', icon: 'assets/svg/Jewelry/Athena.svg' },
+        { id: 'great-zeus', name: 'Great Zeus', icon: 'assets/svg/Jewelry/Great Zeus.svg' },
+        { id: 'julius-caesar', name: 'Julius Caesar', icon: 'assets/svg/Jewelry/Julius Caesar.svg' },
+        { id: 'heartbreaker', name: 'Heartbreaker', icon: 'assets/svg/Jewelry/Heartbreaker.svg' }
+    ],
     // Конфигурация для транспорта
     transportBasePurchaseCost: 500, // Первый транспорт
     transportPurchaseCostIncrement: 250, // Увеличение стоимости каждого следующего
@@ -55,6 +77,13 @@ const INVESTMENTS_CONFIG = {
     transportUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
     transportBaseIncome: 1, // Доход на 1 уровне (алмазы)
     transportIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
+    // Конфигурация для драгоценностей (аналогично транспорту)
+    jewelryBasePurchaseCost: 500, // Первая драгоценность
+    jewelryPurchaseCostIncrement: 250, // Увеличение стоимости каждой следующей
+    jewelryBaseUpgradeCost: 400, // Базовая стоимость улучшения драгоценностей
+    jewelryUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
+    jewelryBaseIncome: 1, // Доход на 1 уровне (алмазы)
+    jewelryIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
     basePurchaseCost: 150, // Первое здание
     purchaseCostIncrement: 100, // Увеличение стоимости каждого следующего
     baseUpgradeCost: 50, // Базовая стоимость улучшения
@@ -79,6 +108,13 @@ function initInvestments() {
         });
         INVESTMENTS_CONFIG.transport.forEach((vehicle, index) => {
             defaultData[vehicle.id] = {
+                purchased: false,
+                level: 0,
+                lastIncomeTime: Date.now()
+            };
+        });
+        INVESTMENTS_CONFIG.jewelry.forEach((item, index) => {
+            defaultData[item.id] = {
                 purchased: false,
                 level: 0,
                 lastIncomeTime: Date.now()
@@ -132,6 +168,23 @@ function getTransportUpgradeCost(level) {
 function getTransportIncome(level) {
     if (level === 0) return 0;
     return INVESTMENTS_CONFIG.transportBaseIncome + (level - 1);
+}
+
+// Получить стоимость покупки драгоценности
+function getJewelryPurchaseCost(itemIndex) {
+    return INVESTMENTS_CONFIG.jewelryBasePurchaseCost + (itemIndex * INVESTMENTS_CONFIG.jewelryPurchaseCostIncrement);
+}
+
+// Получить стоимость улучшения драгоценности
+function getJewelryUpgradeCost(level) {
+    if (level >= INVESTMENTS_CONFIG.maxLevel) return Infinity;
+    return INVESTMENTS_CONFIG.jewelryBaseUpgradeCost + (level * INVESTMENTS_CONFIG.jewelryUpgradeCostIncrement);
+}
+
+// Получить доход драгоценности за интервал (алмазы)
+function getJewelryIncome(level) {
+    if (level === 0) return 0;
+    return INVESTMENTS_CONFIG.jewelryBaseIncome + (level - 1);
 }
 
 // Проверить, доступно ли здание для покупки
@@ -326,6 +379,102 @@ function upgradeTransport(vehicleId) {
     return true;
 }
 
+// Проверить, доступна ли драгоценность для покупки
+function isJewelryAvailable(itemIndex) {
+    if (itemIndex === 0) return true; // Первая драгоценность всегда доступна
+    
+    const data = getInvestmentsData();
+    const prevItem = INVESTMENTS_CONFIG.jewelry[itemIndex - 1];
+    const prevData = data[prevItem.id];
+    
+    if (!prevData || !prevData.purchased) return false;
+    return prevData.level >= INVESTMENTS_CONFIG.unlockLevel;
+}
+
+// Получить название предыдущей драгоценности для недоступных
+function getRequiredJewelryName(itemIndex) {
+    if (itemIndex === 0) return null;
+    return INVESTMENTS_CONFIG.jewelry[itemIndex - 1].name;
+}
+
+// Покупка драгоценности
+function purchaseJewelry(itemId) {
+    const data = getInvestmentsData();
+    const itemIndex = INVESTMENTS_CONFIG.jewelry.findIndex(j => j.id === itemId);
+    
+    if (itemIndex === -1) return false;
+    
+    const itemData = data[itemId] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
+    
+    if (itemData.purchased) return false; // Уже куплено
+    
+    if (!isJewelryAvailable(itemIndex)) {
+        alert(`Необходимо прокачать "${getRequiredJewelryName(itemIndex)}" до ${INVESTMENTS_CONFIG.unlockLevel} уровня`);
+        return false;
+    }
+    
+    const cost = getJewelryPurchaseCost(itemIndex);
+    const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+    
+    if (currentRBC < cost) {
+        alert('Недостаточно RBC');
+        return false;
+    }
+    
+    // Списываем RBC
+    if (typeof setCredits === 'function') {
+        setCredits(currentRBC - cost);
+    } else {
+        localStorage.setItem('credits', (currentRBC - cost).toString());
+        const rbcValue = document.getElementById('rbc-value');
+        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+    }
+    
+    // Покупаем драгоценность
+    itemData.purchased = true;
+    itemData.level = 1;
+    itemData.lastIncomeTime = Date.now();
+    data[itemId] = itemData;
+    saveInvestmentsData(data);
+    
+    updateInvestmentsUI();
+    return true;
+}
+
+// Улучшение драгоценности
+function upgradeJewelry(itemId) {
+    const data = getInvestmentsData();
+    const itemData = data[itemId];
+    
+    if (!itemData || !itemData.purchased) return false;
+    if (itemData.level >= INVESTMENTS_CONFIG.maxLevel) return false;
+    
+    const cost = getJewelryUpgradeCost(itemData.level);
+    const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+    
+    if (currentRBC < cost) {
+        alert('Недостаточно RBC');
+        return false;
+    }
+    
+    // Списываем RBC
+    if (typeof setCredits === 'function') {
+        setCredits(currentRBC - cost);
+    } else {
+        localStorage.setItem('credits', (currentRBC - cost).toString());
+        const rbcValue = document.getElementById('rbc-value');
+        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+    }
+    
+    // Улучшаем драгоценность
+    itemData.level++;
+    data[itemId] = itemData;
+    saveInvestmentsData(data);
+    
+    updateInvestmentsUI();
+    return true;
+}
+
 // Начисление дохода от всех зданий
 function processInvestmentsIncome() {
     const data = getInvestmentsData();
@@ -363,6 +512,23 @@ function processInvestmentsIncome() {
             totalDiamonds += income;
             vehicleData.lastIncomeTime = currentTime - (timePassed % INVESTMENTS_CONFIG.transportIncomeInterval);
             data[vehicle.id] = vehicleData;
+        }
+    });
+    
+    // Обрабатываем доход от драгоценностей (алмазы)
+    INVESTMENTS_CONFIG.jewelry.forEach(item => {
+        const itemData = data[item.id];
+        if (!itemData || !itemData.purchased || itemData.level === 0) return;
+        
+        const incomePerInterval = getJewelryIncome(itemData.level);
+        const timePassed = currentTime - (itemData.lastIncomeTime || currentTime);
+        const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.jewelryIncomeInterval);
+        
+        if (intervalsPassed > 0) {
+            const income = incomePerInterval * intervalsPassed;
+            totalDiamonds += income;
+            itemData.lastIncomeTime = currentTime - (timePassed % INVESTMENTS_CONFIG.jewelryIncomeInterval);
+            data[item.id] = itemData;
         }
     });
     
@@ -626,6 +792,86 @@ function updateInvestmentsUI() {
             }
         });
     }
+    
+    // Обновляем панель "Предметы" (Драгоценности)
+    const itemsContent = panel.querySelector('.banner-panel-content[data-tab-content="items"]');
+    if (itemsContent && itemsContent.style.display !== 'none') {
+        INVESTMENTS_CONFIG.jewelry.forEach((item, index) => {
+            const itemData = data[item.id] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
+            const itemElement = itemsContent.querySelector(`.banner-item[data-jewelry-id="${item.id}"]`);
+            if (!itemElement) return;
+            
+            const icon = itemElement.querySelector('.banner-item-icon');
+            const levelValue = itemElement.querySelector('.banner-stat-cell:first-child .banner-stat-value');
+            const incomeValue = itemElement.querySelector('.banner-stat-cell:last-child .banner-stat-value');
+            const button = itemElement.querySelector('.banner-buy-btn');
+            
+            // Обновляем стиль иконки
+            if (icon) {
+                if (!itemData.purchased) {
+                    icon.style.filter = 'brightness(0.85) grayscale(1)';
+                } else {
+                    icon.style.filter = 'drop-shadow(0 0 8px rgba(255,255,255,0.6))';
+                }
+            }
+            
+            // Обновляем уровень
+            if (levelValue) {
+                levelValue.textContent = itemData.purchased ? itemData.level : '0';
+            }
+            
+            // Обновляем доходность (алмазы/1м)
+            if (incomeValue) {
+                const income = getJewelryIncome(itemData.level);
+                if (income > 0) {
+                    incomeValue.textContent = `${income}/1м`;
+                } else {
+                    incomeValue.textContent = '0/1м';
+                }
+            }
+            
+            // Обновляем кнопку
+            if (button) {
+                if (!itemData.purchased) {
+                    // Кнопка покупки
+                    const cost = getJewelryPurchaseCost(index);
+                    const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+                    const canAfford = currentRBC >= cost;
+                    const isAvailable = isJewelryAvailable(index);
+                    
+                    if (!isAvailable) {
+                        const requiredItem = getRequiredJewelryName(index);
+                        button.textContent = `Необходимо "${requiredItem}" ${INVESTMENTS_CONFIG.unlockLevel} уровня`;
+                        button.disabled = true;
+                        button.style.opacity = '0.5';
+                        button.style.cursor = 'not-allowed';
+                    } else {
+                        button.innerHTML = `Купить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;">`;
+                        button.disabled = !canAfford;
+                        button.style.opacity = canAfford ? '1' : '0.5';
+                        button.style.cursor = canAfford ? 'pointer' : 'not-allowed';
+                    }
+                } else {
+                    // Кнопка улучшения
+                    if (itemData.level >= INVESTMENTS_CONFIG.maxLevel) {
+                        button.textContent = 'Макс. уровень';
+                        button.disabled = true;
+                        button.style.opacity = '0.5';
+                        button.style.cursor = 'not-allowed';
+                    } else {
+                        const cost = getJewelryUpgradeCost(itemData.level);
+                        const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
+                        const canAfford = currentRBC >= cost;
+                        
+                        button.innerHTML = `Улучшить ${cost} <img src="assets/svg/rbc-icon.svg" style="width:13px;height:13px;vertical-align:middle;margin-left:3px;">`;
+                        button.disabled = !canAfford;
+                        button.style.opacity = canAfford ? '1' : '0.5';
+                        button.style.cursor = canAfford ? 'pointer' : 'not-allowed';
+                    }
+                }
+            }
+        });
+    }
 }
 
 // Инициализация обработчиков событий
@@ -681,6 +927,30 @@ function initInvestmentsEvents() {
         });
     }
     
+    // Получаем контейнер с драгоценностями
+    const itemsContent = panel.querySelector('.banner-panel-content[data-tab-content="items"]');
+    if (itemsContent) {
+        // Обработчики для кнопок драгоценностей
+        INVESTMENTS_CONFIG.jewelry.forEach(item => {
+            const itemElement = itemsContent.querySelector(`.banner-item[data-jewelry-id="${item.id}"]`);
+            if (!itemElement) return;
+            
+            const button = itemElement.querySelector('.banner-buy-btn');
+            if (!button) return;
+            
+            button.addEventListener('click', () => {
+                const data = getInvestmentsData();
+                const itemData = data[item.id] || { purchased: false, level: 0 };
+                
+                if (!itemData.purchased) {
+                    purchaseJewelry(item.id);
+                } else {
+                    upgradeJewelry(item.id);
+                }
+            });
+        });
+    }
+    
     // Обработчики для кнопок переключения вкладок
     const tabButtons = panel.querySelectorAll('.banner-tab-btn');
     tabButtons.forEach(btn => {
@@ -713,6 +983,8 @@ function switchInvestmentsTab(tabName) {
             titleElement.textContent = 'REAL ESTATE INVESTMENTS';
         } else if (tabName === 'transport') {
             titleElement.textContent = 'TRANSPORT RENTAL';
+        } else if (tabName === 'items') {
+            titleElement.textContent = 'INVESTING IN JEWELRY';
         } else {
             titleElement.textContent = 'СТРАТЕГИЯ ПРИБЫЛИ';
         }
@@ -731,7 +1003,7 @@ function switchInvestmentsTab(tabName) {
     }
     
     // Обновляем UI для активной вкладки
-    if (tabName === 'buildings' || tabName === 'transport') {
+    if (tabName === 'buildings' || tabName === 'transport' || tabName === 'items') {
         updateInvestmentsUI();
     }
 }

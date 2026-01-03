@@ -251,8 +251,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .banner-item[data-jewelry-id="golden-truth"] .banner-item-icon,
 .banner-item[data-jewelry-id="bohemia-of-goodness"] .banner-item-icon,
 .banner-item[data-jewelry-id="dark-elite"] .banner-item-icon{
-  width:160px;
-  height:160px;
+  transform:scale(0.8);
+  transform-origin:center center;
 }
 
 /* Индивидуальные стили для зданий */
@@ -393,6 +393,236 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Стили для недоступных зданий */
 .banner-item-icon[style*="brightness(0.85)"]{
   filter:brightness(0.85) grayscale(1) !important;
+}
+
+/* Адаптивные стили для ячеек инвестиций на мобильных устройствах */
+@media (max-width: 480px) {
+  .banner-item{
+    width:98%;
+    max-width:480px;
+    height:140px;
+    padding:0 16px 0 0;
+    gap:12px;
+  }
+  .banner-item-icon{
+    width:180px;
+    height:180px;
+    margin-left:-16px;
+  }
+  .banner-item-title{
+    font-size:18px;
+    margin-left:-30px;
+  }
+  .banner-stats{
+    margin-left:-30px;
+    margin-top:36px;
+    gap:5px;
+  }
+  .banner-stat-cell{
+    padding:6px 14px;
+    min-height:30px;
+    height:30px;
+  }
+  .banner-stat-label{
+    font-size:10px;
+  }
+  .banner-stat-value{
+    font-size:12px;
+  }
+  .banner-buy-btn{
+    font-size:12px;
+    padding:6px 18px;
+    width:calc(100% + 30px);
+    max-width:calc(100% + 30px);
+    margin-left:-30px;
+    margin-top:6px;
+  }
+  .banner-buy-btn img{
+    width:12px !important;
+    height:12px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .banner-item{
+    width:97%;
+    max-width:360px;
+    height:130px;
+    padding:0 14px 0 0;
+    gap:10px;
+  }
+  .banner-item-icon{
+    width:160px;
+    height:160px;
+    margin-left:-14px;
+  }
+  .banner-item-title{
+    font-size:16px;
+    margin-left:-28px;
+  }
+  .banner-stats{
+    margin-left:-28px;
+    margin-top:32px;
+    gap:4px;
+  }
+  .banner-stat-cell{
+    padding:5px 12px;
+    min-height:28px;
+    height:28px;
+  }
+  .banner-stat-label{
+    font-size:9px;
+  }
+  .banner-stat-value{
+    font-size:11px;
+  }
+  .banner-buy-btn{
+    font-size:11px;
+    padding:5px 16px;
+    width:calc(100% + 28px);
+    max-width:calc(100% + 28px);
+    margin-left:-28px;
+    margin-top:5px;
+  }
+  .banner-buy-btn img{
+    width:11px !important;
+    height:11px !important;
+  }
+}
+
+@media (max-width: 320px) {
+  .banner-item{
+    width:96%;
+    max-width:320px;
+    height:120px;
+    padding:0 12px 0 0;
+    gap:8px;
+  }
+  .banner-item-icon{
+    width:140px;
+    height:140px;
+    margin-left:-12px;
+  }
+  .banner-item-title{
+    font-size:15px;
+    margin-left:-26px;
+  }
+  .banner-stats{
+    margin-left:-26px;
+    margin-top:28px;
+    gap:3px;
+  }
+  .banner-stat-cell{
+    padding:4px 10px;
+    min-height:26px;
+    height:26px;
+  }
+  .banner-stat-label{
+    font-size:8px;
+  }
+  .banner-stat-value{
+    font-size:10px;
+  }
+  .banner-buy-btn{
+    font-size:10px;
+    padding:4px 14px;
+    width:calc(100% + 26px);
+    max-width:calc(100% + 26px);
+    margin-left:-26px;
+    margin-top:4px;
+  }
+  .banner-buy-btn img{
+    width:10px !important;
+    height:10px !important;
+  }
+  /* Адаптация индивидуальных стилей для зданий на маленьких экранах */
+  .banner-item[data-building-id="town-hall"] .banner-item-icon,
+  .banner-item[data-building-id="forest-village"] .banner-item-icon{
+    transform:scale(1.0) translateX(-15px);
+  }
+}
+
+/* Адаптация для средних экранов (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .banner-item{
+    width:98.5%;
+    max-width:500px;
+    height:145px;
+  }
+  .banner-item-icon{
+    width:190px;
+    height:190px;
+  }
+  .banner-item-title{
+    font-size:19px;
+  }
+  .banner-stats{
+    margin-top:38px;
+  }
+}
+
+/* Адаптация панели инвестиций для мобильных */
+@media (max-width: 480px) {
+  #bottom-banner-panel{
+    padding:16px;
+  }
+  .banner-panel-title{
+    font-size:24px;
+    letter-spacing:2px;
+  }
+  .banner-panel-subtitle{
+    font-size:12px;
+  }
+  .banner-tab-btn{
+    font-size:11px;
+    padding:5px 14px;
+  }
+  .banner-panel-content{
+    gap:16px;
+    padding:0 2px 16px 2px;
+  }
+}
+
+@media (max-width: 360px) {
+  #bottom-banner-panel{
+    padding:12px;
+  }
+  .banner-panel-title{
+    font-size:20px;
+    letter-spacing:1.5px;
+  }
+  .banner-panel-subtitle{
+    font-size:11px;
+  }
+  .banner-tab-btn{
+    font-size:10px;
+    padding:4px 12px;
+  }
+  .banner-panel-content{
+    gap:14px;
+    padding:0 2px 12px 2px;
+  }
+}
+
+@media (max-width: 320px) {
+  #bottom-banner-panel{
+    padding:10px;
+  }
+  .banner-panel-title{
+    font-size:18px;
+    letter-spacing:1px;
+  }
+  .banner-panel-subtitle{
+    font-size:10px;
+  }
+  .banner-tab-btn{
+    font-size:9px;
+    padding:3px 10px;
+  }
+  .banner-panel-content{
+    gap:12px;
+    padding:0 2px 10px 2px;
+  }
 }
 
 /* Bottom navigation bar */

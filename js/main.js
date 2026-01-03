@@ -940,10 +940,10 @@ function animate() {
     const isSettingsOpen = window.isSettingsPanelOpen || (document.getElementById('settings-panel') && document.getElementById('settings-panel').style.display !== 'none');
     const isStatisticsOpen = window.isStatisticsPanelOpen || (document.getElementById('statistics-panel') && document.getElementById('statistics-panel').style.display !== 'none');
     const isPhoneOpen = window.isPhonePanelOpen || (document.getElementById('phone-panel') && document.getElementById('phone-panel').style.display !== 'none');
-    const isBottomBannerOpen = (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
+    const isBottomBannerOpen = window.isBottomBannerOpen || (document.getElementById('bottom-banner-panel') && document.getElementById('bottom-banner-panel').style.display !== 'none');
     
     // Если любая из панелей открыта, скрываем индикаторы прибыли
-    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen) && window.hideProfitIndicators) {
+    if ((isShopOpen || isCharactersOpen || isCityOpen || isTasksOpen || isGameTasksOpen || isProfileOpen || isFriendsOpen || isSettingsOpen || isStatisticsOpen || isPhoneOpen || isBottomBannerOpen) && window.hideProfitIndicators) {
         window.hideProfitIndicators();
         // Принудительно очищаем все индикаторы прибыли
         if (window.clearAllProfitIndicators) {
@@ -3895,6 +3895,19 @@ function hidePanelWithAnimation(panelId, callback = null) {
     const panel = document.getElementById(panelId);
     if (!panel) return;
     
+    // Для панели инвестиций сразу устанавливаем флаг закрытия и показываем индикаторы
+    if (panelId === 'bottom-banner-panel') {
+        window.isBottomBannerOpen = false;
+        // Показываем индикаторы прибыли сразу при начале закрытия
+        if (window.showProfitIndicators) {
+            window.showProfitIndicators({ force: true });
+        }
+        // Обновляем индикаторы прибыли сразу
+        if (window.updateProfitIndicators) {
+            window.updateProfitIndicators();
+        }
+    }
+    
     // Добавляем класс для анимации закрытия
     panel.classList.add('slide-out');
     
@@ -3921,13 +3934,6 @@ function hidePanelWithAnimation(panelId, callback = null) {
         }
         if (panelId === 'phone-panel') {
             window.isPhonePanelOpen = false;
-        }
-        if (panelId === 'bottom-banner-panel') {
-            window.isBottomBannerOpen = false;
-            // Показываем индикаторы прибыли после закрытия панели инвестиций
-            if (window.showProfitIndicators) {
-                window.showProfitIndicators({ force: true });
-            }
         }
         
         // Показываем индикаторы прибыли после закрытия панели (только если это не панель инвестиций)

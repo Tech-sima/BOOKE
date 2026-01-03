@@ -89,17 +89,15 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   margin-top:0;
   padding:12px 20px 20px 20px;
   text-align:center;
-  border-bottom:1px solid rgba(255,255,255,0.08);
 }
 .banner-panel-title{
   color:#fff;
   font-size:24px;
   font-weight:900;
-  margin:0 auto;
+  margin:0 auto 12px auto;
   text-transform:uppercase;
   letter-spacing:3px;
   font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;
-  margin-bottom:12px;
   text-shadow:0 2px 8px rgba(0,0,0,0.5);
   text-align:center;
   display:block;
@@ -213,7 +211,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   max-width:500px;
   height:150px;
   background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.15);
+  border:1px solid #D4AF37;
   border-radius:12px;
   backdrop-filter:blur(15px);
   -webkit-backdrop-filter:blur(15px);

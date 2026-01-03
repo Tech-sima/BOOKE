@@ -6,13 +6,13 @@ const INVESTMENTS_CONFIG = {
         { id: 'cafe', name: 'Уютное кафе', icon: 'assets/svg/construction/cafe.svg' },
         { id: 'forest-house', name: 'Лесной дом', icon: 'assets/svg/construction/forest-house.svg' },
         { id: 'mansion', name: 'Особняк основателя', icon: 'assets/svg/construction/mansion.svg' },
-        { id: 'museum', name: 'Музей коллекционера', icon: 'assets/svg/construction/museum.svg' },
+        { id: 'museum', name: 'Музей чудес', icon: 'assets/svg/construction/museum.svg' },
         { id: 'biologist-house', name: 'Дом биолога', icon: "assets/svg/construction/The biologist's house.svg" },
         { id: 'blumi-estate', name: 'Поместье Блуми', icon: "assets/svg/construction/The blumi Estate.svg" },
         { id: 'fisherman-estate', name: 'Поместье рыбака', icon: "assets/svg/construction/The Fisherman's Estate.svg" },
-        { id: 'house-of-traitors', name: 'Дом представителей', icon: "assets/svg/construction/The House of Traitors.svg" },
+        { id: 'house-of-traitors', name: 'Дом основателей', icon: "assets/svg/construction/The House of Traitors.svg" },
         { id: 'mountain-house', name: 'Горный дом', icon: 'assets/svg/construction/Mountain House.svg' },
-        { id: 'high-tech-office', name: 'Технологичный офис', icon: 'assets/svg/construction/High-tech office.svg' },
+        { id: 'high-tech-office', name: 'Техно-офис', icon: 'assets/svg/construction/High-tech office.svg' },
         { id: 'skyscraper-finance', name: 'Небоскреб финансов', icon: 'assets/svg/construction/Skyscraper of Finance.svg' },
         { id: 'conqueror-castle', name: 'Замок завоевателя', icon: "assets/svg/construction/The Conqueror's Castle.svg" },
         { id: 'town-hall', name: 'Городская ратуша', icon: 'assets/svg/construction/The Town Hall.svg' },
@@ -21,16 +21,16 @@ const INVESTMENTS_CONFIG = {
         { id: 'mountain-village', name: 'Горная деревня', icon: 'assets/svg/construction/Mountain-Village.svg' },
         { id: 'village-grinny', name: 'Деревня Гринни', icon: "assets/svg/construction/The village of Grinny.svg" },
         { id: 'village-technology', name: 'Деревня технологий', icon: 'assets/svg/construction/The Village of Technology.svg' },
-        { id: 'village-technology-2', name: 'Деревня технологий 2', icon: 'assets/svg/construction/The-Village-of-Technology.svg' },
+        { id: 'village-technology-2', name: 'Техно-парк', icon: 'assets/svg/construction/The-Village-of-Technology.svg' },
         // Города
         { id: 'high-tech-city', name: 'Город технологий', icon: 'assets/svg/construction/A-high-tech-city.svg' },
-        { id: 'kingdom', name: 'Книжное королевство', icon: 'assets/svg/construction/Kingdom.svg' }
+        { id: 'kingdom', name: 'Королевство книг', icon: 'assets/svg/construction/Kingdom.svg' }
     ],
     transport: [
         { id: 'bmw-m8', name: 'BMW M8', icon: 'assets/svg/transport/BMW M8.svg' },
         { id: 'bugatti-tourbillon', name: 'Bugatti Tourbillon', icon: 'assets/svg/transport/Bugatti Tourbillon.svg' },
-        { id: 'lamborghini-aventador', name: 'Lamborghini Aventador', icon: 'assets/svg/transport/Lamborghini Aventador.svg' },
-        { id: 'mercedes-g-class', name: 'Mercedes-Benz G-Class', icon: 'assets/svg/transport/Mercedes-Benz G-Class.svg' },
+        { id: 'lamborghini-aventador', name: 'Lambo-Avent', icon: 'assets/svg/transport/Lamborghini Aventador.svg' },
+        { id: 'mercedes-g-class', name: 'MB G-Class', icon: 'assets/svg/transport/Mercedes-Benz G-Class.svg' },
         { id: 'rolls-royce-cullinan', name: 'Rolls-Royce Cullinan', icon: 'assets/svg/transport/Rolls-Royce Cullinan.svg' },
         { id: 'bentley-continental', name: 'Bentley Continental', icon: 'assets/svg/transport/Bentley Continental.svg' },
         { id: 'koenigsegg-gemera', name: 'Koenigsegg Gemera', icon: 'assets/svg/transport/Koenigsegg Gemera.svg' },
@@ -705,6 +705,18 @@ function switchInvestmentsTab(tabName) {
             btn.classList.remove('active');
         }
     });
+    
+    // Обновляем заголовок в зависимости от выбранной секции
+    const titleElement = panel.querySelector('.banner-panel-title');
+    if (titleElement) {
+        if (tabName === 'buildings') {
+            titleElement.textContent = 'REAL ESTATE INVESTMENTS';
+        } else if (tabName === 'transport') {
+            titleElement.textContent = 'TRANSPORT RENTAL';
+        } else {
+            titleElement.textContent = 'СТРАТЕГИЯ ПРИБЫЛИ';
+        }
+    }
     
     // Скрываем все панели контента
     const allContents = panel.querySelectorAll('.banner-panel-content');

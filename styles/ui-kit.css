@@ -27,8 +27,12 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Bottom banner above navigation */
 #bottom-banner{
-  position:fixed;left:12px;right:12px;bottom:72px;
-  height:48px;
+  position:fixed;
+  right:12px;
+  bottom:88px;
+  width:50%;
+  max-width:50vw;
+  height:56px;
   background:rgba(0,0,0,0.3);
   border-radius:12px;
   border:1px solid rgba(255,255,255,0.1);
@@ -37,6 +41,11 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   z-index:9;
   cursor:pointer;
   transition:background 0.2s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 12px;
+  box-sizing:border-box;
 }
 #bottom-banner:active{
   background:rgba(0,0,0,0.5);
@@ -544,6 +553,14 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптация для средних экранов (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
+  #bottom-banner{
+    right:12px;
+    bottom:88px;
+    width:50%;
+    max-width:50vw;
+    height:54px;
+    padding:0 11px;
+  }
   .banner-item{
     width:98.5%;
     max-width:500px;
@@ -563,6 +580,14 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 /* Адаптация панели инвестиций для мобильных */
 @media (max-width: 480px) {
+  #bottom-banner{
+    right:10px;
+    bottom:88px;
+    width:50%;
+    max-width:50vw;
+    height:52px;
+    padding:0 10px;
+  }
   #bottom-banner-panel{
     padding:16px;
   }
@@ -584,6 +609,14 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 @media (max-width: 360px) {
+  #bottom-banner{
+    right:8px;
+    bottom:88px;
+    width:50%;
+    max-width:50vw;
+    height:50px;
+    padding:0 8px;
+  }
   #bottom-banner-panel{
     padding:12px;
   }
@@ -605,6 +638,14 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 
 @media (max-width: 320px) {
+  #bottom-banner{
+    right:6px;
+    bottom:88px;
+    width:50%;
+    max-width:50vw;
+    height:48px;
+    padding:0 6px;
+  }
   #bottom-banner-panel{
     padding:10px;
   }

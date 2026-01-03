@@ -50,7 +50,7 @@ const INVESTMENTS_CONFIG = {
     ],
     jewelry: [
         { id: 'black-prince', name: 'Black Prince', icon: 'assets/svg/Jewelry/Black Prince.svg' },
-        { id: 'the-secret-of-the-dragon', name: 'The Secret of the Dragon', icon: 'assets/svg/Jewelry/The Secret of the Dragon.svg' },
+        { id: 'the-secret-of-the-dragon', name: 'Oriental secrets', icon: 'assets/svg/Jewelry/The Secret of the Dragon.svg' },
         { id: 'golden-truth', name: 'Golden Truth', icon: 'assets/svg/Jewelry/Golden Truth.svg' },
         { id: 'bohemia-of-goodness', name: 'Bohemia of Goodness', icon: 'assets/svg/Jewelry/Bohemia of Goodness.svg' },
         { id: 'dark-elite', name: 'Dark Elite', icon: 'assets/svg/Jewelry/Dark Elite.svg' },
@@ -570,34 +570,6 @@ function processInvestmentsIncome() {
 }
 
 // Получить общую прибыль от всех построек
-function getTotalBuildingsProfit() {
-    const data = getInvestmentsData();
-    let totalProfit = 0;
-    
-    INVESTMENTS_CONFIG.buildings.forEach(building => {
-        const buildingData = data[building.id] || { purchased: false, level: 0 };
-        if (buildingData.purchased && buildingData.level > 0) {
-            totalProfit += getBuildingIncome(buildingData.level);
-        }
-    });
-    
-    return totalProfit;
-}
-
-// Получить общую прибыль от всего транспорта (алмазы)
-function getTotalTransportProfit() {
-    const data = getInvestmentsData();
-    let totalProfit = 0;
-    
-    INVESTMENTS_CONFIG.transport.forEach(vehicle => {
-        const vehicleData = data[vehicle.id] || { purchased: false, level: 0 };
-        if (vehicleData.purchased && vehicleData.level > 0) {
-            totalProfit += getTransportIncome(vehicleData.level);
-        }
-    });
-    
-    return totalProfit;
-}
 
 // Обновление UI панели инвестиций
 function updateInvestmentsUI() {
@@ -609,16 +581,6 @@ function updateInvestmentsUI() {
     // Обновляем панель "Постройки"
     const buildingsContent = panel.querySelector('.banner-panel-content[data-tab-content="buildings"]');
     if (buildingsContent && buildingsContent.style.display !== 'none') {
-    
-    // Обновляем овальную ячейку с общей прибылью
-    const totalProfitCell = buildingsContent.querySelector('.banner-total-profit-cell');
-    if (totalProfitCell) {
-        const totalProfitValue = totalProfitCell.querySelector('.banner-total-profit-value');
-        if (totalProfitValue) {
-            const totalProfit = getTotalBuildingsProfit();
-            totalProfitValue.textContent = `${totalProfit}/5с`;
-        }
-    }
     
     INVESTMENTS_CONFIG.buildings.forEach((building, index) => {
         const buildingData = data[building.id] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
@@ -707,15 +669,6 @@ function updateInvestmentsUI() {
     const transportContent = panel.querySelector('.banner-panel-content[data-tab-content="transport"]');
     if (transportContent && transportContent.style.display !== 'none') {
         // Обновляем овальную ячейку с общей прибылью транспорта
-        const totalProfitCell = transportContent.querySelector('.banner-total-profit-cell');
-        if (totalProfitCell) {
-            const totalProfitValue = totalProfitCell.querySelector('.banner-total-profit-value');
-            if (totalProfitValue) {
-                const totalProfit = getTotalTransportProfit();
-                totalProfitValue.textContent = `${totalProfit}/1м`;
-            }
-        }
-        
         INVESTMENTS_CONFIG.transport.forEach((vehicle, index) => {
             const vehicleData = data[vehicle.id] || { purchased: false, level: 0, lastIncomeTime: Date.now() };
             const item = transportContent.querySelector(`.banner-item[data-vehicle-id="${vehicle.id}"]`);

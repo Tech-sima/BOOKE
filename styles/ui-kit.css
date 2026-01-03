@@ -245,6 +245,16 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   display:none;
 }
 
+/* Уменьшенный размер SVG для первых 5 драгоценностей */
+.banner-item[data-jewelry-id="black-prince"] .banner-item-icon,
+.banner-item[data-jewelry-id="the-secret-of-the-dragon"] .banner-item-icon,
+.banner-item[data-jewelry-id="golden-truth"] .banner-item-icon,
+.banner-item[data-jewelry-id="bohemia-of-goodness"] .banner-item-icon,
+.banner-item[data-jewelry-id="dark-elite"] .banner-item-icon{
+  width:160px;
+  height:160px;
+}
+
 /* Индивидуальные стили для зданий */
 .banner-item[data-building-id="mansion"] .banner-item-icon{
   margin-top:-15px;
@@ -378,13 +388,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 .banner-buy-btn img{
   display:inline-block;
   vertical-align:middle;
-}
-
-/* Фиксированная ширина кнопки для транспорта */
-.banner-panel-content[data-tab-content="transport"] .banner-buy-btn{
-  width:calc(100% + 35px);
-  max-width:calc(100% + 35px);
-  min-width:auto;
 }
 
 /* Стили для недоступных зданий */

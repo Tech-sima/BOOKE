@@ -1,4 +1,18 @@
 // Система инвестиций - управление зданиями
+
+// Функция форматирования чисел с сокращениями для ячеек доходности
+function formatIncomeNumber(num) {
+    if (num >= 1000000) {
+        const millions = num / 1000000;
+        return millions % 1 === 0 ? `${millions}млн` : `${millions.toFixed(1)}млн`;
+    }
+    if (num >= 1000) {
+        const thousands = num / 1000;
+        return thousands % 1 === 0 ? `${thousands}тыс` : `${thousands.toFixed(1)}тыс`;
+    }
+    return num.toString();
+}
+
 const INVESTMENTS_CONFIG = {
     buildings: [
         // Дома
@@ -71,26 +85,26 @@ const INVESTMENTS_CONFIG = {
         { id: 'heartbreaker', name: 'Heartbreaker', icon: 'assets/svg/Jewelry/Heartbreaker.svg' }
     ],
     // Конфигурация для транспорта
-    transportBasePurchaseCost: 500, // Первый транспорт
-    transportPurchaseCostIncrement: 250, // Увеличение стоимости каждого следующего
-    transportBaseUpgradeCost: 400, // Базовая стоимость улучшения транспорта
-    transportUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
-    transportBaseIncome: 1, // Доход на 1 уровне (алмазы)
-    transportIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
+    transportBasePurchaseCost: 2500, // Первый транспорт
+    transportPurchaseCostIncrement: 2500, // Увеличение стоимости каждого следующего
+    transportBaseIncomePercent: 5, // Базовый процент дохода (5% от стоимости)
+    transportIncomePercentPerLevel: 5, // Увеличение процента дохода за каждый уровень (+5%)
+    transportUpgradePercent: 10, // Процент от изначальной стоимости за улучшение
+    transportIncomeInterval: 3600000, // Интервал начисления дохода (1 час)
     // Конфигурация для драгоценностей (аналогично транспорту)
-    jewelryBasePurchaseCost: 500, // Первая драгоценность
-    jewelryPurchaseCostIncrement: 250, // Увеличение стоимости каждой следующей
-    jewelryBaseUpgradeCost: 400, // Базовая стоимость улучшения драгоценностей
-    jewelryUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
-    jewelryBaseIncome: 1, // Доход на 1 уровне (алмазы)
-    jewelryIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
-    // Конфигурация для построек (аналогично транспорту и драгоценностям)
-    buildingsBasePurchaseCost: 500, // Первое здание
-    buildingsPurchaseCostIncrement: 250, // Увеличение стоимости каждого следующего
-    buildingsBaseUpgradeCost: 400, // Базовая стоимость улучшения зданий
-    buildingsUpgradeCostIncrement: 150, // Увеличение стоимости улучшения за уровень
-    buildingsBaseIncome: 1, // Доход на 1 уровне (алмазы)
-    buildingsIncomeInterval: 60000, // Интервал начисления дохода (1 минута)
+    jewelryBasePurchaseCost: 2500, // Первая драгоценность
+    jewelryPurchaseCostIncrement: 2500, // Увеличение стоимости каждой следующей
+    jewelryBaseIncomePercent: 5, // Базовый процент дохода (5% от стоимости)
+    jewelryIncomePercentPerLevel: 5, // Увеличение процента дохода за каждый уровень (+5%)
+    jewelryUpgradePercent: 10, // Процент от изначальной стоимости за улучшение
+    jewelryIncomeInterval: 3600000, // Интервал начисления дохода (1 час)
+    // Конфигурация для построек
+    buildingsBasePurchaseCost: 2500, // Первое здание
+    buildingsPurchaseCostIncrement: 2500, // Увеличение стоимости каждого следующего
+    buildingsBaseIncomePercent: 5, // Базовый процент дохода (5% от стоимости)
+    buildingsIncomePercentPerLevel: 5, // Увеличение процента дохода за каждый уровень (+5%)
+    buildingsUpgradePercent: 10, // Процент от изначальной стоимости за улучшение
+    buildingsIncomeInterval: 3600000, // Интервал начисления дохода (1 час)
     maxLevel: 100,
     unlockLevel: 5 // Уровень для разблокировки следующего здания
 };
@@ -142,16 +156,21 @@ function getBuildingPurchaseCost(buildingIndex) {
     return INVESTMENTS_CONFIG.buildingsBasePurchaseCost + (buildingIndex * INVESTMENTS_CONFIG.buildingsPurchaseCostIncrement);
 }
 
-// Получить стоимость улучшения здания
-function getBuildingUpgradeCost(level) {
+// Получить стоимость улучшения здания (процент от изначальной стоимости)
+function getBuildingUpgradeCost(buildingIndex, level) {
     if (level >= INVESTMENTS_CONFIG.maxLevel) return Infinity;
-    return INVESTMENTS_CONFIG.buildingsBaseUpgradeCost + (level * INVESTMENTS_CONFIG.buildingsUpgradeCostIncrement);
+    const baseCost = getBuildingPurchaseCost(buildingIndex);
+    return Math.floor(baseCost * (INVESTMENTS_CONFIG.buildingsUpgradePercent / 100) * (level + 1));
 }
 
-// Получить доход здания за интервал (алмазы)
-function getBuildingIncome(level) {
+// Получить доход здания за час (процент от стоимости)
+function getBuildingIncome(buildingIndex, level) {
     if (level === 0) return 0;
-    return INVESTMENTS_CONFIG.buildingsBaseIncome + (level - 1);
+    const baseCost = getBuildingPurchaseCost(buildingIndex);
+    // Доход = стоимость × (базовый процент + процент за уровень × уровень)
+    const incomePercent = INVESTMENTS_CONFIG.buildingsBaseIncomePercent + (INVESTMENTS_CONFIG.buildingsIncomePercentPerLevel * level);
+    const incomePerHour = Math.floor(baseCost * (incomePercent / 100));
+    return incomePerHour;
 }
 
 // Получить стоимость покупки транспорта
@@ -159,16 +178,21 @@ function getTransportPurchaseCost(vehicleIndex) {
     return INVESTMENTS_CONFIG.transportBasePurchaseCost + (vehicleIndex * INVESTMENTS_CONFIG.transportPurchaseCostIncrement);
 }
 
-// Получить стоимость улучшения транспорта
-function getTransportUpgradeCost(level) {
+// Получить стоимость улучшения транспорта (процент от изначальной стоимости)
+function getTransportUpgradeCost(vehicleIndex, level) {
     if (level >= INVESTMENTS_CONFIG.maxLevel) return Infinity;
-    return INVESTMENTS_CONFIG.transportBaseUpgradeCost + (level * INVESTMENTS_CONFIG.transportUpgradeCostIncrement);
+    const baseCost = getTransportPurchaseCost(vehicleIndex);
+    return Math.floor(baseCost * (INVESTMENTS_CONFIG.transportUpgradePercent / 100) * (level + 1));
 }
 
-// Получить доход транспорта за интервал (алмазы)
-function getTransportIncome(level) {
+// Получить доход транспорта за час (процент от стоимости)
+function getTransportIncome(vehicleIndex, level) {
     if (level === 0) return 0;
-    return INVESTMENTS_CONFIG.transportBaseIncome + (level - 1);
+    const baseCost = getTransportPurchaseCost(vehicleIndex);
+    // Доход = стоимость × (базовый процент + процент за уровень × уровень)
+    const incomePercent = INVESTMENTS_CONFIG.transportBaseIncomePercent + (INVESTMENTS_CONFIG.transportIncomePercentPerLevel * level);
+    const incomePerHour = Math.floor(baseCost * (incomePercent / 100));
+    return incomePerHour;
 }
 
 // Получить стоимость покупки драгоценности
@@ -176,16 +200,21 @@ function getJewelryPurchaseCost(itemIndex) {
     return INVESTMENTS_CONFIG.jewelryBasePurchaseCost + (itemIndex * INVESTMENTS_CONFIG.jewelryPurchaseCostIncrement);
 }
 
-// Получить стоимость улучшения драгоценности
-function getJewelryUpgradeCost(level) {
+// Получить стоимость улучшения драгоценности (процент от изначальной стоимости)
+function getJewelryUpgradeCost(itemIndex, level) {
     if (level >= INVESTMENTS_CONFIG.maxLevel) return Infinity;
-    return INVESTMENTS_CONFIG.jewelryBaseUpgradeCost + (level * INVESTMENTS_CONFIG.jewelryUpgradeCostIncrement);
+    const baseCost = getJewelryPurchaseCost(itemIndex);
+    return Math.floor(baseCost * (INVESTMENTS_CONFIG.jewelryUpgradePercent / 100) * (level + 1));
 }
 
-// Получить доход драгоценности за интервал (алмазы)
-function getJewelryIncome(level) {
+// Получить доход драгоценности за час (процент от стоимости)
+function getJewelryIncome(itemIndex, level) {
     if (level === 0) return 0;
-    return INVESTMENTS_CONFIG.jewelryBaseIncome + (level - 1);
+    const baseCost = getJewelryPurchaseCost(itemIndex);
+    // Доход = стоимость × (базовый процент + процент за уровень × уровень)
+    const incomePercent = INVESTMENTS_CONFIG.jewelryBaseIncomePercent + (INVESTMENTS_CONFIG.jewelryIncomePercentPerLevel * level);
+    const incomePerHour = Math.floor(baseCost * (incomePercent / 100));
+    return incomePerHour;
 }
 
 // Проверить, доступно ли здание для покупки
@@ -247,6 +276,7 @@ function purchaseBuilding(buildingId) {
     saveInvestmentsData(data);
     
     updateInvestmentsUI();
+    updateTotalProfit();
     return true;
 }
 
@@ -258,7 +288,10 @@ function upgradeBuilding(buildingId) {
     if (!buildingData || !buildingData.purchased) return false;
     if (buildingData.level >= INVESTMENTS_CONFIG.maxLevel) return false;
     
-    const cost = getBuildingUpgradeCost(buildingData.level);
+    const buildingIndex = INVESTMENTS_CONFIG.buildings.findIndex(b => b.id === buildingId);
+    if (buildingIndex === -1) return false;
+    
+    const cost = getBuildingUpgradeCost(buildingIndex, buildingData.level);
     const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
     
     if (currentRBC < cost) {
@@ -281,6 +314,7 @@ function upgradeBuilding(buildingId) {
     saveInvestmentsData(data);
     
     updateInvestmentsUI();
+    updateTotalProfit();
     return true;
 }
 
@@ -343,6 +377,7 @@ function purchaseTransport(vehicleId) {
     saveInvestmentsData(data);
     
     updateInvestmentsUI();
+    updateTotalProfit();
     return true;
 }
 
@@ -354,7 +389,10 @@ function upgradeTransport(vehicleId) {
     if (!vehicleData || !vehicleData.purchased) return false;
     if (vehicleData.level >= INVESTMENTS_CONFIG.maxLevel) return false;
     
-    const cost = getTransportUpgradeCost(vehicleData.level);
+    const vehicleIndex = INVESTMENTS_CONFIG.transport.findIndex(v => v.id === vehicleId);
+    if (vehicleIndex === -1) return false;
+    
+    const cost = getTransportUpgradeCost(vehicleIndex, vehicleData.level);
     const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
     
     if (currentRBC < cost) {
@@ -377,6 +415,7 @@ function upgradeTransport(vehicleId) {
     saveInvestmentsData(data);
     
     updateInvestmentsUI();
+    updateTotalProfit();
     return true;
 }
 
@@ -439,6 +478,7 @@ function purchaseJewelry(itemId) {
     saveInvestmentsData(data);
     
     updateInvestmentsUI();
+    updateTotalProfit();
     return true;
 }
 
@@ -450,7 +490,10 @@ function upgradeJewelry(itemId) {
     if (!itemData || !itemData.purchased) return false;
     if (itemData.level >= INVESTMENTS_CONFIG.maxLevel) return false;
     
-    const cost = getJewelryUpgradeCost(itemData.level);
+    const itemIndex = INVESTMENTS_CONFIG.jewelry.findIndex(j => j.id === itemId);
+    if (itemIndex === -1) return false;
+    
+    const cost = getJewelryUpgradeCost(itemIndex, itemData.level);
     const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
     
     if (currentRBC < cost) {
@@ -473,6 +516,7 @@ function upgradeJewelry(itemId) {
     saveInvestmentsData(data);
     
     updateInvestmentsUI();
+    updateTotalProfit();
     return true;
 }
 
@@ -483,11 +527,11 @@ function processInvestmentsIncome() {
     
     // Обрабатываем доход от построек (алмазы)
     let totalDiamonds = 0;
-    INVESTMENTS_CONFIG.buildings.forEach(building => {
+    INVESTMENTS_CONFIG.buildings.forEach((building, index) => {
         const buildingData = data[building.id];
         if (!buildingData || !buildingData.purchased || buildingData.level === 0) return;
         
-        const incomePerInterval = getBuildingIncome(buildingData.level);
+        const incomePerInterval = getBuildingIncome(index, buildingData.level);
         const timePassed = currentTime - (buildingData.lastIncomeTime || currentTime);
         const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.buildingsIncomeInterval);
         
@@ -500,11 +544,11 @@ function processInvestmentsIncome() {
     });
     
     // Обрабатываем доход от транспорта (алмазы)
-    INVESTMENTS_CONFIG.transport.forEach(vehicle => {
+    INVESTMENTS_CONFIG.transport.forEach((vehicle, index) => {
         const vehicleData = data[vehicle.id];
         if (!vehicleData || !vehicleData.purchased || vehicleData.level === 0) return;
         
-        const incomePerInterval = getTransportIncome(vehicleData.level);
+        const incomePerInterval = getTransportIncome(index, vehicleData.level);
         const timePassed = currentTime - (vehicleData.lastIncomeTime || currentTime);
         const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.transportIncomeInterval);
         
@@ -517,11 +561,11 @@ function processInvestmentsIncome() {
     });
     
     // Обрабатываем доход от драгоценностей (алмазы)
-    INVESTMENTS_CONFIG.jewelry.forEach(item => {
+    INVESTMENTS_CONFIG.jewelry.forEach((item, index) => {
         const itemData = data[item.id];
         if (!itemData || !itemData.purchased || itemData.level === 0) return;
         
-        const incomePerInterval = getJewelryIncome(itemData.level);
+        const incomePerInterval = getJewelryIncome(index, itemData.level);
         const timePassed = currentTime - (itemData.lastIncomeTime || currentTime);
         const intervalsPassed = Math.floor(timePassed / INVESTMENTS_CONFIG.jewelryIncomeInterval);
         
@@ -595,13 +639,14 @@ function updateInvestmentsUI() {
             levelValue.textContent = buildingData.purchased ? buildingData.level : '0';
         }
         
-        // Обновляем доходность (алмазы/1м)
+        // Обновляем доходность (алмазы/ч)
         if (incomeValue) {
-            const income = getBuildingIncome(buildingData.level);
+            const income = getBuildingIncome(index, buildingData.level);
             if (income > 0) {
-                incomeValue.textContent = `${income}/1м`;
+                const formattedIncome = formatIncomeNumber(income);
+                incomeValue.innerHTML = `+${formattedIncome} <img src="assets/svg/rbc-icon.svg" style="width:10px;height:10px;vertical-align:middle;margin-left:2px;display:inline-block;flex-shrink:0;">`;
             } else {
-                incomeValue.textContent = '0/1м';
+                incomeValue.textContent = '0';
             }
         }
         
@@ -634,7 +679,7 @@ function updateInvestmentsUI() {
                     button.style.opacity = '0.5';
                     button.style.cursor = 'not-allowed';
                 } else {
-                    const cost = getBuildingUpgradeCost(buildingData.level);
+                    const cost = getBuildingUpgradeCost(index, buildingData.level);
                     const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
                     const canAfford = currentRBC >= cost;
                     
@@ -676,13 +721,14 @@ function updateInvestmentsUI() {
                 levelValue.textContent = vehicleData.purchased ? vehicleData.level : '0';
             }
             
-            // Обновляем доходность (алмазы/1м)
+            // Обновляем доходность (алмазы/ч)
             if (incomeValue) {
-                const income = getTransportIncome(vehicleData.level);
+                const income = getTransportIncome(index, vehicleData.level);
                 if (income > 0) {
-                    incomeValue.textContent = `${income}/1м`;
+                    const formattedIncome = formatIncomeNumber(income);
+                    incomeValue.innerHTML = `+${formattedIncome} <img src="assets/svg/rbc-icon.svg" style="width:10px;height:10px;vertical-align:middle;margin-left:2px;display:inline-block;flex-shrink:0;">`;
                 } else {
-                    incomeValue.textContent = '0/1м';
+                    incomeValue.textContent = '0';
                 }
             }
             
@@ -715,7 +761,7 @@ function updateInvestmentsUI() {
                         button.style.opacity = '0.5';
                         button.style.cursor = 'not-allowed';
                     } else {
-                        const cost = getTransportUpgradeCost(vehicleData.level);
+                        const cost = getTransportUpgradeCost(index, vehicleData.level);
                         const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
                         const canAfford = currentRBC >= cost;
                         
@@ -756,13 +802,14 @@ function updateInvestmentsUI() {
                 levelValue.textContent = itemData.purchased ? itemData.level : '0';
             }
             
-            // Обновляем доходность (алмазы/1м)
+            // Обновляем доходность (алмазы/ч)
             if (incomeValue) {
-                const income = getJewelryIncome(itemData.level);
+                const income = getJewelryIncome(index, itemData.level);
                 if (income > 0) {
-                    incomeValue.textContent = `${income}/1м`;
+                    const formattedIncome = formatIncomeNumber(income);
+                    incomeValue.innerHTML = `+${formattedIncome} <img src="assets/svg/rbc-icon.svg" style="width:10px;height:10px;vertical-align:middle;margin-left:2px;display:inline-block;flex-shrink:0;">`;
                 } else {
-                    incomeValue.textContent = '0/1м';
+                    incomeValue.textContent = '0';
                 }
             }
             
@@ -795,7 +842,7 @@ function updateInvestmentsUI() {
                         button.style.opacity = '0.5';
                         button.style.cursor = 'not-allowed';
                     } else {
-                        const cost = getJewelryUpgradeCost(itemData.level);
+                        const cost = getJewelryUpgradeCost(index, itemData.level);
                         const currentRBC = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
                         const canAfford = currentRBC >= cost;
                         
@@ -807,6 +854,45 @@ function updateInvestmentsUI() {
                 }
             }
         });
+    }
+    
+    // Обновляем общую доходность
+    updateTotalProfit();
+}
+
+// Функция для расчета и отображения общей доходности
+function updateTotalProfit() {
+    const data = getInvestmentsData();
+    let totalProfit = 0;
+    
+    // Суммируем доходность всех построек
+    INVESTMENTS_CONFIG.buildings.forEach((building, index) => {
+        const buildingData = data[building.id];
+        if (buildingData && buildingData.purchased && buildingData.level > 0) {
+            totalProfit += getBuildingIncome(index, buildingData.level);
+        }
+    });
+    
+    // Суммируем доходность всего транспорта
+    INVESTMENTS_CONFIG.transport.forEach((vehicle, index) => {
+        const vehicleData = data[vehicle.id];
+        if (vehicleData && vehicleData.purchased && vehicleData.level > 0) {
+            totalProfit += getTransportIncome(index, vehicleData.level);
+        }
+    });
+    
+    // Суммируем доходность всех драгоценностей
+    INVESTMENTS_CONFIG.jewelry.forEach((item, index) => {
+        const itemData = data[item.id];
+        if (itemData && itemData.purchased && itemData.level > 0) {
+            totalProfit += getJewelryIncome(index, itemData.level);
+        }
+    });
+    
+    // Обновляем отображение
+    const profitValue = document.getElementById('investments-total-profit-value');
+    if (profitValue) {
+        profitValue.textContent = totalProfit.toLocaleString();
     }
 }
 
@@ -941,6 +1027,7 @@ function switchInvestmentsTab(tabName) {
     // Обновляем UI для активной вкладки
     if (tabName === 'buildings' || tabName === 'transport' || tabName === 'items') {
         updateInvestmentsUI();
+        updateTotalProfit();
     }
 }
 
@@ -995,6 +1082,7 @@ function setupInvestments() {
     initInvestmentsEvents();
     setupCreditsInterceptor();
     updateInvestmentsUI();
+    updateTotalProfit();
     startInvestmentsIncome();
     
     // Повторно пытаемся перехватить setCredits после загрузки всех скриптов

@@ -136,9 +136,9 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   border:1px solid rgba(255,255,255,0.3);
   border-radius:20px;
   color:rgba(255,255,255,0.7);
-  font-size:12px;
+  font-size:14px;
   font-weight:600;
-  padding:6px 16px;
+  padding:8px 20px;
   cursor:pointer;
   transition:all 0.2s ease;
   white-space:nowrap;
@@ -167,60 +167,96 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   padding:0 4px 20px 4px;
 }
 .banner-total-profit-cell{
-  width:90%;
-  max-width:400px;
-  background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:50px;
-  backdrop-filter:blur(15px);
-  -webkit-backdrop-filter:blur(15px);
+  width:92%;
+  max-width:450px;
+  background:linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:16px;
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
   display:flex;
-  flex-direction:row;
-  align-items:center;
-  justify-content:space-between;
-  padding:6px 20px;
+  flex-direction:column;
+  padding:16px 20px;
+  margin:16px auto 8px auto;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  position:relative;
+  overflow:hidden;
+  align-self:center;
+}
+.banner-total-profit-cell::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:1px;
+  background:linear-gradient(to right, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+  z-index:1;
+}
+.banner-total-profit-content{
+  display:flex;
+  flex-direction:column;
   gap:12px;
-  margin-bottom:8px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  width:100%;
+}
+.banner-total-profit-header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
 }
 .banner-total-profit-label{
-  color:rgba(255,255,255,0.8);
-  font-size:11px;
-  font-weight:600;
+  color:rgba(255,255,255,0.9);
+  font-size:10px;
+  font-weight:800;
   text-transform:uppercase;
-  letter-spacing:0.8px;
-  font-family:"Segoe UI",Arial,sans-serif;
-  white-space:normal;
-  word-break:break-word;
-  flex:1;
-  min-width:0;
-  line-height:1.2;
+  letter-spacing:1.5px;
+  font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  text-align:center;
 }
-.banner-total-profit-value-wrapper{
+.banner-total-profit-period{
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  line-height:1;
+  align-self:flex-end;
+  margin-bottom:2px;
+}
+.banner-total-profit-amount{
   display:flex;
-  align-items:center;
-  gap:6px;
+  align-items:baseline;
+  gap:8px;
+  justify-content:center;
+  width:100%;
 }
 .banner-total-profit-icon{
-  width:14px;
-  height:14px;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  width:18px;
+  height:18px;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   object-fit:contain;
+  flex-shrink:0;
 }
 .banner-total-profit-value{
   color:#fff;
-  font-size:14px;
-  font-weight:700;
-  font-family:"Segoe UI",Arial,sans-serif;
-  text-shadow:0 2px 4px rgba(0,0,0,0.3);
+  font-size:24px;
+  font-weight:900;
+  font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  text-shadow:0 2px 8px rgba(0,0,0,0.5);
   white-space:nowrap;
+  letter-spacing:0.5px;
+  line-height:1;
 }
 .banner-item{
   width:99%;
   max-width:500px;
   height:150px;
   background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.15);
+  border:1px solid rgba(255,255,255,0.8);
   border-radius:12px;
   backdrop-filter:blur(20px) saturate(180%);
   -webkit-backdrop-filter:blur(20px) saturate(180%);
@@ -317,6 +353,9 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   margin-left:-35px;
   margin-top:40px;
   margin-bottom:0;
+  width:calc(100% + 35px);
+  max-width:calc(100% + 35px);
+  box-sizing:border-box;
 }
 .banner-stat-cell{
   background:rgba(255,255,255,0.1);
@@ -333,6 +372,15 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
 }
+.banner-stat-cell:first-child{
+  flex:0 0 auto;
+  width:calc(35% - 3px);
+}
+.banner-stat-cell:last-child{
+  flex:1;
+  min-width:0;
+  justify-content:center;
+}
 .banner-stat-label{
   color:rgba(255,255,255,0.7);
   font-size:11px;
@@ -342,11 +390,17 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   color:#fff;
   font-size:13px;
   font-weight:700;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:2px;
 }
 .banner-stat-value img{
-  width:13px !important;
-  height:13px !important;
-  margin-left:2px !important;
+  width:10px !important;
+  height:10px !important;
+  margin-left:0 !important;
+  flex-shrink:0;
+  display:inline-block;
 }
 .banner-item-name{
   color:#fff;
@@ -426,11 +480,21 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     margin-left:-30px;
     margin-top:36px;
     gap:5px;
+    width:calc(100% + 30px);
+    max-width:calc(100% + 30px);
   }
   .banner-stat-cell{
     padding:6px 14px;
     min-height:30px;
     height:30px;
+  }
+  .banner-stat-cell:first-child{
+    width:calc(35% - 2.5px);
+  }
+  .banner-stat-cell:last-child{
+    flex:1;
+    min-width:0;
+    justify-content:center;
   }
   .banner-stat-label{
     font-size:10px;
@@ -473,11 +537,21 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     margin-left:-28px;
     margin-top:32px;
     gap:4px;
+    width:calc(100% + 28px);
+    max-width:calc(100% + 28px);
   }
   .banner-stat-cell{
     padding:5px 12px;
     min-height:28px;
     height:28px;
+  }
+  .banner-stat-cell:first-child{
+    width:calc(35% - 2px);
+  }
+  .banner-stat-cell:last-child{
+    flex:1;
+    min-width:0;
+    justify-content:center;
   }
   .banner-stat-label{
     font-size:9px;
@@ -520,11 +594,21 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     margin-left:-26px;
     margin-top:28px;
     gap:3px;
+    width:calc(100% + 26px);
+    max-width:calc(100% + 26px);
   }
   .banner-stat-cell{
     padding:4px 10px;
     min-height:26px;
     height:26px;
+  }
+  .banner-stat-cell:first-child{
+    width:calc(35% - 1.5px);
+  }
+  .banner-stat-cell:last-child{
+    flex:1;
+    min-width:0;
+    justify-content:center;
   }
   .banner-stat-label{
     font-size:8px;
@@ -575,6 +659,23 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   }
   .banner-stats{
     margin-top:38px;
+    width:calc(100% + 35px);
+    max-width:calc(100% + 35px);
+  }
+  .banner-total-profit-cell{
+    width:94%;
+    padding:14px 18px;
+    margin:14px auto 6px auto;
+  }
+  .banner-total-profit-value{
+    font-size:22px;
+  }
+  .banner-total-profit-period{
+    font-size:13px;
+  }
+  .banner-total-profit-icon{
+    width:16px;
+    height:16px;
   }
 }
 
@@ -599,8 +700,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     font-size:12px;
   }
   .banner-tab-btn{
-    font-size:11px;
-    padding:5px 14px;
+    font-size:13px;
+    padding:7px 18px;
   }
   .banner-panel-content{
     gap:16px;
@@ -628,12 +729,31 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     font-size:11px;
   }
   .banner-tab-btn{
-    font-size:10px;
-    padding:4px 12px;
+    font-size:12px;
+    padding:6px 16px;
   }
   .banner-panel-content{
     gap:14px;
     padding:0 2px 12px 2px;
+  }
+  .banner-total-profit-cell{
+    width:95%;
+    padding:12px 16px;
+    margin:12px auto 4px auto;
+  }
+  .banner-total-profit-value{
+    font-size:20px;
+  }
+  .banner-total-profit-period{
+    font-size:12px;
+  }
+  .banner-total-profit-icon{
+    width:15px;
+    height:15px;
+  }
+  .banner-total-profit-label{
+    font-size:9px;
+    letter-spacing:1.2px;
   }
 }
 
@@ -657,12 +777,31 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     font-size:10px;
   }
   .banner-tab-btn{
-    font-size:9px;
-    padding:3px 10px;
+    font-size:11px;
+    padding:5px 14px;
   }
   .banner-panel-content{
     gap:12px;
     padding:0 2px 10px 2px;
+  }
+  .banner-total-profit-cell{
+    width:96%;
+    padding:10px 14px;
+    margin:10px auto 4px auto;
+  }
+  .banner-total-profit-value{
+    font-size:18px;
+  }
+  .banner-total-profit-icon{
+    width:14px;
+    height:14px;
+  }
+  .banner-total-profit-period{
+    font-size:11px;
+  }
+  .banner-total-profit-label{
+    font-size:8px;
+    letter-spacing:1px;
   }
 }
 

@@ -25,7 +25,7 @@
             
             // Инициализируем PostHog с конфигурацией
             posthog.init(config.apiKey, {
-                api_host: config.host || 'https://app.posthog.com',
+                api_host: config.host || 'https://us.posthog.com',
                 autocapture: config.autocapture !== false,
                 capture_pageview: config.capture_pageview !== false,
                 capture_pageleave: config.capture_pageleave !== false,

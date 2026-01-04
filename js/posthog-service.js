@@ -11,7 +11,14 @@
 
     // Инициализация PostHog
     function initPostHog() {
-        if (isInitialized || typeof window.posthog === 'undefined') {
+        if (isInitialized) {
+            console.log('[PostHog] Already initialized');
+            return;
+        }
+        
+        if (typeof window.posthog === 'undefined') {
+            console.warn('[PostHog] PostHog SDK not loaded yet, retrying in 500ms...');
+            setTimeout(initPostHog, 500);
             return;
         }
 
@@ -23,21 +30,61 @@
         try {
             posthog = window.posthog;
             
+            // Проверяем API ключ перед инициализацией
+            if (!config.apiKey || config.apiKey === 'YOUR_POSTHOG_API_KEY' || !config.apiKey.startsWith('phc_')) {
+                console.error('[PostHog] Invalid API key! Key must start with "phc_" and be copied from PostHog project settings.');
+                console.error('[PostHog] Current key:', config.apiKey ? config.apiKey.substring(0, 20) + '...' : 'undefined');
+                return;
+            }
+            
+            console.log('[PostHog] Initializing with API key:', config.apiKey.substring(0, 10) + '...');
+            
             // Инициализируем PostHog с конфигурацией
             posthog.init(config.apiKey, {
                 api_host: config.host || 'https://us.posthog.com',
                 autocapture: config.autocapture !== false,
                 capture_pageview: config.capture_pageview !== false,
                 capture_pageleave: config.capture_pageleave !== false,
+                disable_session_recording: true,
+                advanced_disable_feature_flags_on_first_load: true, // Отключаем feature flags
                 loaded: function(ph) {
                     isInitialized = true;
                     console.log('[PostHog] Service initialized');
+                    console.log('[PostHog] PostHog instance:', ph);
                     
                     // Идентифицируем пользователя при загрузке
                     identifyUser();
                     
                     // Устанавливаем свойства пользователя
                     setUserProperties();
+                    
+                    // Принудительно отправляем событие для проверки установки
+                    setTimeout(function() {
+                        try {
+                            // Отправляем несколько событий для гарантии
+                            ph.capture('$pageview', {
+                                test_event: true,
+                                installation_check: true,
+                                source: 'booke_game'
+                            });
+                            console.log('[PostHog] Test $pageview event sent');
+                            
+                            // Дополнительное событие
+                            ph.capture('installation_test', {
+                                test: true,
+                                timestamp: new Date().toISOString()
+                            });
+                            console.log('[PostHog] Test installation_test event sent');
+                            
+                            // Принудительно отправляем все события
+                            if (ph.flush) {
+                                ph.flush();
+                                console.log('[PostHog] Events flushed');
+                            }
+                        } catch (error) {
+                            console.error('[PostHog] Failed to send test events:', error);
+                        }
+                    }, 1000);
                     
                     if (config.loaded && typeof config.loaded === 'function') {
                         config.loaded(ph);
@@ -135,6 +182,7 @@
             enrichedProperties.buildings_owned = userData.buildingsOwned;
 
             posthog.capture(eventName, enrichedProperties);
+            console.log('[PostHog] Event tracked:', eventName, enrichedProperties);
         } catch (error) {
             console.error('[PostHog] Failed to track event:', error);
         }
@@ -223,11 +271,45 @@
     }
 
     // Инициализация при загрузке DOM
+    function startInit() {
+        // Ждем, пока PostHog SDK загрузится
+        if (typeof window.posthog === 'undefined') {
+            console.log('[PostHog] Waiting for PostHog SDK to load...');
+            setTimeout(startInit, 100);
+            return;
+        }
+        console.log('[PostHog] PostHog SDK loaded, initializing...');
+        initPostHog();
+    }
+    
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPostHog);
+        document.addEventListener('DOMContentLoaded', startInit);
     } else {
         // DOM уже загружен
-        setTimeout(initPostHog, 100);
+        setTimeout(startInit, 200);
+    }
+
+    // Функция для тестирования отправки событий
+    function testEvent() {
+        if (!posthog || !isInitialized) {
+            console.error('[PostHog] Cannot send test event - PostHog not initialized');
+            console.log('[PostHog] isInitialized:', isInitialized);
+            console.log('[PostHog] posthog:', posthog);
+            return false;
+        }
+        
+        try {
+            posthog.capture('test_event', {
+                test: true,
+                timestamp: new Date().toISOString(),
+                message: 'Test event from Booke game'
+            });
+            console.log('[PostHog] Test event sent successfully');
+            return true;
+        } catch (error) {
+            console.error('[PostHog] Failed to send test event:', error);
+            return false;
+        }
     }
 
     // Экспорт API
@@ -243,8 +325,17 @@
         trackRewardOpened: trackRewardOpened,
         identify: identifyUser,
         setUserProperties: setUserProperties,
+        testEvent: testEvent,
         isReady: function() {
             return isInitialized && posthog !== null;
+        },
+        getStatus: function() {
+            return {
+                isInitialized: isInitialized,
+                posthogLoaded: typeof window.posthog !== 'undefined',
+                posthogInstance: posthog,
+                config: config
+            };
         }
     };
 

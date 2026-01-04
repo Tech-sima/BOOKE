@@ -5084,6 +5084,11 @@
                 // Сохраняем данные
                 saveBuildingsData();
                 
+                // Отслеживание улучшения здания в PostHog
+                if (window.posthogService && window.posthogService.isReady()) {
+                    window.posthogService.trackBuildingUpgraded('Типография', 'print', upgradeCost, building.level);
+                }
+                
                 // Обновляем стоимость улучшения на кнопке
                 updateUpgradeCostDisplay('print');
                 

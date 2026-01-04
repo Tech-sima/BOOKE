@@ -787,9 +787,20 @@ function updateProgressVisual(){
 // BALANCE helpers + persistence
 function getBalance(){return parseFloat(localStorage.getItem('balance')||'10000');}
 function setBalance(v){
+    const oldBalance = getBalance();
     localStorage.setItem('balance',v);
     const moneyAmount = document.getElementById('money-amount');
     const bcValue = document.getElementById('bc-value');
+    
+    // Отслеживание изменений баланса в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        const diff = v - oldBalance;
+        if (diff > 0) {
+            window.posthogService.trackEarned(diff, 'money', 'game_action');
+        } else if (diff < 0) {
+            window.posthogService.trackSpent(Math.abs(diff), 'money', 'game_action');
+        }
+    }
     if(moneyAmount) {
         moneyAmount.textContent=formatNumber(v);
         moneyAmount.dataset.val=v;
@@ -1152,9 +1163,20 @@ safeAddEventListener('shop-close', 'click', () => {
 // credits helpers
 function getCredits(){return parseInt(localStorage.getItem('credits')||'0');}
 function setCredits(v){
+    const oldCredits = getCredits();
     localStorage.setItem('credits',v);
     const creditsAmount = document.getElementById('credits-amount');
     const rbcValue = document.getElementById('rbc-value');
+    
+    // Отслеживание изменений кредитов в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        const diff = v - oldCredits;
+        if (diff > 0) {
+            window.posthogService.trackEarned(diff, 'credits', 'game_action');
+        } else if (diff < 0) {
+            window.posthogService.trackSpent(Math.abs(diff), 'credits', 'game_action');
+        }
+    }
     if(creditsAmount) {
         creditsAmount.textContent=v;
     }
@@ -1609,6 +1631,11 @@ window.purchaseBuildingFromCity = function(buildingKey, buildingName, cost) {
         buildingsData[buildingKey].lastCollectTime = Date.now();
         buildingsData[buildingKey].accumulatedProfit = 0;
         localStorage.setItem('buildingsData', JSON.stringify(buildingsData));
+        
+        // Отслеживание постройки здания в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackBuildingBuilt(buildingName, buildingKey, cost, 1);
+        }
         
         // Обновляем старую систему для совместимости
         if (buildingKey === 'factory') {
@@ -2355,6 +2382,15 @@ function updateStorageUpgradeCost(){
     }
 }
 function upgradeStorage(){const cost=storageNextCost();if(getBalance()<cost){alert('Недостаточно денег');return;}setBalance(getBalance()-cost);storageUpgrades++;storageCapacity=STORAGE_BASE_CAP+storageUpgrades*STORAGE_INC;saveStorage();updateStorageUI();updateStorageUpgradeCost();addXP(storageUpgrades);
+    
+    // Отслеживание улучшения хранилища в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        window.posthogService.track('storage_upgraded', {
+            cost: cost,
+            new_level: storageUpgrades,
+            new_capacity: storageCapacity
+        });
+    }
 
     // Обновляем статистику если панель открыта
     if(window.refreshStatistics) {
@@ -2696,6 +2732,12 @@ window.upgradeLibraryDirectly = function() {
         setBalance(getBalance() - cost);
         upgradesCount++;
         saveProgress();
+        
+        // Отслеживание улучшения библиотеки в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackBuildingUpgraded('Библиотека', 'library', cost, upgradesCount);
+        }
+        
         return true;
     }
     return false;
@@ -2707,6 +2749,12 @@ window.upgradeFactoryDirectly = function() {
         setBalance(getBalance() - cost);
         factoryUpgrades++;
         saveFactory();
+        
+        // Отслеживание улучшения завода в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackBuildingUpgraded('Завод', 'factory', cost, factoryUpgrades);
+        }
+        
         return true;
     }
     return false;
@@ -3231,6 +3279,15 @@ function buyChest() {
         setCredits(getCredits() - item.cost);
         setCredits(getCredits() + item.coins);
         
+        // Отслеживание покупки в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackPurchase('chest', item.name || 'Chest', item.cost, 'credits', {
+                reward_credits: item.coins,
+                chest_type: 'coins'
+            });
+            window.posthogService.trackRewardOpened('chest', { credits: item.coins });
+        }
+        
         // Показываем панель наград
         showRewardPanel('chests', {
             credits: item.coins
@@ -3243,6 +3300,15 @@ function buyChest() {
         }
         setBalance(getBalance() - item.cost);
         setCredits(getCredits() + item.coins);
+        
+        // Отслеживание покупки в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackPurchase('chest', item.name || 'Chest', item.cost, 'money', {
+                reward_credits: item.coins,
+                chest_type: 'coins'
+            });
+            window.posthogService.trackRewardOpened('chest', { credits: item.coins });
+        }
         
         // Показываем панель наград
         showRewardPanel('chests', {
@@ -3373,6 +3439,20 @@ function buySafe() {
         setCredits(getCredits() + creditReward);
         addXP(10);
         
+        // Отслеживание покупки в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackPurchase('safe', item.name || 'Safe', item.cost, 'credits', {
+                reward_money: moneyReward,
+                reward_credits: creditReward,
+                reward_xp: 10
+            });
+            window.posthogService.trackRewardOpened('safe', {
+                money: moneyReward,
+                credits: creditReward,
+                xp: 10
+            });
+        }
+        
         // Показываем панель наград
         showRewardPanel('safes', {
             money: moneyReward,
@@ -3395,6 +3475,20 @@ function buySafe() {
         setBalance(getBalance() + moneyReward);
         setCredits(getCredits() + creditReward);
         addXP(10);
+        
+        // Отслеживание покупки в PostHog
+        if (window.posthogService && window.posthogService.isReady()) {
+            window.posthogService.trackPurchase('safe', item.name || 'Safe', item.cost, 'money', {
+                reward_money: moneyReward,
+                reward_credits: creditReward,
+                reward_xp: 10
+            });
+            window.posthogService.trackRewardOpened('safe', {
+                money: moneyReward,
+                credits: creditReward,
+                xp: 10
+            });
+        }
         
         // Показываем панель наград
         showRewardPanel('safes', {
@@ -3515,6 +3609,20 @@ function buyCharacter() {
     // Начисляем XP за покупку набора (зависит от редкости)
     const setXP = item.rarity * 5; // 5 XP за каждую звезду редкости
     addXP(setXP);
+    
+    // Отслеживание покупки в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        window.posthogService.trackPurchase('character', item.name || 'Character Set', item.cost, 'money', {
+            reward_money: rewards,
+            reward_xp: setXP,
+            rarity: item.rarity || 0,
+            character: item.character || null
+        });
+        window.posthogService.trackRewardOpened('character', {
+            money: rewards,
+            xp: setXP
+        });
+    }
     
     // Показываем панель наград
     showRewardPanel('characters', {
@@ -3885,6 +3993,11 @@ function showPanelWithAnimation(panelId) {
     
     // Показываем панель
     panel.style.display = 'flex';
+    
+    // Отслеживание открытия панели в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        window.posthogService.trackPanelOpened(panelId);
+    }
     
     // Добавляем классы для анимации
     panel.classList.add('slide-in');

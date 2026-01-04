@@ -275,6 +275,17 @@ function purchaseBuilding(buildingId) {
     data[buildingId] = buildingData;
     saveInvestmentsData(data);
     
+    // Отслеживание покупки здания в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        const buildingConfig = INVESTMENTS_CONFIG.buildings[buildingIndex];
+        window.posthogService.trackBuildingBuilt(
+            buildingConfig ? buildingConfig.name : `Building ${buildingId}`,
+            buildingId,
+            cost,
+            1
+        );
+    }
+    
     updateInvestmentsUI();
     updateTotalProfit();
     return true;
@@ -309,9 +320,21 @@ function upgradeBuilding(buildingId) {
     }
     
     // Улучшаем здание
+    const oldLevel = buildingData.level;
     buildingData.level++;
     data[buildingId] = buildingData;
     saveInvestmentsData(data);
+    
+    // Отслеживание улучшения здания в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        const buildingConfig = INVESTMENTS_CONFIG.buildings[buildingIndex];
+        window.posthogService.trackBuildingUpgraded(
+            buildingConfig ? buildingConfig.name : `Building ${buildingId}`,
+            buildingId,
+            cost,
+            buildingData.level
+        );
+    }
     
     updateInvestmentsUI();
     updateTotalProfit();

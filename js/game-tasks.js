@@ -177,6 +177,16 @@ function autoClaimGameReward(taskId) {
         window.setBalance(currentBalance + rewardValue);
     }
     
+    // Отслеживание автоматического выполнения задания в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        window.posthogService.trackTaskCompleted(taskId, task.title, {
+            money: rewardValue,
+            credits: 0,
+            xp: 0,
+            auto_claimed: true
+        });
+    }
+    
     localStorage.setItem(`task_claimed_${taskId}`, 'true');
     renderGameTasks();
     const updatedTasks = getGameTasksData();
@@ -387,7 +397,14 @@ function claimTaskReward(task) {
         window.setBalance(currentBalance + rewardValue);
     }
     
-
+    // Отслеживание получения награды за задание в PostHog
+    if (window.posthogService && window.posthogService.isReady()) {
+        window.posthogService.trackTaskCompleted(task.id, task.title, {
+            money: rewardValue,
+            credits: 0,
+            xp: 0
+        });
+    }
     
     // Перерисовываем панель
     renderGameTasks();

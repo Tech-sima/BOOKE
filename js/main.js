@@ -3975,16 +3975,37 @@ async function buyCases() {
                 return;
             }
             
+            // Сохраняем данные о текущей покупке для обработки после оплаты
+            window.currentPurchase = {
+                item: item,
+                caseIndex: currentCasesIndex,
+                timestamp: Date.now()
+            };
+            
             // Открываем invoice прямо в Mini App (не как сообщение от бота)
             if (webApp.openInvoice) {
                 webApp.openInvoice(invoiceUrl, (status) => {
+                    // Обрабатываем результат оплаты
                     if (status === 'paid') {
                         // Платеж успешен - открываем кейс
-                        handleSuccessfulCasePurchase(item);
+                        const purchaseData = window.currentPurchase;
+                        if (purchaseData && purchaseData.item) {
+                            handleSuccessfulCasePurchase(purchaseData.item);
+                            window.currentPurchase = null;
+                        } else {
+                            // Fallback: используем текущий кейс
+                            handleSuccessfulCasePurchase(item);
+                        }
                     } else if (status === 'cancelled') {
-                        console.log('Платеж отменен пользователем');
+                        window.currentPurchase = null;
+                        // Платеж отменен - ничего не делаем
                     } else if (status === 'failed') {
+                        window.currentPurchase = null;
                         alert('Ошибка при оплате. Попробуйте еще раз.');
+                    } else {
+                        // Неизвестный статус
+                        window.currentPurchase = null;
+                        alert('Неизвестный статус платежа: ' + status);
                     }
                 });
             } else {
@@ -4011,14 +4032,9 @@ async function createInvoiceLink(userId, item, caseIndex) {
     // Токен бота
     const BOT_TOKEN = '8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU';
     
-    // Создаем payload для invoice
-    const payload = JSON.stringify({
-        type: 'case_purchase',
-        caseIndex: caseIndex,
-        caseName: item.name,
-        starsPrice: item.starsPrice,
-        timestamp: Date.now()
-    });
+    // Создаем простой payload для invoice (без JSON, чтобы избежать проблем)
+    // Формат: case_index_timestamp
+    const payload = `case_${caseIndex}_${Date.now()}`;
     
     // Для createInvoiceLink prices должен быть JSON строкой
     // amount должен быть числом (не строкой!)
@@ -4048,14 +4064,6 @@ async function createInvoiceLink(userId, item, caseIndex) {
         urlParams.append('provider_token', invoiceData.provider_token || '');
         urlParams.append('currency', invoiceData.currency);
         urlParams.append('prices', invoiceData.prices);
-        
-        console.log('Отправляем данные:', {
-            title: invoiceData.title,
-            description: invoiceData.description,
-            payload: invoiceData.payload,
-            currency: invoiceData.currency,
-            prices: invoiceData.prices
-        });
         
         const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
             method: 'POST',
@@ -4139,56 +4147,25 @@ function initTelegramBotHandler() {
     // Обработчик для получения данных от бота через MainButton или другие события
     // Бот может отправлять данные через webApp.sendData или через callback_query
     
-    // Слушаем события от бота - обработка успешной оплаты
-    webApp.onEvent('invoice_closed', (event) => {
-        console.log('Invoice closed event:', event);
-        
-        if (event.status === 'paid') {
-            // Платеж успешен - извлекаем данные из payload
-            try {
-                let purchaseData;
-                
-                // Пытаемся получить данные из разных источников
-                if (event.payload) {
-                    purchaseData = JSON.parse(event.payload);
-                } else if (event.slug) {
-                    purchaseData = JSON.parse(decodeURIComponent(event.slug));
+    // Слушаем события от бота - обработка успешной оплаты (альтернативный способ)
+    if (webApp.onEvent) {
+        webApp.onEvent('invoice_closed', (event) => {
+            // Это событие может сработать, если openInvoice callback не сработал
+            if (event && event.status === 'paid') {
+                // Используем сохраненные данные о покупке
+                if (window.currentPurchase && window.currentPurchase.item) {
+                    handleSuccessfulCasePurchase(window.currentPurchase.item);
+                    window.currentPurchase = null;
                 } else {
-                    // Если нет данных в событии, используем текущий выбранный кейс
+                    // Fallback: используем текущий выбранный кейс
                     const item = casesItems[currentCasesIndex];
                     if (item) {
                         handleSuccessfulCasePurchase(item);
-                        return;
                     }
-                }
-                
-                const caseIndex = purchaseData.caseIndex !== undefined ? purchaseData.caseIndex : currentCasesIndex;
-                const item = casesItems[caseIndex];
-                
-                if (item) {
-                    handleSuccessfulCasePurchase(item);
-                } else {
-                    console.error('Кейс не найден:', caseIndex);
-                    // Fallback: используем текущий кейс
-                    const fallbackItem = casesItems[currentCasesIndex];
-                    if (fallbackItem) {
-                        handleSuccessfulCasePurchase(fallbackItem);
-                    }
-                }
-            } catch (error) {
-                console.error('Ошибка при обработке успешного платежа:', error);
-                // Fallback: открываем текущий выбранный кейс
-                const item = casesItems[currentCasesIndex];
-                if (item) {
-                    handleSuccessfulCasePurchase(item);
                 }
             }
-        } else if (event.status === 'cancelled') {
-            console.log('Платеж отменен пользователем');
-        } else if (event.status === 'failed') {
-            alert('Ошибка при оплате. Попробуйте еще раз.');
-        }
-    });
+        });
+    }
     
     // Обработчик для получения данных через sendData (если бот использует этот метод)
     // Это будет вызвано, когда бот отправит данные через webApp.sendData()

@@ -36,14 +36,9 @@ if (!$userId) {
     exit;
 }
 
-// Создаем payload для invoice
-$payload = json_encode([
-    'type' => 'case_purchase',
-    'caseIndex' => $caseIndex,
-    'caseName' => $caseName,
-    'starsPrice' => $starsPrice,
-    'timestamp' => time()
-]);
+// Создаем простой payload для invoice (без JSON, чтобы избежать проблем)
+// Формат: case_index_timestamp
+$payload = "case_{$caseIndex}_" . time();
 
 // Данные для создания invoice link
 // createInvoiceLink не требует chat_id, так как создает ссылку, а не отправляет сообщение

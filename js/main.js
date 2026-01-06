@@ -3943,8 +3943,8 @@ function openCase() {
     claimBtn.addEventListener('click', claimHandler);
 }
 
-// Функция покупки кейсов через Telegram Stars
-function buyCases() {
+// Функция покупки кейсов через Telegram Stars (прямая покупка из игры)
+async function buyCases() {
     const item = casesItems[currentCasesIndex];
     if (!item) return;
     
@@ -3962,28 +3962,102 @@ function buyCases() {
         return;
     }
     
-    // Создаем callback_data для бота
-    const callbackData = JSON.stringify({
-        type: 'purchase_case',
-        caseIndex: currentCasesIndex,
+    // Создаем invoice через Bot API
+    try {
+        // URL endpoint для создания invoice (замените на ваш)
+        // Если у вас нет сервера, можно использовать прямой вызов Bot API (см. комментарий ниже)
+        const INVOICE_ENDPOINT = 'create_invoice.php'; // Замените на полный URL, например: 'https://yourdomain.com/create_invoice.php'
+        
+        // Данные для создания invoice
+        const invoiceRequest = {
+            caseIndex: currentCasesIndex,
+            caseName: item.name,
+            starsPrice: item.starsPrice,
+            userId: userId
+        };
+        
+        // Отправляем запрос на создание invoice
+        const response = await fetch(INVOICE_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(invoiceRequest)
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok) {
+            // Invoice создан успешно
+            // Telegram автоматически покажет окно подтверждения оплаты
+            // После успешной оплаты обработаем через invoice_closed событие
+            console.log('Invoice создан успешно, ожидаем подтверждения оплаты...');
+        } else {
+            console.error('Ошибка при создании invoice:', result);
+            
+            // Fallback: прямой вызов Bot API (если нет сервера)
+            // ВНИМАНИЕ: Токен в клиентском коде - небезопасно, используйте только для тестирования!
+            if (result.error && result.error.includes('404') || result.error.includes('Not Found')) {
+                console.log('Пробуем прямой вызов Bot API...');
+                await createInvoiceDirectly(userId, item, currentCasesIndex);
+            } else {
+                alert('Ошибка при создании платежа: ' + (result.description || result.error || 'Неизвестная ошибка'));
+            }
+        }
+        
+    } catch (error) {
+        console.error('Ошибка при покупке:', error);
+        // Fallback: прямой вызов Bot API
+        try {
+            await createInvoiceDirectly(userId, item, currentCasesIndex);
+        } catch (fallbackError) {
+            console.error('Ошибка при fallback:', fallbackError);
+            alert('Ошибка при обработке платежа. Попробуйте еще раз.');
+        }
+    }
+}
+
+// Функция прямого создания invoice через Bot API (fallback, если нет сервера)
+async function createInvoiceDirectly(userId, item, caseIndex) {
+    // ВНИМАНИЕ: Токен в клиентском коде - небезопасно!
+    // Используйте только если нет возможности использовать сервер
+    const BOT_TOKEN = '8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU';
+    
+    const payload = JSON.stringify({
+        type: 'case_purchase',
+        caseIndex: caseIndex,
         caseName: item.name,
         starsPrice: item.starsPrice,
         timestamp: Date.now()
     });
     
-    // Открываем ссылку на бота с callback_data
-    // Бот должен обработать этот запрос и создать invoice для Telegram Stars
-    // ВАЖНО: Замените 'your_bot_username' на реальный username вашего бота (без @)
-    const botUsername = 'BookeGame_bot'; // Username бота (без @)
-    const botUrl = `https://t.me/${botUsername}?start=purchase_${encodeURIComponent(callbackData)}`;
+    const invoiceData = {
+        chat_id: userId,
+        title: `Покупка ${item.name}`,
+        description: `${item.name} за ${item.starsPrice} звезд Telegram`,
+        payload: payload,
+        provider_token: '',
+        currency: 'XTR',
+        prices: JSON.stringify([{
+            label: item.name,
+            amount: item.starsPrice
+        }])
+    };
     
-    if (webApp.openTelegramLink) {
-        webApp.openTelegramLink(botUrl);
-    } else if (webApp.openLink) {
-        webApp.openLink(botUrl);
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendInvoice`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(invoiceData)
+    });
+    
+    const result = await response.json();
+    
+    if (result.ok) {
+        console.log('Invoice создан успешно через прямой вызов');
     } else {
-        // Fallback: отправляем данные через sendData
-        webApp.sendData(callbackData);
+        throw new Error(result.description || 'Ошибка при создании invoice');
     }
 }
 
@@ -4018,19 +4092,54 @@ function initTelegramBotHandler() {
     // Обработчик для получения данных от бота через MainButton или другие события
     // Бот может отправлять данные через webApp.sendData или через callback_query
     
-    // Слушаем события от бота
+    // Слушаем события от бота - обработка успешной оплаты
     webApp.onEvent('invoice_closed', (event) => {
-        if (event.status === 'paid' && event.slug) {
-            // Платеж успешен - извлекаем данные из slug
+        console.log('Invoice closed event:', event);
+        
+        if (event.status === 'paid') {
+            // Платеж успешен - извлекаем данные из payload
             try {
-                const purchaseData = JSON.parse(decodeURIComponent(event.slug));
-                const item = casesItems[purchaseData.caseIndex || currentCasesIndex];
+                let purchaseData;
+                
+                // Пытаемся получить данные из разных источников
+                if (event.payload) {
+                    purchaseData = JSON.parse(event.payload);
+                } else if (event.slug) {
+                    purchaseData = JSON.parse(decodeURIComponent(event.slug));
+                } else {
+                    // Если нет данных в событии, используем текущий выбранный кейс
+                    const item = casesItems[currentCasesIndex];
+                    if (item) {
+                        handleSuccessfulCasePurchase(item);
+                        return;
+                    }
+                }
+                
+                const caseIndex = purchaseData.caseIndex !== undefined ? purchaseData.caseIndex : currentCasesIndex;
+                const item = casesItems[caseIndex];
+                
                 if (item) {
                     handleSuccessfulCasePurchase(item);
+                } else {
+                    console.error('Кейс не найден:', caseIndex);
+                    // Fallback: используем текущий кейс
+                    const fallbackItem = casesItems[currentCasesIndex];
+                    if (fallbackItem) {
+                        handleSuccessfulCasePurchase(fallbackItem);
+                    }
                 }
             } catch (error) {
                 console.error('Ошибка при обработке успешного платежа:', error);
+                // Fallback: открываем текущий выбранный кейс
+                const item = casesItems[currentCasesIndex];
+                if (item) {
+                    handleSuccessfulCasePurchase(item);
+                }
             }
+        } else if (event.status === 'cancelled') {
+            console.log('Платеж отменен пользователем');
+        } else if (event.status === 'failed') {
+            alert('Ошибка при оплате. Попробуйте еще раз.');
         }
     });
     

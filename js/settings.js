@@ -439,11 +439,7 @@ function updateAllTexts() {
         });
     }
     
-    // Обновляем названия товаров
-    try {
-        updateShopItems();
-    } catch (error) {
-    }
+    // Обновление названий товаров магазина удалено
     
     // Обновляем панели зданий
     try {
@@ -464,25 +460,9 @@ function updateAllTexts() {
     }
 }
 
-// Обновление товаров магазина
+// Обновление товаров магазина удалено
 function updateShopItems() {
-    // Сейфы
-    const safeNames = document.querySelectorAll('[data-section="safes"] .item-name');
-    if (safeNames.length > 0) {
-        safeNames[0].textContent = t('common_safe');
-    }
-    
-    // Монеты
-    const coinNames = document.querySelectorAll('[data-section="coins"] .item-name');
-    if (coinNames.length > 0) {
-        coinNames[0].textContent = t('coin_handful');
-    }
-    
-    // Наборы
-    const setNames = document.querySelectorAll('[data-section="sets"] .item-name');
-    if (setNames.length > 0) {
-        setNames[0].textContent = t('bloomi_set');
-    }
+    // Функция оставлена пустой для совместимости
 }
 
 // Обновление панелей зданий

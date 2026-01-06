@@ -98,3 +98,6 @@ window.posthogService.trackEarned(500, 'money', 'source_name');
 3. Проверьте, что скрипты PostHog загружаются (в Network вкладке DevTools)
 4. Убедитесь, что `window.posthogService.isReady()` возвращает `true`
 
+
+
+

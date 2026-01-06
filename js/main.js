@@ -3207,624 +3207,768 @@ safeAddEventListener('bottom-banner-close', 'click', () => {
 // === NAVIGATION ACTIVE STATE MANAGEMENT ===
 
 // === SHOP PANEL ===
-// Обработчики для новой панели магазина
+// Система переключения денег в первой ячейке
+let currentMoneyIndex = 0;
+const moneyItems = [
+    { name: 'Some money', image: 'assets/svg/shop/Some money.svg', amount: 20000, cost: 150, discount: 20 },
+    { name: 'Lots of money', image: 'assets/svg/shop/Lots of money.svg', amount: 40000, cost: 300, discount: 25 },
+    { name: 'Money Mountain', image: 'assets/svg/shop/Money Mountain.svg', amount: 80000, cost: 450, discount: 30 }
+];
+
+// Система переключения алмазов во второй ячейке
+let currentDiamondsIndex = 0;
+const diamondsItems = [
+    { name: 'A few diamonds', image: 'assets/svg/shop/A few diamonds.svg', amount: 100, cost: 60000, discount: 15 },
+    { name: 'Lots of diamonds', image: 'assets/svg/shop/Lots of diamonds.svg', amount: 250, cost: 120000, discount: 22 },
+    { name: 'Mountain of diamonds', image: 'assets/svg/shop/Mountain of diamonds.svg', amount: 500, cost: 195000, discount: 30 }
+];
+
 function initializeShop() {
-    // Предотвращаем повторную инициализацию
-    if (shopInitialized) {
-        return;
-    }
-    
-    try {
-        // Инициализация карточек товаров в магазине
-        initializeShopCards();
-        
-        // Инициализация сундуков
-        initializeChests();
-        
-        // Инициализация сейфов
-        initializeSafes();
-        
-        // Инициализация персонажей
-        initializeCharacters();
-        
-    } catch (error) {
-        console.error('Error in shop initialization:', error);
-        // Не позволяем ошибке влиять на работу игры
-    }
-}
-
-// Инициализация сундуков
-function initializeChests() {
-    // Устанавливаем начальный индекс
-    window.currentChestIndex = 0;
-    
-    // Обновляем отображение сундука
-    updateChestDisplay();
-    
-    // Добавляем обработчики событий для стрелок и кнопки покупки
-    const leftArrow = document.getElementById('chest-left-arrow');
-    const rightArrow = document.getElementById('chest-right-arrow');
-    const buyBtn = document.getElementById('buy-chest-btn');
+    // Инициализация системы переключения денег
+    const leftArrow = document.getElementById('shop-money-left-arrow');
+    const rightArrow = document.getElementById('shop-money-right-arrow');
+    const buyBtn = document.getElementById('shop-buy-btn');
     
     if (leftArrow) {
-        leftArrow.addEventListener('click', () => switchChest('prev'));
+        leftArrow.addEventListener('click', () => switchMoney('prev'));
     }
     
     if (rightArrow) {
-        rightArrow.addEventListener('click', () => switchChest('next'));
+        rightArrow.addEventListener('click', () => switchMoney('next'));
     }
     
     if (buyBtn) {
-        buyBtn.addEventListener('click', buyChest);
+        buyBtn.addEventListener('click', buyMoney);
     }
     
-
+    // Инициализация системы переключения алмазов
+    const diamondsLeftArrow = document.getElementById('shop-diamonds-left-arrow');
+    const diamondsRightArrow = document.getElementById('shop-diamonds-right-arrow');
+    const buyDiamondsBtn = document.getElementById('shop-buy-diamonds-btn');
+    
+    if (diamondsLeftArrow) {
+        diamondsLeftArrow.addEventListener('click', () => switchDiamonds('prev'));
+    }
+    
+    if (diamondsRightArrow) {
+        diamondsRightArrow.addEventListener('click', () => switchDiamonds('next'));
+    }
+    
+    if (buyDiamondsBtn) {
+        buyDiamondsBtn.addEventListener('click', buyDiamonds);
+    }
+    
+    // Устанавливаем начальные изображения
+    updateMoneyDisplay();
+    updateDiamondsDisplay();
 }
 
-// Покупка сундука
-function buyChest() {
-    const items = getShopItems('coins');
-    const currentIndex = window.currentChestIndex || 0;
-    const item = items[currentIndex];
+function switchMoney(direction) {
+    if (direction === 'next') {
+        currentMoneyIndex = (currentMoneyIndex + 1) % moneyItems.length;
+    } else {
+        currentMoneyIndex = (currentMoneyIndex - 1 + moneyItems.length) % moneyItems.length;
+    }
     
+    updateMoneyDisplay();
+}
+
+function updateMoneyDisplay() {
+    const moneyImage = document.getElementById('shop-money-image');
+    const moneyAmount = document.getElementById('shop-money-amount');
+    
+    if (moneyImage && moneyItems[currentMoneyIndex]) {
+        moneyImage.style.opacity = '0';
+        if (moneyAmount) moneyAmount.style.opacity = '0';
+        
+        setTimeout(() => {
+            const item = moneyItems[currentMoneyIndex];
+            
+            moneyImage.src = item.image;
+            moneyImage.alt = item.name;
+            
+            // Делаем Money Mountain немного больше, но не слишком
+            if (currentMoneyIndex === 2) { // Money Mountain - третий элемент (индекс 2)
+                moneyImage.style.maxWidth = '90%';
+                moneyImage.style.maxHeight = '130px';
+            } else {
+                moneyImage.style.maxWidth = '90%';
+                moneyImage.style.maxHeight = '120px';
+            }
+            
+            // Сдвигаем все изображения выше
+            moneyImage.style.marginTop = '-15px';
+            
+            // Обновляем количество
+            if (moneyAmount && item.amount) {
+                moneyAmount.textContent = item.amount.toLocaleString('ru-RU');
+            }
+            
+            // Обновляем цену на кнопке
+            const buyPrice = document.getElementById('shop-buy-price');
+            if (buyPrice && item.cost) {
+                buyPrice.textContent = item.cost;
+            }
+            
+            // Обновляем значение выгоды
+            const discountValue = document.getElementById('shop-discount-value');
+            if (discountValue && item.discount) {
+                discountValue.textContent = item.discount + '%';
+            }
+            
+            moneyImage.style.opacity = '1';
+            if (moneyAmount) moneyAmount.style.opacity = '1';
+        }, 150);
+    }
+}
+
+function buyMoney() {
+    const item = moneyItems[currentMoneyIndex];
     if (!item) return;
     
-    // Проверяем баланс в зависимости от типа валюты
-    if (item.isRBC) {
-        // Для RBC (Дипломат монет)
-        if (getCredits() < item.cost) {
+    const currentCredits = getCredits();
+    
+    // Проверяем баланс RBC
+    if (currentCredits < item.cost) {
             alert('Недостаточно RBC!');
             return;
         }
-        setCredits(getCredits() - item.cost);
-        setCredits(getCredits() + item.coins);
-        
-        // Отслеживание покупки в PostHog
-        if (window.posthogService && window.posthogService.isReady()) {
-            window.posthogService.trackPurchase('chest', item.name || 'Chest', item.cost, 'credits', {
-                reward_credits: item.coins,
-                chest_type: 'coins'
-            });
-            window.posthogService.trackRewardOpened('chest', { credits: item.coins });
-        }
-        
-        // Показываем панель наград
-        showRewardPanel('chests', {
-            credits: item.coins
+    
+    // Списываем RBC
+    setCredits(currentCredits - item.cost);
+    
+    // Закрываем панель
+    hidePanelWithAnimation('shop-panel', () => {
+        // Запускаем анимацию полета денег из центра экрана
+        // Пополнение баланса произойдет после завершения анимации
+        animateShopMoneyCollection(item.amount, () => {
+            // Начисляем деньги после завершения анимации
+            const currentBalance = getBalance();
+            setBalance(currentBalance + item.amount);
         });
-    } else {
-        // Для обычных денег
-        if (getBalance() < item.cost) {
-            alert('Недостаточно денег!');
-            return;
-        }
-        setBalance(getBalance() - item.cost);
-        setCredits(getCredits() + item.coins);
-        
-        // Отслеживание покупки в PostHog
-        if (window.posthogService && window.posthogService.isReady()) {
-            window.posthogService.trackPurchase('chest', item.name || 'Chest', item.cost, 'money', {
-                reward_credits: item.coins,
-                chest_type: 'coins'
-            });
-            window.posthogService.trackRewardOpened('chest', { credits: item.coins });
-        }
-        
-        // Показываем панель наград
-        showRewardPanel('chests', {
-            credits: item.coins
-        });
-    }
-    
-    // Обновляем отображение баланса в магазине
-    updateShopBalance();
-    
-
+    });
 }
 
-// Обновление баланса в магазине
-function updateShopBalance() {
-    const shopCoins = document.getElementById('shop-coins');
-    if (shopCoins) {
-        shopCoins.textContent = getCredits();
-    }
-}
-
-// Инициализация сейфов
-function initializeSafes() {
-    // Устанавливаем начальный индекс
-    window.currentSafeIndex = 0;
-    
-    // Обновляем отображение сейфа
-    updateSafeDisplay();
-    
-    // Добавляем обработчики событий для стрелок и кнопки покупки
-    const leftArrow = document.getElementById('safe-left-arrow');
-    const rightArrow = document.getElementById('safe-right-arrow');
-    const buyBtn = document.getElementById('buy-safe-btn');
-    
-    if (leftArrow) {
-        leftArrow.addEventListener('click', () => switchSafe('prev'));
-    }
-    
-    if (rightArrow) {
-        rightArrow.addEventListener('click', () => switchSafe('next'));
-    }
-    
-    if (buyBtn) {
-        buyBtn.addEventListener('click', buySafe);
-    }
-    
-
-}
-
-// Переключение между сейфами
-function switchSafe(direction) {
-    const items = getShopItems('safes');
-    let newIndex = window.currentSafeIndex;
-    
+// Функции для алмазов
+function switchDiamonds(direction) {
     if (direction === 'next') {
-        newIndex = (newIndex + 1) % items.length;
+        currentDiamondsIndex = (currentDiamondsIndex + 1) % diamondsItems.length;
     } else {
-        newIndex = (newIndex - 1 + items.length) % items.length;
+        currentDiamondsIndex = (currentDiamondsIndex - 1 + diamondsItems.length) % diamondsItems.length;
     }
     
-    window.currentSafeIndex = newIndex;
-    
-    // Обновляем отображение без задержки
-    updateSafeDisplay();
-    
-
+    updateDiamondsDisplay();
 }
 
-// Обновление отображения сейфа
-function updateSafeDisplay() {
-    const items = getShopItems('safes');
-    const currentIndex = window.currentSafeIndex || 0;
-    const item = items[currentIndex];
+function updateDiamondsDisplay() {
+    const diamondsImage = document.getElementById('shop-diamonds-image');
+    const diamondsAmount = document.getElementById('shop-diamonds-amount');
     
-    if (!item) return;
-    
-    // Обновляем только картинку с плавным переходом
-    const safeImage = document.getElementById('safe-image');
-    if (safeImage) {
-        // Проверяем, есть ли изображение в кеше
-        const cachedImage = window.shopImagesCache && window.shopImagesCache[item.image];
+    if (diamondsImage && diamondsItems[currentDiamondsIndex]) {
+        diamondsImage.style.opacity = '0';
+        if (diamondsAmount) diamondsAmount.style.opacity = '0';
         
-        // Если изображение в кеше, используем его сразу (уже загружено)
-        if (cachedImage && cachedImage.complete) {
-            safeImage.src = item.image;
-            safeImage.alt = item.name;
-            safeImage.style.opacity = '1';
-            safeImage.style.transform = 'scale(1)';
-        } else {
-            // Если нет в кеше, используем небольшую задержку для анимации
-            safeImage.style.opacity = '0';
-            safeImage.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+            const item = diamondsItems[currentDiamondsIndex];
             
-            // Используем requestAnimationFrame для мгновенного обновления
-            requestAnimationFrame(() => {
-                safeImage.src = item.image;
-                safeImage.alt = item.name;
-                safeImage.style.opacity = '1';
-                safeImage.style.transform = 'scale(1)';
-            });
-        }
-    }
-}
-
-// Покупка сейфа
-function buySafe() {
-    const items = getShopItems('safes');
-    const currentIndex = window.currentSafeIndex || 0;
-    const item = items[currentIndex];
-    
-    if (!item) return;
-    
-    // Проверяем баланс в зависимости от типа валюты
-    if (item.isRBC) {
-        // Для RBC (Гигантский сейф)
-        if (getCredits() < item.cost) {
-            alert('Недостаточно RBC!');
-            return;
-        }
-        setCredits(getCredits() - item.cost);
-        
-        // Генерируем награды
-        const moneyReward = randRange([15000, 30000]);
-        const creditReward = randRange([75, 150]);
-        
-        // Добавляем награды
-        setBalance(getBalance() + moneyReward);
-        setCredits(getCredits() + creditReward);
-        addXP(10);
-        
-        // Отслеживание покупки в PostHog
-        if (window.posthogService && window.posthogService.isReady()) {
-            window.posthogService.trackPurchase('safe', item.name || 'Safe', item.cost, 'credits', {
-                reward_money: moneyReward,
-                reward_credits: creditReward,
-                reward_xp: 10
-            });
-            window.posthogService.trackRewardOpened('safe', {
-                money: moneyReward,
-                credits: creditReward,
-                xp: 10
-            });
-        }
-        
-        // Показываем панель наград
-        showRewardPanel('safes', {
-            money: moneyReward,
-            credits: creditReward,
-            xp: 10
-        });
-    } else {
-        // Для обычных денег
-        if (getBalance() < item.cost) {
-            alert('Недостаточно денег!');
-            return;
-        }
-        setBalance(getBalance() - item.cost);
-        
-        // Генерируем награды
-        const moneyReward = randRange([15000, 30000]);
-        const creditReward = randRange([75, 150]);
-        
-        // Добавляем награды
-        setBalance(getBalance() + moneyReward);
-        setCredits(getCredits() + creditReward);
-        addXP(10);
-        
-        // Отслеживание покупки в PostHog
-        if (window.posthogService && window.posthogService.isReady()) {
-            window.posthogService.trackPurchase('safe', item.name || 'Safe', item.cost, 'money', {
-                reward_money: moneyReward,
-                reward_credits: creditReward,
-                reward_xp: 10
-            });
-            window.posthogService.trackRewardOpened('safe', {
-                money: moneyReward,
-                credits: creditReward,
-                xp: 10
-            });
-        }
-        
-        // Показываем панель наград
-        showRewardPanel('safes', {
-            money: moneyReward,
-            credits: creditReward,
-            xp: 10
-        });
-    }
-    
-
-}
-
-// Инициализация персонажей
-function initializeCharacters() {
-    // Устанавливаем начальный индекс
-    window.currentCharacterIndex = 0;
-    
-    // Обновляем отображение персонажа
-    updateCharacterDisplay();
-    
-    // Добавляем обработчики событий для стрелок и кнопки покупки
-    const leftArrow = document.getElementById('character-left-arrow');
-    const rightArrow = document.getElementById('character-right-arrow');
-    const buyBtn = document.getElementById('buy-character-btn');
-    
-    if (leftArrow) {
-        leftArrow.addEventListener('click', () => switchCharacter('prev'));
-    }
-    
-    if (rightArrow) {
-        rightArrow.addEventListener('click', () => switchCharacter('next'));
-    }
-    
-    if (buyBtn) {
-        buyBtn.addEventListener('click', buyCharacter);
-    }
-    
-
-}
-
-// Переключение между персонажами
-function switchCharacter(direction) {
-    const items = getShopItems('sets');
-    let newIndex = window.currentCharacterIndex;
-    
-    if (direction === 'next') {
-        newIndex = (newIndex + 1) % items.length;
-    } else {
-        newIndex = (newIndex - 1 + items.length) % items.length;
-    }
-    
-    window.currentCharacterIndex = newIndex;
-    
-    // Обновляем отображение без задержки
-    updateCharacterDisplay();
-    
-
-}
-
-// Обновление отображения персонажа
-function updateCharacterDisplay() {
-    const items = getShopItems('sets');
-    const currentIndex = window.currentCharacterIndex || 0;
-    const item = items[currentIndex];
-    
-    if (!item) return;
-    
-    // Обновляем только картинку с плавным переходом
-    const characterImage = document.getElementById('character-image');
-    if (characterImage) {
-        // Проверяем, есть ли изображение в кеше
-        const cachedImage = window.shopImagesCache && window.shopImagesCache[item.image];
-        
-        // Если изображение в кеше, используем его сразу (уже загружено)
-        if (cachedImage && cachedImage.complete) {
-            characterImage.src = item.image;
-            characterImage.alt = item.name;
-            characterImage.style.opacity = '1';
-            characterImage.style.transform = 'scale(1)';
-        } else {
-            // Если нет в кеше, используем небольшую задержку для анимации
-            characterImage.style.opacity = '0';
-            characterImage.style.transform = 'scale(0.9)';
+            diamondsImage.src = item.image;
+            diamondsImage.alt = item.name;
             
-            // Используем requestAnimationFrame для мгновенного обновления
-            requestAnimationFrame(() => {
-                characterImage.src = item.image;
-                characterImage.alt = item.name;
-                characterImage.style.opacity = '1';
-                characterImage.style.transform = 'scale(1)';
-            });
-        }
+            // Делаем Mountain of diamonds немного больше
+            if (currentDiamondsIndex === 2) {
+                diamondsImage.style.maxWidth = '100%';
+                diamondsImage.style.maxHeight = '160px';
+            } else {
+                diamondsImage.style.maxWidth = '100%';
+                diamondsImage.style.maxHeight = '150px';
+            }
+            
+            diamondsImage.style.marginTop = '-15px';
+            
+            // Обновляем количество
+            if (diamondsAmount && item.amount) {
+                diamondsAmount.textContent = item.amount.toLocaleString('ru-RU');
+            }
+            
+            // Обновляем цену на кнопке
+            const buyPrice = document.getElementById('shop-diamonds-price');
+            if (buyPrice && item.cost) {
+                buyPrice.textContent = item.cost.toLocaleString('ru-RU');
+            }
+            
+            // Обновляем значение выгоды
+            const discountValue = document.getElementById('shop-diamonds-discount-value');
+            if (discountValue && item.discount) {
+                discountValue.textContent = item.discount + '%';
+            }
+            
+            diamondsImage.style.opacity = '1';
+            if (diamondsAmount) diamondsAmount.style.opacity = '1';
+        }, 150);
     }
 }
 
-// Покупка персонажа
-function buyCharacter() {
-    const items = getShopItems('sets');
-    const currentIndex = window.currentCharacterIndex || 0;
-    const item = items[currentIndex];
-    
+function buyDiamonds() {
+    const item = diamondsItems[currentDiamondsIndex];
     if (!item) return;
+    
+    const currentBalance = getBalance();
     
     // Проверяем баланс денег
-    if (getBalance() < item.cost) {
+    if (currentBalance < item.cost) {
         alert('Недостаточно денег!');
         return;
     }
     
     // Списываем деньги
-    setBalance(getBalance() - item.cost);
+    setBalance(currentBalance - item.cost);
     
-    // Даем награды в зависимости от редкости
-    const baseReward = item.cost * (1 + item.rarity * 0.5);
-    const rewards = Math.floor(baseReward + Math.random() * baseReward * 0.5);
-    setBalance(getBalance() + rewards);
-    
-    // Начисляем XP за покупку набора (зависит от редкости)
-    const setXP = item.rarity * 5; // 5 XP за каждую звезду редкости
-    addXP(setXP);
-    
-    // Отслеживание покупки в PostHog
-    if (window.posthogService && window.posthogService.isReady()) {
-        window.posthogService.trackPurchase('character', item.name || 'Character Set', item.cost, 'money', {
-            reward_money: rewards,
-            reward_xp: setXP,
-            rarity: item.rarity || 0,
-            character: item.character || null
+    // Закрываем панель
+    hidePanelWithAnimation('shop-panel', () => {
+        // Запускаем анимацию полета RBC из центра экрана
+        // Пополнение RBC произойдет после завершения анимации
+        animateShopRBCCollection(item.amount, () => {
+            // Начисляем RBC после завершения анимации
+            const currentCredits = getCredits();
+            setCredits(currentCredits + item.amount);
         });
-        window.posthogService.trackRewardOpened('character', {
-            money: rewards,
-            xp: setXP
-        });
+    });
+}
+
+function animateShopRBCCollection(amount, callback) {
+    // Центр экрана
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight / 2;
+    
+    // Получаем координаты SVG RBC в левой панели (аналогично логике для денег)
+    function getRBCTargetPoint() {
+        // Основной путь — info-panel
+        const infoPanel = document.getElementById('info-panel');
+        if (infoPanel) {
+            // Ищем SVG-иконку RBC в указанном порядке приоритета
+            let rbcIcon = null;
+            
+            // 1. img[src*="rbc-icon.svg"] — приоритет
+            rbcIcon = infoPanel.querySelector('img[src*="rbc-icon.svg"]');
+            
+            // 2. .rbc-bg img.info-icon
+            if (!rbcIcon) {
+                rbcIcon = infoPanel.querySelector('.rbc-bg img.info-icon');
+            }
+            
+            // 3. .rbc-bg img
+            if (!rbcIcon) {
+                rbcIcon = infoPanel.querySelector('.rbc-bg img');
+            }
+            
+            // 4. img[src*="rbc"]
+            if (!rbcIcon) {
+                rbcIcon = infoPanel.querySelector('img[src*="rbc"]');
+            }
+            
+            // 5. img.info-icon внутри rbc-cell
+            if (!rbcIcon) {
+                const rbcCell = document.getElementById('rbc-cell');
+                if (rbcCell) {
+                    rbcIcon = rbcCell.querySelector('img.info-icon');
+                }
+            }
+            
+            // Если иконка найдена и видима, используем центр её getBoundingClientRect()
+            if (rbcIcon && rbcIcon.offsetParent !== null) {
+                const iconRect = rbcIcon.getBoundingClientRect();
+                if (iconRect.width > 0 && iconRect.height > 0) {
+                    return {
+                        x: iconRect.left + iconRect.width / 2 - 15, // Смещаем левее
+                        y: iconRect.top + iconRect.height / 2
+                    };
+                }
+            }
+            
+            // Fallback 2 — ячейка .rbc-bg
+            const rbcBg = infoPanel.querySelector('.rbc-bg');
+            if (rbcBg && rbcBg.offsetParent !== null) {
+                const rbcRect = rbcBg.getBoundingClientRect();
+                const isMobile = window.innerWidth <= 768;
+                const iconSize = isMobile ? 24 : 24;
+                return {
+                    x: rbcRect.left + iconSize / 2 + (isMobile ? 8 : 10) - 15, // Смещаем левее
+                    y: rbcRect.top + rbcRect.height / 2
+                };
+            }
+            
+            // Fallback 3 — rbc-cell напрямую
+            const rbcCell = document.getElementById('rbc-cell');
+            if (rbcCell && rbcCell.offsetParent !== null) {
+                const cellRect = rbcCell.getBoundingClientRect();
+                // Ищем иконку внутри ячейки
+                const icon = rbcCell.querySelector('img[src*="rbc-icon.svg"]');
+                if (icon) {
+                    const iconRect = icon.getBoundingClientRect();
+                    if (iconRect.width > 0 && iconRect.height > 0) {
+                        return {
+                            x: iconRect.left + iconRect.width / 2 - 15, // Смещаем левее
+                            y: iconRect.top + iconRect.height / 2
+                        };
+                    }
+                }
+                // Если иконка не найдена, используем центр ячейки
+                return {
+                    x: cellRect.left + cellRect.width / 2 - 15, // Смещаем левее
+                    y: cellRect.top + cellRect.height / 2
+                };
+            }
+            
+            // Fallback 4 — позиция панели
+            const infoRect = infoPanel.getBoundingClientRect();
+            const isMobile = window.innerWidth <= 768;
+            return {
+                x: infoRect.left + (isMobile ? 25 : 30) - 15, // Смещаем левее
+                y: infoRect.top + 50
+            };
+        }
+        
+        // Последний fallback
+        return { x: window.innerWidth - 100, y: 50 };
     }
     
-    // Показываем панель наград
-    showRewardPanel('characters', {
-        money: rewards,
-        xp: setXP
+    const targetPoint = getRBCTargetPoint();
+    const endX = targetPoint.x;
+    const endY = targetPoint.y;
+    
+    // Количество RBC иконок (как в анимации сбора дохода + 15)
+    const rbcCount = Math.min(Math.max(Math.floor(amount / 500), 10), 25) + 15;
+    const spreadDuration = 600;
+    const pauseDuration = 300;
+    const collectDuration = 1200;
+    
+    // Создаем контейнер для всех RBC
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    
+    // Создаем центральный SVG алмазов с подсветкой и черным контуром
+    const centerDiamonds = document.createElement('img');
+    centerDiamonds.src = diamondsItems[currentDiamondsIndex].image;
+    centerDiamonds.style.position = 'fixed';
+    centerDiamonds.style.width = '100px';
+    centerDiamonds.style.height = '100px';
+    centerDiamonds.style.left = startX + 'px';
+    centerDiamonds.style.top = startY + 'px';
+    centerDiamonds.style.transform = 'translate(-50%, -50%)';
+    centerDiamonds.style.objectFit = 'contain';
+    centerDiamonds.style.opacity = '0';
+    centerDiamonds.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    centerDiamonds.style.zIndex = '10000';
+    centerDiamonds.style.filter = 'drop-shadow(0 0 15px rgba(255,255,255,0.8)) drop-shadow(0 0 2px rgba(0,0,0,1)) drop-shadow(0 0 0px rgba(0,0,0,0.9))';
+    container.appendChild(centerDiamonds);
+    
+    // Показываем центральный SVG
+    requestAnimationFrame(() => {
+        centerDiamonds.style.opacity = '1';
+        centerDiamonds.style.transform = 'translate(-50%, -50%) scale(1.2)';
     });
     
-    // Проверяем, был ли куплен диван (если это набор с диваном)
-    if (item.character && item.character.toLowerCase().includes('диван') && window.onSofaBought) {
-        window.onSofaBought();
-    }
-}
-
-// Переключение между сундуками
-function switchChest(direction) {
-    const items = getShopItems('coins');
-    let newIndex = window.currentChestIndex;
+    let completedCount = 0;
     
-    if (direction === 'next') {
-        newIndex = (newIndex + 1) % items.length;
-    } else {
-        newIndex = (newIndex - 1 + items.length) % items.length;
-    }
-    
-    window.currentChestIndex = newIndex;
-    
-    // Обновляем отображение без задержки
-    updateChestDisplay();
-    
-
-}
-
-// Обновление отображения сундука
-function updateChestDisplay() {
-    const items = getShopItems('coins');
-    const currentIndex = window.currentChestIndex || 0;
-    const item = items[currentIndex];
-    
-    if (!item) return;
-    
-    // Обновляем только картинку с плавным переходом
-    const chestImage = document.getElementById('chest-image');
-    if (chestImage) {
-        // Проверяем, есть ли изображение в кеше
-        const cachedImage = window.shopImagesCache && window.shopImagesCache[item.image];
+    // Создаем RBC иконки (аналогично анимации сбора дохода)
+    for (let i = 0; i < rbcCount; i++) {
+        const rbcIcon = document.createElement('img');
+        rbcIcon.src = 'assets/svg/rbc-icon.svg';
+        rbcIcon.style.position = 'fixed';
+        rbcIcon.style.width = '32px';
+        rbcIcon.style.height = '32px';
+        rbcIcon.style.left = startX + 'px';
+        rbcIcon.style.top = startY + 'px';
+        rbcIcon.style.transform = 'translate(-50%, -50%)';
+        rbcIcon.style.opacity = '0';
+        rbcIcon.style.transition = 'opacity 0.2s ease';
+        rbcIcon.style.zIndex = '10000';
+        container.appendChild(rbcIcon);
         
-        // Если изображение в кеше, используем его сразу (уже загружено)
-        if (cachedImage && cachedImage.complete) {
-            chestImage.src = item.image;
-            chestImage.alt = item.name;
-            chestImage.style.opacity = '1';
-            chestImage.style.transform = 'scale(1)';
-        } else {
-            // Если нет в кеше, используем небольшую задержку для анимации
-            chestImage.style.opacity = '0';
-            chestImage.style.transform = 'scale(0.9)';
+        // Показываем иконку
+        requestAnimationFrame(() => {
+            rbcIcon.style.opacity = '1';
+        });
+        
+        // Угол разлёта для каждой иконки (равномерно по кругу с небольшим рандомом)
+        const baseAngle = (Math.PI * 2 * i) / rbcCount;
+        const spreadAngle = baseAngle + (Math.random() - 0.5) * 0.6;
+        const spreadRadius = 60 + Math.random() * 40;
+        
+        // Конечная точка разлёта
+        const spreadEndX = startX + Math.cos(spreadAngle) * spreadRadius;
+        const spreadEndY = startY + Math.sin(spreadAngle) * spreadRadius;
+        
+        // Случайная задержка для асинхронности
+        const delay = Math.random() * 300;
+        
+        const iconSpreadDuration = spreadDuration * (0.85 + Math.random() * 0.5);
+        const iconPauseDuration = pauseDuration * (0.7 + Math.random() * 0.6);
+        const iconCollectDuration = collectDuration * (0.85 + Math.random() * 0.5);
+        const iconTotalDuration = iconSpreadDuration + iconPauseDuration + iconCollectDuration;
+        
+        setTimeout(() => {
+            const startTime = performance.now();
             
-            // Используем requestAnimationFrame для мгновенного обновления
-            requestAnimationFrame(() => {
-                chestImage.src = item.image;
-                chestImage.alt = item.name;
-                chestImage.style.opacity = '1';
-                chestImage.style.transform = 'scale(1)';
-            });
+            // Инициализируем целевую точку
+            let targetPoint = getRBCTargetPoint();
+            let endX = targetPoint.x;
+            let endY = targetPoint.y;
+            
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const spreadProgress = Math.min(elapsed / iconSpreadDuration, 1);
+                const pauseStart = iconSpreadDuration;
+                const collectStart = iconSpreadDuration + iconPauseDuration;
+                const totalProgress = Math.min(elapsed / iconTotalDuration, 1);
+                
+                // Пересчитываем позицию в начале анимации (когда progress < 0.1)
+                if (spreadProgress < 0.1) {
+                    targetPoint = getRBCTargetPoint();
+                    endX = targetPoint.x;
+                    endY = targetPoint.y;
+                }
+                
+                if (spreadProgress < 1) {
+                    // ФАЗА 1: Разлёт из центра
+                    const easeSpread = 1 - Math.pow(1 - spreadProgress, 2); // Ease out
+                    const currentX = startX + (spreadEndX - startX) * easeSpread;
+                    const currentY = startY + (spreadEndY - startY) * easeSpread;
+                    
+                    rbcIcon.style.left = currentX + 'px';
+                    rbcIcon.style.top = currentY + 'px';
+                    
+                    // Вращение при разлёте
+                    const rotation = spreadProgress * 360;
+                    rbcIcon.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+                    
+                    requestAnimationFrame(animate);
+                } else if (elapsed < collectStart) {
+                    // ПАУЗА: RBC остаются на месте разлёта
+                    rbcIcon.style.left = spreadEndX + 'px';
+                    rbcIcon.style.top = spreadEndY + 'px';
+                    rbcIcon.style.transform = `translate(-50%, -50%) rotate(360deg)`;
+                    
+                    requestAnimationFrame(animate);
+                } else if (totalProgress < 1) {
+                    // ФАЗА 2: Полёт к панели RBC
+                    const collectElapsed = elapsed - collectStart;
+                    const collectProgress = Math.min(collectElapsed / iconCollectDuration, 1);
+                    const easeCollect = 1 - Math.pow(1 - collectProgress, 3); // Ease out cubic
+                    
+                    // Текущая позиция (от точки разлёта к панели)
+                    const currentX = spreadEndX + (endX - spreadEndX) * easeCollect;
+                    const currentY = spreadEndY + (endY - spreadEndY) * easeCollect;
+                    
+                    rbcIcon.style.left = currentX + 'px';
+                    rbcIcon.style.top = currentY + 'px';
+                    
+                    // Вращение и уменьшение при полёте
+                    const rotation = 360 + collectProgress * 240;
+                    const scale = 1.0 - collectProgress * 0.6;
+                    rbcIcon.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`;
+                    
+                    requestAnimationFrame(animate);
+                } else {
+                    // Анимация исчезновения при достижении цели
+                    rbcIcon.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
+                    rbcIcon.style.opacity = '0';
+                    rbcIcon.style.transform = `translate(-50%, -50%) scale(0.1)`;
+                    
+                    setTimeout(() => {
+                        rbcIcon.remove();
+                        completedCount++;
+                        // Удаляем контейнер и вызываем callback, когда все иконки завершились
+                        if (completedCount >= rbcCount) {
+                            // Скрываем центральный SVG
+                            centerDiamonds.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                            centerDiamonds.style.opacity = '0';
+                            centerDiamonds.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                            
+                            setTimeout(() => {
+                                if (container.parentNode) {
+                                    container.remove();
+                                }
+                                if (callback) callback();
+                            }, 300);
+                        }
+                    }, 100);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }, delay);
+    }
+    
+    // Скрываем центральный SVG после задержки (когда частицы начинают собираться)
+    setTimeout(() => {
+        centerDiamonds.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        centerDiamonds.style.opacity = '0';
+        centerDiamonds.style.transform = 'translate(-50%, -50%) scale(0.8)';
+    }, spreadDuration + pauseDuration + collectDuration * 0.3);
+}
+
+function animateShopMoneyCollection(amount, callback) {
+    // Центр экрана
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight / 2;
+    
+    // Получаем правильные координаты панели денег (используем ту же логику, что и в анимации сбора прибыли)
+    function getShopMoneyTargetPoint() {
+        // Основной путь — info-panel
+        const infoPanel = document.getElementById('info-panel');
+        if (infoPanel) {
+            // Ищем SVG-иконку денег в указанном порядке приоритета
+            let moneyIcon = null;
+            
+            // 1. img[src*="bc-icon.svg"] — приоритет
+            moneyIcon = infoPanel.querySelector('img[src*="bc-icon.svg"]');
+            
+            // 2. .bc-bg img.info-icon
+            if (!moneyIcon) {
+                moneyIcon = infoPanel.querySelector('.bc-bg img.info-icon');
+            }
+            
+            // 3. .bc-bg img
+            if (!moneyIcon) {
+                moneyIcon = infoPanel.querySelector('.bc-bg img');
+            }
+            
+            // 4. img[src*="money"]
+            if (!moneyIcon) {
+                moneyIcon = infoPanel.querySelector('img[src*="money"]');
+            }
+            
+            // 5. img.info-icon
+            if (!moneyIcon) {
+                moneyIcon = infoPanel.querySelector('img.info-icon');
+            }
+            
+            // Если иконка найдена и видима, используем центр её getBoundingClientRect()
+            if (moneyIcon && moneyIcon.offsetParent !== null) {
+                const iconRect = moneyIcon.getBoundingClientRect();
+                if (iconRect.width > 0 && iconRect.height > 0) {
+                    return {
+                        x: iconRect.left + iconRect.width / 2,
+                        y: iconRect.top + iconRect.height / 2
+                    };
+                }
+            }
+            
+            // Fallback 2 — ячейка .bc-bg
+            const bcBg = infoPanel.querySelector('.bc-bg');
+            if (bcBg && bcBg.offsetParent !== null) {
+                const bcRect = bcBg.getBoundingClientRect();
+                const isMobile = window.innerWidth <= 768;
+                const iconSize = isMobile ? 20 : 24;
+                return {
+                    x: bcRect.left + iconSize / 2 + (isMobile ? 8 : 10),
+                    y: bcRect.top + bcRect.height / 2
+                };
+            }
+            
+            // Fallback 3 — позиция панели
+            const infoRect = infoPanel.getBoundingClientRect();
+            const isMobile = window.innerWidth <= 768;
+            return {
+                x: infoRect.left + (isMobile ? 25 : 30),
+                y: infoRect.top + 70
+            };
         }
+        
+        // Fallback — money-panel
+        const moneyPanel = document.getElementById('money-panel');
+        if (moneyPanel) {
+            const rect = moneyPanel.getBoundingClientRect();
+            return {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+            };
+        }
+        
+        // Последний fallback
+        return {
+            x: window.innerWidth - 100,
+            y: 50
+        };
     }
-}
-
-// Функция покупки убрана - используется только переключение картинок
-
-// Обработчики оставлены для совместимости, но не используются
-// так как все элементы уже есть в SVG панели
-function shopBuyHandler(event) {
-
-}
-
-function shopNavHandler(event) {
-
-}
-
-// Инициализация карточек товаров в магазине
-function initializeShopCards() {
-    // Функция оставлена для совместимости, но не создает карточки
-    // так как все элементы уже есть в SVG панели
-    // Изображения уже предзагружены при загрузке игры
-
-}
-
-// Функция навигации оставлена для совместимости
-function navigateShopItem(section, currentIndex, direction) {
-
-}
-
-// Получение списка товаров для секции
-function getShopItems(section) {
-    switch(section) {
-        case 'safes':
-            return [
-                { name: 'Простой сейф', cost: 30000, rarity: 1, type: 'simple', image: 'assets/svg/safes/safe-common.svg' },
-                { name: 'Огромный сейф', cost: 300000, rarity: 2, type: 'huge', image: 'assets/svg/safes/safe-gold.svg' },
-                { name: 'Гигантский сейф', cost: 300, rarity: 3, type: 'giant', image: 'assets/svg/safes/safe-mystic.svg', isRBC: true }
-            ];
-        case 'coins':
-            return [
-                { name: 'Чемоданчик монет', cost: 30000, rarity: 1, coins: 50, image: 'assets/svg/chests/chest-1.svg' },
-                { name: 'Кейс монет', cost: 300000, rarity: 3, coins: 100, image: 'assets/svg/chests/chest-2.svg' },
-                { name: 'Дипломат монет', cost: 300, rarity: 4, coins: 200, image: 'assets/svg/chests/chest-3.svg', isRBC: true }
-            ];
-        case 'sets':
-            return [
-                { name: 'Набор Гринни', cost: 500, rarity: 1, character: 'Гринни', image: 'assets/svg/characters/character-1.svg' },
-                { name: 'Набор Рэджи', cost: 1000, rarity: 2, character: 'Рэджи', image: 'assets/svg/characters/character-2.svg' },
-                { name: 'Набор Пёрпи', cost: 2000, rarity: 3, character: 'Пёрпи', image: 'assets/svg/characters/character-3.svg' }
-            ];
-        default:
-            return [];
-    }
-}
-
-// Обновление карточки товара оставлено для совместимости
-function updateShopCard(section, index) {
-
-}
-
-// Получение текста редкости
-function getRarityText(rarity) {
-    switch(rarity) {
-        case 1: return 'Обычные';
-        case 2: return 'Редкие';
-        case 3: return 'Уникальные';
-        case 4: return 'Эпические';
-        case 5: return 'Легендарные';
-        default: return 'Обычные';
-    }
-}
-
-function handleShopPurchase(itemType) {
-    const [section, type] = itemType.split('-');
-    const card = document.querySelector(`[data-section="${section}"]`);
-    const index = parseInt(card?.getAttribute('data-index') || '0');
-    const items = getShopItems(section);
-    const item = items[index];
     
-    if (!item) return;
+    const targetPoint = getShopMoneyTargetPoint();
     
-    switch(section) {
-        case 'safes':
-            // Проверяем баланс RBC для платных сейфов
-            if (item.cost > 0 && getCredits() < item.cost) {
-                alert('Недостаточно RBC');
-                return;
-            }
-            openCrate(item.type);
-            break;
-        case 'coins':
-            if(getBalance() < item.cost) {
-                alert('Недостаточно денег');
-                return;
-            }
-            setBalance(getBalance() - item.cost);
-            setCredits(getCredits() + item.coins);
+    const endX = targetPoint.x;
+    const endY = targetPoint.y;
+    
+    // Количество денежных иконок (как в анимации сбора прибыли)
+    const moneyCount = Math.min(Math.max(Math.floor(amount / 500), 10), 25);
+    const spreadDuration = 600; // Как в анимации сбора прибыли
+    const pauseDuration = 300; // Как в анимации сбора прибыли
+    const collectDuration = 1200; // Как в анимации сбора прибыли
+    
+    // Создаем контейнер для всех денег
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    
+    // Создаем центральный SVG денег с подсветкой и черным контуром
+    const centerMoney = document.createElement('img');
+    centerMoney.src = moneyItems[currentMoneyIndex].image;
+    centerMoney.style.position = 'fixed';
+    centerMoney.style.width = '100px';
+    centerMoney.style.height = '100px';
+    centerMoney.style.left = startX + 'px';
+    centerMoney.style.top = startY + 'px';
+    centerMoney.style.transform = 'translate(-50%, -50%)';
+    centerMoney.style.objectFit = 'contain';
+    centerMoney.style.opacity = '0';
+    centerMoney.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    centerMoney.style.zIndex = '10000';
+    // Оптимизированная подсветка и черный контур по форме SVG (не квадрат)
+    centerMoney.style.filter = 'drop-shadow(0 0 20px rgba(255,255,255,0.9)) drop-shadow(0 0 2px rgba(0,0,0,1)) drop-shadow(0 0 0px rgba(0,0,0,0.9))';
+    container.appendChild(centerMoney);
+    
+    // Показываем центральный SVG
+    requestAnimationFrame(() => {
+        centerMoney.style.opacity = '1';
+        centerMoney.style.transform = 'translate(-50%, -50%) scale(1.2)';
+    });
+    
+    let completedCount = 0;
+    
+    // Создаем денежные иконки
+    setTimeout(() => {
+        for (let i = 0; i < moneyCount; i++) {
+            const moneyIcon = document.createElement('img');
+            moneyIcon.src = 'assets/svg/money-icon.svg';
+            moneyIcon.style.position = 'fixed';
+            moneyIcon.style.width = '24px';
+            moneyIcon.style.height = '24px';
+            moneyIcon.style.left = startX + 'px';
+            moneyIcon.style.top = startY + 'px';
+            moneyIcon.style.transform = 'translate(-50%, -50%)';
+            moneyIcon.style.opacity = '0';
+            moneyIcon.style.transition = 'opacity 0.2s ease';
+            moneyIcon.style.zIndex = '10000';
+            container.appendChild(moneyIcon);
             
-            // Начисляем XP за покупку монет (зависит от редкости)
-            const coinXP = item.rarity * 2; // 2 XP за каждую звезду редкости
-            addXP(coinXP);
-            
-            // Показываем красивое уведомление о покупке монет
-            showPurchaseNotification('Монеты получены!', {
-                credits: item.coins,
-                xp: coinXP
-            }, 'coins');
-            break;
-        case 'sets':
-            if(getBalance() < item.cost) {
-                alert('Недостаточно денег');
-                return;
-            }
-            setBalance(getBalance() - item.cost);
-            // Даем награды в зависимости от редкости
-            const baseReward = item.cost * (1 + item.rarity * 0.5);
-            const rewards = Math.floor(baseReward + Math.random() * baseReward * 0.5);
-            setBalance(getBalance() + rewards);
-            
-            // Начисляем XP за покупку набора (зависит от редкости)
-            const setXP = item.rarity * 5; // 5 XP за каждую звезду редкости
-            addXP(setXP);
-            
-            // Показываем панель наград
-            showRewardPanel('characters', {
-                money: rewards,
-                xp: setXP
+            // Показываем иконку
+            requestAnimationFrame(() => {
+                moneyIcon.style.opacity = '1';
             });
             
-            // Проверяем, был ли куплен диван (если это набор с диваном)
-            if (item.character && item.character.toLowerCase().includes('диван') && window.onSofaBought) {
-                window.onSofaBought();
-            }
-            break;
-        default:
-
-    }
+            // Угол разлёта
+            const baseAngle = (Math.PI * 2 * i) / moneyCount;
+            const spreadAngle = baseAngle + (Math.random() - 0.5) * 0.6;
+            const spreadRadius = 80 + Math.random() * 60;
+            
+            const spreadEndX = startX + Math.cos(spreadAngle) * spreadRadius;
+            const spreadEndY = startY + Math.sin(spreadAngle) * spreadRadius;
+            
+            const delay = Math.random() * 200;
+            const iconSpreadDuration = spreadDuration * (0.85 + Math.random() * 0.5);
+            const iconPauseDuration = pauseDuration * (0.7 + Math.random() * 0.6);
+            const iconCollectDuration = collectDuration * (0.85 + Math.random() * 0.5);
+            const iconTotalDuration = iconSpreadDuration + iconPauseDuration + iconCollectDuration;
+            
+            setTimeout(() => {
+                const startTime = performance.now();
+                
+                function animate(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const spreadProgress = Math.min(elapsed / iconSpreadDuration, 1);
+                    const pauseStart = iconSpreadDuration;
+                    const collectStart = iconSpreadDuration + iconPauseDuration;
+                    const totalProgress = Math.min(elapsed / iconTotalDuration, 1);
+                    
+                    if (spreadProgress < 1) {
+                        const easeSpread = 1 - Math.pow(1 - spreadProgress, 2);
+                        const currentX = startX + (spreadEndX - startX) * easeSpread;
+                        const currentY = startY + (spreadEndY - startY) * easeSpread;
+                        
+                        moneyIcon.style.left = currentX + 'px';
+                        moneyIcon.style.top = currentY + 'px';
+                        
+                        const rotation = spreadProgress * 360;
+                        moneyIcon.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+                        
+                        requestAnimationFrame(animate);
+                    } else if (elapsed < collectStart) {
+                        moneyIcon.style.left = spreadEndX + 'px';
+                        moneyIcon.style.top = spreadEndY + 'px';
+                        moneyIcon.style.transform = `translate(-50%, -50%) rotate(360deg)`;
+                        
+                        requestAnimationFrame(animate);
+                    } else if (totalProgress < 1) {
+                        const collectElapsed = elapsed - collectStart;
+                        const collectProgress = Math.min(collectElapsed / iconCollectDuration, 1);
+                        const easeCollect = 1 - Math.pow(1 - collectProgress, 3);
+                        
+                        // Пересчитываем целевую точку во время полета (на случай, если панель переместилась)
+                        const currentTarget = getShopMoneyTargetPoint();
+                        const currentX = spreadEndX + (currentTarget.x - spreadEndX) * easeCollect;
+                        const currentY = spreadEndY + (currentTarget.y - spreadEndY) * easeCollect;
+                        
+                        moneyIcon.style.left = currentX + 'px';
+                        moneyIcon.style.top = currentY + 'px';
+                        
+                        const rotation = 360 + collectProgress * 240;
+                        const scale = 1.0 - collectProgress * 0.6;
+                        moneyIcon.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`;
+                        
+                        requestAnimationFrame(animate);
+        } else {
+                        moneyIcon.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
+                        moneyIcon.style.opacity = '0';
+                        moneyIcon.style.transform = `translate(-50%, -50%) scale(0.1)`;
+                        
+                        setTimeout(() => {
+                            moneyIcon.remove();
+                            completedCount++;
+                            
+                            if (completedCount >= moneyCount) {
+                                // Скрываем центральный SVG
+                                centerMoney.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                centerMoney.style.opacity = '0';
+                                centerMoney.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                                
+                                setTimeout(() => {
+                                    if (container.parentNode) {
+                                        container.remove();
+                                    }
+                                    // Вызываем callback после завершения анимации
+                                    if (callback) callback();
+                                }, 300);
+                            }
+                        }, 100);
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }, delay);
+        }
+        
+        // Скрываем центральный SVG после задержки (когда деньги начинают лететь)
+        setTimeout(() => {
+            centerMoney.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            centerMoney.style.opacity = '0';
+            centerMoney.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        }, spreadDuration + pauseDuration + 100);
+    }, 300);
 }
+
+// Все функции магазина удалены
 
 // Функция для обновления уровней сотрудников
 function updateEmployeeLevels() {
@@ -3951,6 +4095,15 @@ function showPanelWithAnimation(panelId) {
     // Устанавливаем глобальные переменные для отслеживания состояния панелей
     if (panelId === 'shop-panel') {
         window.isShopPanelOpen = true;
+        // Инициализируем магазин при открытии панели
+        if (!shopInitialized) {
+            try {
+                initializeShop();
+                shopInitialized = true;
+            } catch (error) {
+                console.error('Error initializing shop:', error);
+            }
+        }
     }
     if (panelId === 'characters-panel') {
         window.isCharactersPanelOpen = true;
@@ -4324,63 +4477,7 @@ function initializeSync() {
     }, 2000);
 }
 
-// Предварительная загрузка всех изображений товаров
-// Кеш для предзагруженных изображений магазина
-window.shopImagesCache = {};
-
-function preloadShopImages() {
-    return new Promise((resolve) => {
-        const allItems = [
-            ...getShopItems('safes'),
-            ...getShopItems('coins'),
-            ...getShopItems('sets')
-        ];
-        
-        if (allItems.length === 0) {
-            resolve();
-            return;
-        }
-        
-        let loadedCount = 0;
-        const totalImages = allItems.filter(item => item.image).length;
-        
-        if (totalImages === 0) {
-            resolve();
-            return;
-        }
-        
-        allItems.forEach(item => {
-            if (item.image) {
-                // Проверяем, не загружено ли уже это изображение
-                if (window.shopImagesCache[item.image]) {
-                    loadedCount++;
-                    if (loadedCount === totalImages) {
-                        resolve();
-                    }
-                    return;
-                }
-                
-                const img = new Image();
-                img.onload = () => {
-                    // Сохраняем загруженное изображение в кеше
-                    window.shopImagesCache[item.image] = img;
-                    loadedCount++;
-                    if (loadedCount === totalImages) {
-                        resolve();
-                    }
-                };
-                img.onerror = () => {
-                    // Даже при ошибке считаем загруженным, чтобы не блокировать
-                    loadedCount++;
-                    if (loadedCount === totalImages) {
-                        resolve();
-                    }
-                };
-                img.src = item.image;
-            }
-        });
-    });
-}
+// Функция предзагрузки изображений магазина удалена
 
 // Предварительная загрузка всех SVG персонажей и сотрудников
 function preloadCharacterImages() {
@@ -4819,30 +4916,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error during advent panel initialization:', error);
         }
         
-        // Предварительно загружаем изображения магазина и ждем их загрузки
-        // перед инициализацией магазина
-        preloadShopImages().then(() => {
-            // Инициализируем магазин после загрузки всех изображений
-            if (!shopInitialized) {
-                try {
-                    initializeShop();
-                    shopInitialized = true;
-                } catch (error) {
-                    console.error('Error during shop initialization:', error);
-                }
-            }
-        }).catch((error) => {
-            console.error('Error during shop images preloading:', error);
-            // Инициализируем магазин даже при ошибке загрузки
-            if (!shopInitialized) {
-                try {
-                    initializeShop();
-                    shopInitialized = true;
-                } catch (initError) {
-                    console.error('Error during shop initialization:', initError);
-                }
-            }
-        });
+        // Инициализация магазина удалена
         
         // Добавляем дополнительную защиту от повторной инициализации
         Object.defineProperty(window, 'gameInitialized', {

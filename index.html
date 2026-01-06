@@ -2131,66 +2131,150 @@
                 <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
                     <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">МАГАЗИН</h2>
                     <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Монеты и активы</h3>
-                    <p style="margin:0 0 20px;font-size:10.5px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
-                            </div>
-                
-
-                
-                <!-- Секция сундуков -->
-                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid rgba(255,255,255,0.1);">
-                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Сундуки с монетами</h3>
-                    
-                    <!-- Простое место для SVG сундука с навигацией -->
-                    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;position:relative;min-height:120px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;">
-                        <!-- SVG картинка сундука -->
-                        <img id="chest-image" src="assets/svg/chests/chest-1.svg" alt="Сундук" style="width:100%;height:100%;object-fit:contain;transition:all 0.2s ease-in-out;" onerror="this.style.display='none'">
-                        
-                        <!-- Прозрачная кнопка "Купить" поверх SVG -->
-                        <button id="buy-chest-btn" style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:180px;height:40px;background:transparent;border:none;cursor:pointer;z-index:10;" title="Купить"></button>
-                        
-                        <!-- Стрелки навигации -->
-                        <button id="chest-left-arrow" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
-                        <button id="chest-right-arrow" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
-                    </div>
+                    <p style="margin:0 0 20px;font-size:9px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
                 </div>
                 
-                <!-- Секция сейфов -->
-                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid rgba(255,255,255,0.1);">
-                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Монеты и активы</h3>
-                    
-                    <!-- Простое место для SVG сейфа с навигацией -->
-                    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;position:relative;min-height:120px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;">
-                        <!-- SVG картинка сейфа -->
-                        <img id="safe-image" src="assets/svg/safes/safe-common.svg" alt="Сейф" style="width:100%;height:100%;object-fit:contain;transition:all 0.2s ease-in-out;" onerror="this.style.display='none'">
+                <!-- Три ячейки (вертикально) -->
+                <div style="display:flex;flex-direction:column;gap:12px;width:100%;padding:0 4px;margin-bottom:12px;">
+                    <!-- Ячейка 1 с системой переключения -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">1</div>
+                        <!-- Ячейка выгоды в правом верхнем углу -->
+                        <div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,rgba(100,100,100,0.6) 0%,rgba(80,80,80,0.55) 100%);backdrop-filter:blur(8px);border-radius:12px;padding:4px 10px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,215,0,0.8);z-index:5;">
+                            <span style="color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;">Выгода</span>
+                            <span id="shop-discount-value" style="color:white;font-size:11px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;">20%</span>
+                        </div>
                         
-                        <!-- Прозрачная кнопка "Купить" поверх SVG -->
-                        <button id="buy-safe-btn" style="position:absolute;bottom:8%;left:50%;transform:translateX(-50%);width:180px;height:40px;background:transparent;border:none;cursor:pointer;z-index:10;" title="Купить"></button>
+                        <!-- Переключатель влево -->
+                        <button id="shop-money-left-arrow" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50px;width:32px;height:32px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;z-index:10;padding:0;" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='translateY(-50%) scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.transform='translateY(-50%) scale(1)';">
+                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                                <path d="M9 4L5 8L9 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                         
-                        <!-- Стрелки навигации -->
-                        <button id="safe-left-arrow" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
-                        <button id="safe-right-arrow" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
-                    </div>
-                </div>
-                
-                <!-- Секция наборов персонажей -->
-                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid rgba(255,255,255,0.1);">
-                    <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.5);text-align:center;">Наборы персонажей</h3>
-                    
-                    <!-- Простое место для SVG персонажа с навигацией -->
-                    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;position:relative;min-height:140px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);transition:all 0.2s ease;">
-                        <!-- SVG картинка персонажа -->
-                        <img id="character-image" src="assets/svg/characters/character-1.svg" alt="Персонаж" style="width:100%;height:100%;object-fit:contain;transition:all 0.2s ease-in-out;" onerror="this.style.display='none'">
-                        
-                        <!-- Прозрачная кнопка "Купить" поверх SVG -->
-                        <button id="buy-character-btn" style="position:absolute;bottom:15%;left:50%;transform:translateX(-50%);width:180px;height:40px;background:transparent;border:none;cursor:pointer;z-index:10;" title="Купить"></button>
-                        
-                        <!-- Стрелки навигации -->
-                        <button id="character-left-arrow" style="position:absolute;left:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
-                        <button id="character-right-arrow" style="position:absolute;right:-20px;top:50%;transform:translateY(-50%);background:#4a148c;border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:18px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+                        <!-- Изображение и информация -->
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:35px;width:100%;max-width:320px;">
+                            <img id="shop-money-image" src="assets/svg/shop/Some money.svg" alt="Money" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));margin-top:-15px;">
+                            
+                            <!-- Ячейки в стиле панели инвестиций -->
+                            <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
+                                <!-- Ячейка количества -->
+                                <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50px;padding:5px 16px;display:flex;align-items:center;justify-content:space-between;min-height:26px;height:26px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);gap:10px;">
+                                    <span style="color:rgba(255,255,255,0.7);font-size:11px;font-weight:600;font-family:'Segoe UI',Arial,sans-serif;">Количество</span>
+                                    <div style="width:1px;height:16px;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
+                                    <span id="shop-money-amount" style="color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;white-space:nowrap;display:flex;align-items:center;transition:opacity 0.3s ease;font-family:'Segoe UI',Arial,sans-serif;">20 000</span>
+                                </div>
+                                
+                                <!-- Кнопка купить -->
+                                <button id="shop-buy-btn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50px;color:#fff;font-size:13px;font-weight:800;padding:7px 20px;cursor:pointer;transition:background 0.2s ease;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Segoe UI',Arial,sans-serif;margin-top:2px;" onmouseover="this.style.background='rgba(255,255,255,0.25)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';" onmousedown="this.style.transform='scale(0.95)';" onmouseup="this.style.transform='scale(1)';">
+                                    <span>Купить</span>
+                                    <span style="display:flex;align-items:center;gap:3px;">
+                                        <span id="shop-buy-price" style="font-weight:800;">150</span>
+                                        <img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;display:inline-block;vertical-align:middle;">
+                                    </span>
+                                </button>
                             </div>
                         </div>
-                
+                        
+                        <!-- Переключатель вправо -->
+                        <button id="shop-money-right-arrow" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50px;width:32px;height:32px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;z-index:10;padding:0;" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='translateY(-50%) scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.transform='translateY(-50%) scale(1)';">
+                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                                <path d="M7 4L11 8L7 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
                     </div>
+                    
+                    <!-- Ячейка 2 с системой переключения алмазов -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">2</div>
+                        
+                        <!-- Ячейка выгоды в правом верхнем углу -->
+                        <div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,rgba(100,100,100,0.6) 0%,rgba(80,80,80,0.55) 100%);backdrop-filter:blur(8px);border-radius:12px;padding:4px 10px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,215,0,0.8);z-index:5;">
+                            <span style="color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;">Выгода</span>
+                            <span id="shop-diamonds-discount-value" style="color:white;font-size:11px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;">15%</span>
+                        </div>
+                        
+                        <!-- Переключатель влево -->
+                        <button id="shop-diamonds-left-arrow" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50px;width:32px;height:32px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;z-index:10;padding:0;" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='translateY(-50%) scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.transform='translateY(-50%) scale(1)';">
+                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                                <path d="M9 4L5 8L9 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        
+                        <!-- Изображение и информация -->
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:35px;width:100%;max-width:320px;">
+                            <img id="shop-diamonds-image" src="assets/svg/shop/A few diamonds.svg" alt="Diamonds" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));margin-top:-15px;">
+                            
+                            <!-- Ячейки в стиле панели инвестиций -->
+                            <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
+                                <!-- Ячейка количества -->
+                                <div style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:50px;padding:5px 16px;display:flex;align-items:center;justify-content:space-between;min-height:26px;height:26px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);gap:10px;">
+                                    <span style="color:rgba(255,255,255,0.7);font-size:11px;font-weight:600;font-family:'Segoe UI',Arial,sans-serif;">Количество</span>
+                                    <div style="width:1px;height:16px;background:rgba(255,255,255,0.3);flex-shrink:0;"></div>
+                                    <span id="shop-diamonds-amount" style="color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;white-space:nowrap;display:flex;align-items:center;transition:opacity 0.3s ease;font-family:'Segoe UI',Arial,sans-serif;">100</span>
+                                </div>
+                                
+                                <!-- Кнопка купить -->
+                                <button id="shop-buy-diamonds-btn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50px;color:#fff;font-size:13px;font-weight:800;padding:7px 20px;cursor:pointer;transition:background 0.2s ease;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Segoe UI',Arial,sans-serif;margin-top:2px;" onmouseover="this.style.background='rgba(255,255,255,0.25)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';" onmousedown="this.style.transform='scale(0.95)';" onmouseup="this.style.transform='scale(1)';">
+                                    <span>Купить</span>
+                                    <span style="display:flex;align-items:center;gap:3px;">
+                                        <span id="shop-diamonds-price" style="font-weight:800;">60 000</span>
+                                        <img src="assets/svg/bc-icon.svg" alt="Money" style="width:18px;height:18px;object-fit:contain;display:inline-block;vertical-align:middle;">
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Переключатель вправо -->
+                        <button id="shop-diamonds-right-arrow" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50px;width:32px;height:32px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;z-index:10;padding:0;" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='translateY(-50%) scale(1.05)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.transform='translateY(-50%) scale(1)';">
+                            <svg width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                                <path d="M7 4L11 8L7 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Ячейка 3 -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">3</div>
+                        <!-- Пустая ячейка -->
+                    </div>
+                </div>
+                
+                <!-- Сетка 2x2 из 4 ячеек -->
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;padding:0 4px;">
+                    <!-- Ячейка 4 -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">4</div>
+                        <!-- Пустая ячейка -->
+                    </div>
+                    
+                    <!-- Ячейка 5 -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">5</div>
+                        <!-- Пустая ячейка -->
+                    </div>
+                    
+                    <!-- Ячейка 6 -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">6</div>
+                        <!-- Пустая ячейка -->
+                    </div>
+                    
+                    <!-- Ячейка 7 -->
+                    <div style="background:linear-gradient(135deg,rgba(0,0,0,0.85) 0%,rgba(10,10,10,0.8) 100%);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid white;display:flex;align-items:center;justify-content:center;position:relative;">
+                        <!-- Номер ячейки -->
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;">7</div>
+                        <!-- Пустая ячейка -->
+                    </div>
+                </div>
+                
+            </div>
             
         </div>
     </div>

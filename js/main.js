@@ -3967,27 +3967,27 @@ async function buyCases() {
         // Создаем invoice link через Bot API
         const invoiceUrl = await createInvoiceLink(userId, item, currentCasesIndex);
         
-        if (invoiceUrl) {
+        if (invoiceUrl && typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+            // Проверяем, что это валидный URL
+            if (!invoiceUrl.startsWith('https://') && !invoiceUrl.startsWith('http://')) {
+                console.error('Некорректный формат invoice URL:', invoiceUrl);
+                alert('Ошибка: некорректный формат платежной ссылки');
+                return;
+            }
+            
             // Открываем invoice прямо в Mini App (не как сообщение от бота)
             if (webApp.openInvoice) {
-                console.log('Открываем invoice в Mini App:', invoiceUrl);
                 webApp.openInvoice(invoiceUrl, (status) => {
-                    console.log('Статус оплаты:', status);
                     if (status === 'paid') {
                         // Платеж успешен - открываем кейс
-                        console.log('Платеж успешен, открываем кейс');
                         handleSuccessfulCasePurchase(item);
                     } else if (status === 'cancelled') {
                         console.log('Платеж отменен пользователем');
                     } else if (status === 'failed') {
-                        console.error('Платеж не прошел');
                         alert('Ошибка при оплате. Попробуйте еще раз.');
-                    } else {
-                        console.log('Неизвестный статус платежа:', status);
                     }
                 });
             } else {
-                console.warn('webApp.openInvoice не доступен, используем fallback');
                 // Fallback: открываем через ссылку
                 if (webApp.openLink) {
                     webApp.openLink(invoiceUrl);
@@ -3996,8 +3996,8 @@ async function buyCases() {
                 }
             }
         } else {
-            console.error('Не удалось создать invoice link');
-            alert('Ошибка при создании платежа. Проверьте консоль для деталей.');
+            console.error('Invoice URL не получен или некорректен:', invoiceUrl);
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
         }
         
     } catch (error) {
@@ -4020,31 +4020,49 @@ async function createInvoiceLink(userId, item, caseIndex) {
         timestamp: Date.now()
     });
     
+    // Для createInvoiceLink prices должен быть JSON строкой
+    // amount должен быть числом (не строкой!)
+    const prices = JSON.stringify([{
+        label: item.name,
+        amount: parseInt(item.starsPrice, 10) || 1  // Убеждаемся, что это число
+    }]);
+    
     // Используем createInvoiceLink вместо sendInvoice
     // createInvoiceLink создает ссылку, которую можно открыть в Mini App
-    const prices = [{
-        label: item.name,
-        amount: item.starsPrice
-    }];
-    
-    // Для Bot API нужно передать prices как JSON строку
     const invoiceData = {
         title: `Покупка ${item.name}`,
         description: `${item.name} за ${item.starsPrice} звезд Telegram`,
         payload: payload,
         provider_token: '', // Для Telegram Stars оставляем пустым
         currency: 'XTR',    // XTR - валюта Telegram Stars
-        prices: JSON.stringify(prices)
+        prices: prices
     };
     
     try {
         // Создаем invoice link через Bot API
+        // Правильно формируем параметры для отправки
+        const urlParams = new URLSearchParams();
+        urlParams.append('title', invoiceData.title);
+        urlParams.append('description', invoiceData.description);
+        urlParams.append('payload', invoiceData.payload);
+        urlParams.append('provider_token', invoiceData.provider_token || '');
+        urlParams.append('currency', invoiceData.currency);
+        urlParams.append('prices', invoiceData.prices);
+        
+        console.log('Отправляем данные:', {
+            title: invoiceData.title,
+            description: invoiceData.description,
+            payload: invoiceData.payload,
+            currency: invoiceData.currency,
+            prices: invoiceData.prices
+        });
+        
         const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: new URLSearchParams(invoiceData)
+            body: urlParams.toString()
         });
         
         const result = await response.json();
@@ -4053,7 +4071,7 @@ async function createInvoiceLink(userId, item, caseIndex) {
             // Проверяем, что result.result - это строка (URL)
             const invoiceUrl = result.result;
             if (typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
-                console.log('Invoice link создан успешно:', invoiceUrl);
+                console.log('Invoice link создан успешно');
                 return invoiceUrl;
             } else {
                 console.error('Некорректный формат invoice URL:', invoiceUrl);
@@ -4061,12 +4079,12 @@ async function createInvoiceLink(userId, item, caseIndex) {
                 return null;
             }
         } else {
+            // Детальная обработка ошибок
             console.error('Ошибка при создании invoice link:', result);
-            // Показываем более детальную ошибку
             let errorMessage = 'Неизвестная ошибка';
+            
             if (result.description) {
                 errorMessage = result.description;
-                console.error('Описание ошибки:', result.description);
             } else if (result.error_code) {
                 errorMessage = `Ошибка ${result.error_code}`;
             }
@@ -4075,7 +4093,9 @@ async function createInvoiceLink(userId, item, caseIndex) {
             if (result.error_code === 401) {
                 errorMessage = 'Ошибка авторизации бота. Проверьте токен.';
             } else if (result.error_code === 400) {
-                errorMessage = 'Некорректные данные для создания платежа.';
+                errorMessage = 'Некорректные данные для создания платежа. Проверьте формат данных.';
+            } else if (result.error_code === 404) {
+                errorMessage = 'Метод createInvoiceLink не найден. Обновите бота или проверьте API.';
             }
             
             alert('Ошибка при создании платежа: ' + errorMessage);

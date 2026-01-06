@@ -47,16 +47,19 @@ $payload = json_encode([
 
 // Данные для создания invoice link
 // createInvoiceLink не требует chat_id, так как создает ссылку, а не отправляет сообщение
+// prices должен быть JSON строкой
+$prices = json_encode([[
+    'label' => $caseName,
+    'amount' => (int)$starsPrice  // Убеждаемся, что это число
+]]);
+
 $invoiceData = [
     'title' => "Покупка {$caseName}",
     'description' => "{$caseName} за {$starsPrice} звезд Telegram",
     'payload' => $payload,
     'provider_token' => '', // Для Telegram Stars оставляем пустым
     'currency' => 'XTR',    // XTR - валюта Telegram Stars
-    'prices' => json_encode([[
-        'label' => $caseName,
-        'amount' => $starsPrice
-    ]])
+    'prices' => $prices
 ];
 
 // Отправляем запрос к Telegram Bot API для создания invoice link (не sendInvoice!)

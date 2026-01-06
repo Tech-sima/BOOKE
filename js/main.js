@@ -495,6 +495,7 @@ function init() {
         getTelegramUser();
         updateProfileWithTelegram();
         adaptUIForTelegram();
+        initTelegramBotHandler();
     }
     
     sceneInitialized = true;
@@ -3233,9 +3234,9 @@ const diamondsItems = [
 // Система переключения кейсов в третьей ячейке
 let currentCasesIndex = 0;
 const casesItems = [
-    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, discount: 10 },
-    { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, discount: 15 },
-    { name: 'Legendary case', image: 'assets/svg/shop/legendary case.svg', amount: 1, cost: 500, discount: 20 }
+    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, starsPrice: 1, discount: 10 },
+    { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, starsPrice: 1, discount: 15 },
+    { name: 'Legendary case', image: 'assets/svg/shop/legendary case.svg', amount: 1, cost: 500, starsPrice: 1, discount: 20 }
 ];
 
 function initializeShop() {
@@ -3521,10 +3522,19 @@ function updateCasesDisplay() {
             casesImage.style.maxHeight = '120px';
             casesImage.style.marginTop = '-15px';
             
-            // Обновляем цену на кнопке
+            // Обновляем цену на кнопке (в звездах Telegram)
             const buyPrice = document.getElementById('shop-cases-price');
-            if (buyPrice && item.cost) {
-                buyPrice.textContent = item.cost.toLocaleString('ru-RU');
+            if (buyPrice && item.starsPrice) {
+                buyPrice.textContent = item.starsPrice;
+                // Добавляем иконку звезды, если её нет
+                const priceParent = buyPrice.parentElement;
+                if (priceParent && !priceParent.querySelector('.star-icon')) {
+                    const starIcon = document.createElement('span');
+                    starIcon.className = 'star-icon';
+                    starIcon.innerHTML = '⭐';
+                    starIcon.style.marginLeft = '2px';
+                    priceParent.appendChild(starIcon);
+                }
             }
             
             // Обновляем значение выгоды
@@ -3933,21 +3943,52 @@ function openCase() {
     claimBtn.addEventListener('click', claimHandler);
 }
 
+// Функция покупки кейсов через Telegram Stars
 function buyCases() {
     const item = casesItems[currentCasesIndex];
     if (!item) return;
     
-    const currentCredits = getCredits();
-    
-    // Проверяем баланс RBC
-    if (currentCredits < item.cost) {
-        alert('Недостаточно RBC!');
+    // Проверяем, запущено ли приложение в Telegram
+    if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
+        alert('Покупка доступна только в Telegram!');
         return;
     }
     
-    // Списываем RBC
-    setCredits(currentCredits - item.cost);
+    const webApp = window.Telegram.WebApp;
+    const userId = webApp.initDataUnsafe?.user?.id;
     
+    if (!userId) {
+        alert('Не удалось получить данные пользователя. Попробуйте перезапустить приложение.');
+        return;
+    }
+    
+    // Создаем callback_data для бота
+    const callbackData = JSON.stringify({
+        type: 'purchase_case',
+        caseIndex: currentCasesIndex,
+        caseName: item.name,
+        starsPrice: item.starsPrice,
+        timestamp: Date.now()
+    });
+    
+    // Открываем ссылку на бота с callback_data
+    // Бот должен обработать этот запрос и создать invoice для Telegram Stars
+    // ВАЖНО: Замените 'your_bot_username' на реальный username вашего бота (без @)
+    const botUsername = 'BookeGame_bot'; // Username бота (без @)
+    const botUrl = `https://t.me/${botUsername}?start=purchase_${encodeURIComponent(callbackData)}`;
+    
+    if (webApp.openTelegramLink) {
+        webApp.openTelegramLink(botUrl);
+    } else if (webApp.openLink) {
+        webApp.openLink(botUrl);
+    } else {
+        // Fallback: отправляем данные через sendData
+        webApp.sendData(callbackData);
+    }
+}
+
+// Обработка успешной покупки кейса (вызывается ботом через webApp.sendData)
+function handleSuccessfulCasePurchase(item) {
     // Закрываем панель магазина и открываем панель открытия кейса
     hidePanelWithAnimation('shop-panel', () => {
         // Запускаем анимацию открытия кейса
@@ -3955,6 +3996,78 @@ function buyCases() {
             openCase();
         }, 300);
     });
+    
+    // Отслеживание покупки в аналитике (если есть)
+    if (window.posthogService && window.posthogService.isReady()) {
+        window.posthogService.track('case_purchased', {
+            case_name: item.name,
+            stars_price: item.starsPrice,
+            case_index: currentCasesIndex
+        });
+    }
+}
+
+// Инициализация обработчика сообщений от бота
+function initTelegramBotHandler() {
+    if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
+        return;
+    }
+    
+    const webApp = window.Telegram.WebApp;
+    
+    // Обработчик для получения данных от бота через MainButton или другие события
+    // Бот может отправлять данные через webApp.sendData или через callback_query
+    
+    // Слушаем события от бота
+    webApp.onEvent('invoice_closed', (event) => {
+        if (event.status === 'paid' && event.slug) {
+            // Платеж успешен - извлекаем данные из slug
+            try {
+                const purchaseData = JSON.parse(decodeURIComponent(event.slug));
+                const item = casesItems[purchaseData.caseIndex || currentCasesIndex];
+                if (item) {
+                    handleSuccessfulCasePurchase(item);
+                }
+            } catch (error) {
+                console.error('Ошибка при обработке успешного платежа:', error);
+            }
+        }
+    });
+    
+    // Обработчик для получения данных через sendData (если бот использует этот метод)
+    // Это будет вызвано, когда бот отправит данные через webApp.sendData()
+    if (webApp.onEvent) {
+        webApp.onEvent('message', (data) => {
+            try {
+                const message = typeof data === 'string' ? JSON.parse(data) : data;
+                
+                if (message.type === 'invoice_url' && message.url) {
+                    // Бот отправил URL invoice - открываем его
+                    if (webApp.openInvoice) {
+                        webApp.openInvoice(message.url, (status) => {
+                            if (status === 'paid') {
+                                const item = casesItems[message.caseIndex || currentCasesIndex];
+                                if (item) {
+                                    handleSuccessfulCasePurchase(item);
+                                }
+                            } else if (status === 'failed') {
+                                alert('Ошибка при оплате. Попробуйте еще раз.');
+                            }
+                        });
+                    } else if (webApp.openLink) {
+                        webApp.openLink(message.url);
+                    }
+                } else if (message.type === 'purchase_success') {
+                    const item = casesItems[message.caseIndex || currentCasesIndex];
+                    if (item) {
+                        handleSuccessfulCasePurchase(item);
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка при обработке сообщения от бота:', error);
+            }
+        });
+    }
 }
 
 function animateShopRBCCollection(amount, callback) {

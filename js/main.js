@@ -3970,17 +3970,24 @@ async function buyCases() {
         if (invoiceUrl) {
             // Открываем invoice прямо в Mini App (не как сообщение от бота)
             if (webApp.openInvoice) {
+                console.log('Открываем invoice в Mini App:', invoiceUrl);
                 webApp.openInvoice(invoiceUrl, (status) => {
+                    console.log('Статус оплаты:', status);
                     if (status === 'paid') {
                         // Платеж успешен - открываем кейс
+                        console.log('Платеж успешен, открываем кейс');
                         handleSuccessfulCasePurchase(item);
                     } else if (status === 'cancelled') {
                         console.log('Платеж отменен пользователем');
                     } else if (status === 'failed') {
+                        console.error('Платеж не прошел');
                         alert('Ошибка при оплате. Попробуйте еще раз.');
+                    } else {
+                        console.log('Неизвестный статус платежа:', status);
                     }
                 });
             } else {
+                console.warn('webApp.openInvoice не доступен, используем fallback');
                 // Fallback: открываем через ссылку
                 if (webApp.openLink) {
                     webApp.openLink(invoiceUrl);
@@ -3989,7 +3996,8 @@ async function buyCases() {
                 }
             }
         } else {
-            alert('Ошибка при создании платежа. Попробуйте еще раз.');
+            console.error('Не удалось создать invoice link');
+            alert('Ошибка при создании платежа. Проверьте консоль для деталей.');
         }
         
     } catch (error) {
@@ -4014,16 +4022,19 @@ async function createInvoiceLink(userId, item, caseIndex) {
     
     // Используем createInvoiceLink вместо sendInvoice
     // createInvoiceLink создает ссылку, которую можно открыть в Mini App
+    const prices = [{
+        label: item.name,
+        amount: item.starsPrice
+    }];
+    
+    // Для Bot API нужно передать prices как JSON строку
     const invoiceData = {
         title: `Покупка ${item.name}`,
         description: `${item.name} за ${item.starsPrice} звезд Telegram`,
         payload: payload,
         provider_token: '', // Для Telegram Stars оставляем пустым
         currency: 'XTR',    // XTR - валюта Telegram Stars
-        prices: JSON.stringify([{
-            label: item.name,
-            amount: item.starsPrice
-        }])
+        prices: JSON.stringify(prices)
     };
     
     try {
@@ -4039,14 +4050,40 @@ async function createInvoiceLink(userId, item, caseIndex) {
         const result = await response.json();
         
         if (result.ok && result.result) {
-            // Возвращаем ссылку на invoice
-            return result.result;
+            // Проверяем, что result.result - это строка (URL)
+            const invoiceUrl = result.result;
+            if (typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+                console.log('Invoice link создан успешно:', invoiceUrl);
+                return invoiceUrl;
+            } else {
+                console.error('Некорректный формат invoice URL:', invoiceUrl);
+                alert('Ошибка: некорректный формат платежной ссылки');
+                return null;
+            }
         } else {
             console.error('Ошибка при создании invoice link:', result);
+            // Показываем более детальную ошибку
+            let errorMessage = 'Неизвестная ошибка';
+            if (result.description) {
+                errorMessage = result.description;
+                console.error('Описание ошибки:', result.description);
+            } else if (result.error_code) {
+                errorMessage = `Ошибка ${result.error_code}`;
+            }
+            
+            // Специальная обработка для известных ошибок
+            if (result.error_code === 401) {
+                errorMessage = 'Ошибка авторизации бота. Проверьте токен.';
+            } else if (result.error_code === 400) {
+                errorMessage = 'Некорректные данные для создания платежа.';
+            }
+            
+            alert('Ошибка при создании платежа: ' + errorMessage);
             return null;
         }
     } catch (error) {
         console.error('Ошибка при создании invoice link:', error);
+        alert('Ошибка подключения. Проверьте интернет и попробуйте еще раз.');
         return null;
     }
 }

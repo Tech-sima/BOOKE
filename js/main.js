@@ -1109,6 +1109,13 @@ function startGame(){
             console.error('Error during advent images preloading:', error);
         }
         
+        // Предзагружаем изображения магазина при запуске игры
+        try {
+            preloadShopImages();
+        } catch (error) {
+            console.error('Error during shop images preloading:', error);
+        }
+        
         // Инициализируем адвент-панель при запуске игры
         try {
             initializeAdventPanel();
@@ -3417,8 +3424,8 @@ function buyDiamonds() {
     // Проверяем баланс денег
     if (currentBalance < item.cost) {
         alert('Недостаточно денег!');
-        return;
-    }
+            return;
+        }
     
     // Списываем деньги
     setBalance(currentBalance - item.cost);
@@ -3676,7 +3683,7 @@ function animateShopRBCCollection(amount, callback) {
                     rbcIcon.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`;
                     
                     requestAnimationFrame(animate);
-                } else {
+        } else {
                     // Анимация исчезновения при достижении цели
                     rbcIcon.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
                     rbcIcon.style.opacity = '0';
@@ -3840,7 +3847,7 @@ function animateShopMoneyCollection(amount, callback) {
     container.appendChild(centerMoney);
     
     // Показываем центральный SVG
-    requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
         centerMoney.style.opacity = '1';
         centerMoney.style.transform = 'translate(-50%, -50%) scale(1.2)';
     });
@@ -4540,6 +4547,64 @@ function preloadAdventImages() {
         };
         img.onerror = () => {
             console.warn(`⚠️ Failed to load advent image: ${imagePath}`);
+        };
+    });
+}
+
+// Предварительная загрузка всех ресурсов магазина
+function preloadShopImages() {
+    const shopImages = [
+        // SVG денег
+        'assets/svg/shop/Some money.svg',
+        'assets/svg/shop/Lots of money.svg',
+        'assets/svg/shop/Money Mountain.svg',
+        // SVG алмазов
+        'assets/svg/shop/A few diamonds.svg',
+        'assets/svg/shop/Lots of diamonds.svg',
+        'assets/svg/shop/Mountain of diamonds.svg',
+        // Иконки
+        'assets/svg/rbc-icon.svg',
+        'assets/svg/bc-icon.svg',
+        'assets/svg/money-icon.svg'
+    ];
+    
+    shopImages.forEach(imagePath => {
+        const img = new Image();
+        img.src = imagePath;
+        img.onload = () => {
+            // Изображение загружено
+        };
+        img.onerror = () => {
+            console.warn(`⚠️ Failed to load shop image: ${imagePath}`);
+        };
+    });
+}
+
+// Предварительная загрузка всех ресурсов магазина
+function preloadShopImages() {
+    const shopImages = [
+        // SVG денег
+        'assets/svg/shop/Some money.svg',
+        'assets/svg/shop/Lots of money.svg',
+        'assets/svg/shop/Money Mountain.svg',
+        // SVG алмазов
+        'assets/svg/shop/A few diamonds.svg',
+        'assets/svg/shop/Lots of diamonds.svg',
+        'assets/svg/shop/Mountain of diamonds.svg',
+        // Иконки
+        'assets/svg/rbc-icon.svg',
+        'assets/svg/bc-icon.svg',
+        'assets/svg/money-icon.svg'
+    ];
+    
+    shopImages.forEach(imagePath => {
+        const img = new Image();
+        img.src = imagePath;
+        img.onload = () => {
+            // Изображение загружено
+        };
+        img.onerror = () => {
+            console.warn(`⚠️ Failed to load shop image: ${imagePath}`);
         };
     });
 }

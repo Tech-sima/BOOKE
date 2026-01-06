@@ -3700,6 +3700,49 @@ function showCaseOdds() {
     oddsPanel.style.display = 'flex';
 }
 
+// Функции для скрытия/показа кругов зданий
+function hideBuildingCircles() {
+    // Скрываем profit-indicator (круги с индикаторами прибыли)
+    const profitIndicators = document.querySelectorAll('.profit-indicator');
+    profitIndicators.forEach(indicator => {
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+    });
+    
+    // Скрываем круги из pure-map (ищем все элементы с кругами в pure-map-buildings)
+    const pureMapBuildings = document.getElementById('pure-map-buildings');
+    if (pureMapBuildings) {
+        const circles = pureMapBuildings.querySelectorAll('div[style*="borderRadius"]');
+        circles.forEach(circle => {
+            if (circle.style.borderRadius === '50%') {
+                circle.style.display = 'none';
+            }
+        });
+    }
+}
+
+function showBuildingCircles() {
+    // Показываем profit-indicator обратно
+    const profitIndicators = document.querySelectorAll('.profit-indicator');
+    profitIndicators.forEach(indicator => {
+        if (indicator) {
+            indicator.style.display = '';
+        }
+    });
+    
+    // Показываем круги из pure-map обратно
+    const pureMapBuildings = document.getElementById('pure-map-buildings');
+    if (pureMapBuildings) {
+        const circles = pureMapBuildings.querySelectorAll('div[style*="borderRadius"]');
+        circles.forEach(circle => {
+            if (circle.style.borderRadius === '50%') {
+                circle.style.display = '';
+            }
+        });
+    }
+}
+
 // Функция открытия кейса с анимацией прокрутки наград
 function openCase() {
     const panel = document.getElementById('case-opening-panel');
@@ -3745,6 +3788,9 @@ function openCase() {
     if (oddsPanel) {
         oddsPanel.style.display = 'none';
     }
+    
+    // Скрываем круги зданий перед показом панели
+    hideBuildingCircles();
     
     // Показываем панель
     panel.style.display = 'flex';
@@ -3917,6 +3963,9 @@ function openCase() {
         if (claimHandler) {
             claimBtn.removeEventListener('click', claimHandler);
         }
+        
+        // Показываем круги зданий обратно после закрытия панели
+        showBuildingCircles();
         
         // Скрываем контейнер с прокруткой (круги)
         const rewardsContainer = document.getElementById('case-rewards-container');

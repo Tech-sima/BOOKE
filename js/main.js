@@ -3702,24 +3702,44 @@ function showCaseOdds() {
 
 // Функции для скрытия/показа кругов зданий
 function hideBuildingCircles() {
-    // Скрываем profit-indicator (круги с индикаторами прибыли)
+    // Скрываем profit-indicator (круги с индикаторами прибыли) - более агрессивно
     const profitIndicators = document.querySelectorAll('.profit-indicator');
     profitIndicators.forEach(indicator => {
         if (indicator) {
             indicator.style.display = 'none';
+            indicator.style.visibility = 'hidden';
+            indicator.style.opacity = '0';
+            indicator.style.pointerEvents = 'none';
+            indicator.style.zIndex = '-1';
         }
     });
     
     // Скрываем круги из pure-map (ищем все элементы с кругами в pure-map-buildings)
     const pureMapBuildings = document.getElementById('pure-map-buildings');
     if (pureMapBuildings) {
-        const circles = pureMapBuildings.querySelectorAll('div[style*="borderRadius"]');
+        const circles = pureMapBuildings.querySelectorAll('div');
         circles.forEach(circle => {
-            if (circle.style.borderRadius === '50%') {
+            const borderRadius = window.getComputedStyle(circle).borderRadius;
+            if (borderRadius === '50%' || borderRadius.includes('50%')) {
                 circle.style.display = 'none';
+                circle.style.visibility = 'hidden';
+                circle.style.opacity = '0';
+                circle.style.pointerEvents = 'none';
+                circle.style.zIndex = '-1';
             }
         });
     }
+    
+    // Также скрываем все элементы с классом profit-indicator-wrapper
+    const profitWrappers = document.querySelectorAll('.profit-indicator-wrapper');
+    profitWrappers.forEach(wrapper => {
+        if (wrapper) {
+            wrapper.style.display = 'none';
+            wrapper.style.visibility = 'hidden';
+            wrapper.style.opacity = '0';
+            wrapper.style.pointerEvents = 'none';
+        }
+    });
 }
 
 function showBuildingCircles() {
@@ -3728,19 +3748,39 @@ function showBuildingCircles() {
     profitIndicators.forEach(indicator => {
         if (indicator) {
             indicator.style.display = '';
+            indicator.style.visibility = '';
+            indicator.style.opacity = '';
+            indicator.style.pointerEvents = '';
+            indicator.style.zIndex = '';
         }
     });
     
     // Показываем круги из pure-map обратно
     const pureMapBuildings = document.getElementById('pure-map-buildings');
     if (pureMapBuildings) {
-        const circles = pureMapBuildings.querySelectorAll('div[style*="borderRadius"]');
+        const circles = pureMapBuildings.querySelectorAll('div');
         circles.forEach(circle => {
-            if (circle.style.borderRadius === '50%') {
+            const borderRadius = window.getComputedStyle(circle).borderRadius;
+            if (borderRadius === '50%' || borderRadius.includes('50%')) {
                 circle.style.display = '';
+                circle.style.visibility = '';
+                circle.style.opacity = '';
+                circle.style.pointerEvents = '';
+                circle.style.zIndex = '';
             }
         });
     }
+    
+    // Показываем profit-indicator-wrapper обратно
+    const profitWrappers = document.querySelectorAll('.profit-indicator-wrapper');
+    profitWrappers.forEach(wrapper => {
+        if (wrapper) {
+            wrapper.style.display = '';
+            wrapper.style.visibility = '';
+            wrapper.style.opacity = '';
+            wrapper.style.pointerEvents = '';
+        }
+    });
 }
 
 // Функция открытия кейса с анимацией прокрутки наград
@@ -3791,6 +3831,9 @@ function openCase() {
     
     // Скрываем круги зданий перед показом панели
     hideBuildingCircles();
+    
+    // Добавляем класс на body для CSS скрытия
+    document.body.classList.add('case-panel-open');
     
     // Показываем панель
     panel.style.display = 'flex';
@@ -3963,6 +4006,9 @@ function openCase() {
         if (claimHandler) {
             claimBtn.removeEventListener('click', claimHandler);
         }
+        
+        // Убираем класс с body
+        document.body.classList.remove('case-panel-open');
         
         // Показываем круги зданий обратно после закрытия панели
         showBuildingCircles();

@@ -291,6 +291,16 @@
             position: fixed !important;
         }
         .profit-indicator.show{opacity:1;transform:scale(1);}
+        
+        /* Скрытие кругов когда открыта панель кейса */
+        .case-panel-open .profit-indicator,
+        .case-panel-open .profit-indicator-wrapper {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
+        }
 
         .profit-indicator:hover .profit-indicator-wrapper{
             transform:scale(1.1);
@@ -2372,7 +2382,7 @@
     </div>
 
     <!-- Панель открытия кейса -->
-    <div id="case-opening-panel" class="modal" style="display:none;position:fixed;inset:0;z-index:2000;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
+    <div id="case-opening-panel" class="modal" style="display:none;position:fixed;inset:0;z-index:10000;justify-content:center;align-items:center;font-family:'Segoe UI',Arial,sans-serif;">
         <div style="position:relative;max-width:520px;width:90%;display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <!-- Контейнер с прозрачным фоном -->
             <div style="background:rgba(0,0,0,0.6);backdrop-filter:blur(20px);border:2px solid rgba(255,255,255,0.15);border-radius:40px;padding:28px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.6);">

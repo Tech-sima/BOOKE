@@ -3962,7 +3962,7 @@ async function buyCases() {
         return;
     }
     
-    // Отправляем invoice через sendInvoice (правильный способ для Telegram Stars)
+    // Создаем invoice link и открываем его прямо в Mini App (без бота)
     try {
         // Сохраняем данные о текущей покупке для обработки после оплаты
         window.currentPurchase = {
@@ -3971,22 +3971,51 @@ async function buyCases() {
             timestamp: Date.now()
         };
         
-        // Отправляем invoice через Bot API
-        const invoiceSent = await sendInvoiceToUser(userId, item, currentCasesIndex);
+        // Создаем invoice link через Bot API
+        const invoiceUrl = await createInvoiceLinkForMiniApp(userId, item, currentCasesIndex);
         
-        if (invoiceSent) {
-            // Invoice отправлен успешно
-            // Telegram покажет окно оплаты пользователю
-            // После успешной оплаты бот должен обработать successful_payment
-            // и отправить данные обратно в Mini App через webApp.sendData()
+        if (invoiceUrl && typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+            // Проверяем, что это валидный URL
+            if (!invoiceUrl.startsWith('https://') && !invoiceUrl.startsWith('http://')) {
+                alert('Ошибка: некорректный формат платежной ссылки');
+                window.currentPurchase = null;
+                return;
+            }
             
-            // Закрываем панель магазина, чтобы пользователь видел окно оплаты
-            hidePanelWithAnimation('shop-panel');
-            
-            // Слушаем данные от бота о успешной оплате
-            // Бот должен отправить данные через webApp.sendData() после successful_payment
+            // Открываем invoice прямо в Mini App (не как сообщение от бота)
+            if (webApp.openInvoice) {
+                webApp.openInvoice(invoiceUrl, (status) => {
+                    // Обрабатываем результат оплаты
+                    if (status === 'paid') {
+                        // Платеж успешен - открываем кейс
+                        const purchaseData = window.currentPurchase;
+                        if (purchaseData && purchaseData.item) {
+                            handleSuccessfulCasePurchase(purchaseData.item);
+                            window.currentPurchase = null;
+                        } else {
+                            // Fallback: используем текущий кейс
+                            handleSuccessfulCasePurchase(item);
+                        }
+                    } else if (status === 'cancelled') {
+                        window.currentPurchase = null;
+                        // Платеж отменен - ничего не делаем
+                    } else if (status === 'failed') {
+                        window.currentPurchase = null;
+                        alert('Ошибка при оплате. Попробуйте еще раз.');
+                    }
+                });
+            } else {
+                // Fallback: открываем через ссылку
+                if (webApp.openLink) {
+                    webApp.openLink(invoiceUrl);
+                } else {
+                    alert('Ваша версия Telegram не поддерживает прямую оплату. Обновите приложение.');
+                    window.currentPurchase = null;
+                }
+            }
         } else {
             window.currentPurchase = null;
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
         }
         
     } catch (error) {
@@ -3995,8 +4024,8 @@ async function buyCases() {
     }
 }
 
-// Функция отправки invoice через sendInvoice (правильный способ для Telegram Stars)
-async function sendInvoiceToUser(userId, item, caseIndex) {
+// Функция создания invoice link для открытия в Mini App (без бота)
+async function createInvoiceLinkForMiniApp(userId, item, caseIndex) {
     // Токен бота
     const BOT_TOKEN = '8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU';
     
@@ -4004,27 +4033,25 @@ async function sendInvoiceToUser(userId, item, caseIndex) {
     // Формат: case_index_timestamp
     const payload = `case_${caseIndex}_${Date.now()}`;
     
-    // Для sendInvoice prices должен быть массивом объектов
-    const prices = [{
+    // Для createInvoiceLink prices должен быть JSON строкой
+    const prices = JSON.stringify([{
         label: item.name,
         amount: parseInt(item.starsPrice, 10) || 1
-    }];
+    }]);
     
-    // Данные для sendInvoice
+    // Данные для createInvoiceLink
     const invoiceData = {
-        chat_id: userId,
         title: `Покупка ${item.name}`,
         description: `${item.name} за ${item.starsPrice} звезд Telegram`,
         payload: payload,
         provider_token: '', // Для Telegram Stars оставляем пустым
         currency: 'XTR',    // XTR - валюта Telegram Stars
-        prices: JSON.stringify(prices)
+        prices: prices
     };
     
     try {
-        // Отправляем invoice через Bot API
+        // Создаем invoice link через Bot API
         const urlParams = new URLSearchParams();
-        urlParams.append('chat_id', invoiceData.chat_id);
         urlParams.append('title', invoiceData.title);
         urlParams.append('description', invoiceData.description);
         urlParams.append('payload', invoiceData.payload);
@@ -4032,7 +4059,7 @@ async function sendInvoiceToUser(userId, item, caseIndex) {
         urlParams.append('currency', invoiceData.currency);
         urlParams.append('prices', invoiceData.prices);
         
-        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendInvoice`, {
+        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -4042,11 +4069,15 @@ async function sendInvoiceToUser(userId, item, caseIndex) {
         
         const result = await response.json();
         
-        if (result.ok) {
-            // Invoice отправлен успешно
-            // Telegram покажет окно оплаты пользователю
-            // После оплаты нужно обработать successful_payment через бота
-            return true;
+        if (result.ok && result.result) {
+            // Проверяем, что result.result - это строка (URL)
+            const invoiceUrl = result.result;
+            if (typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+                return invoiceUrl;
+            } else {
+                alert('Ошибка: некорректный формат платежной ссылки');
+                return null;
+            }
         } else {
             // Обработка ошибок
             let errorMessage = 'Неизвестная ошибка';
@@ -4064,11 +4095,11 @@ async function sendInvoiceToUser(userId, item, caseIndex) {
             }
             
             alert('Ошибка при создании платежа: ' + errorMessage);
-            return false;
+            return null;
         }
     } catch (error) {
         alert('Ошибка подключения. Проверьте интернет и попробуйте еще раз.');
-        return false;
+        return null;
     }
 }
 
@@ -4103,30 +4134,23 @@ function initTelegramBotHandler() {
     // Обработчик для получения данных от бота через MainButton или другие события
     // Бот может отправлять данные через webApp.sendData или через callback_query
     
-    // Слушаем данные от бота о успешной оплате
-    // Бот должен отправить данные через webApp.sendData() после обработки successful_payment
+    // Слушаем событие invoice_closed как дополнительный обработчик
+    // (основная обработка происходит через callback openInvoice)
     if (webApp.onEvent) {
-        webApp.onEvent('message', (data) => {
-            try {
-                const message = typeof data === 'string' ? JSON.parse(data) : data;
-                
-                if (message.type === 'purchase_success') {
-                    // Бот подтвердил успешную покупку
-                    const purchaseData = window.currentPurchase;
-                    if (purchaseData && purchaseData.item) {
-                        handleSuccessfulCasePurchase(purchaseData.item);
-                        window.currentPurchase = null;
-                    } else {
-                        // Fallback: используем данные из сообщения или текущий кейс
-                        const caseIndex = message.caseIndex !== undefined ? message.caseIndex : currentCasesIndex;
-                        const item = casesItems[caseIndex];
-                        if (item) {
-                            handleSuccessfulCasePurchase(item);
-                        }
+        webApp.onEvent('invoice_closed', (event) => {
+            // Это событие может сработать, если callback openInvoice не сработал
+            if (event && event.status === 'paid') {
+                const purchaseData = window.currentPurchase;
+                if (purchaseData && purchaseData.item) {
+                    handleSuccessfulCasePurchase(purchaseData.item);
+                    window.currentPurchase = null;
+                } else {
+                    // Fallback: используем текущий выбранный кейс
+                    const item = casesItems[currentCasesIndex];
+                    if (item) {
+                        handleSuccessfulCasePurchase(item);
                     }
                 }
-            } catch (error) {
-                // Игнорируем ошибки парсинга
             }
         });
     }

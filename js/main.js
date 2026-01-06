@@ -3230,6 +3230,14 @@ const diamondsItems = [
     { name: 'Mountain of diamonds', image: 'assets/svg/shop/Mountain of diamonds.svg', amount: 500, cost: 195000, discount: 30 }
 ];
 
+// Система переключения кейсов в третьей ячейке
+let currentCasesIndex = 0;
+const casesItems = [
+    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, discount: 10 },
+    { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, discount: 15 },
+    { name: 'Legendary case', image: 'assets/svg/shop/legendary case.svg', amount: 1, cost: 500, discount: 20 }
+];
+
 function initializeShop() {
     // Инициализация системы переключения денег
     const leftArrow = document.getElementById('shop-money-left-arrow');
@@ -3265,9 +3273,52 @@ function initializeShop() {
         buyDiamondsBtn.addEventListener('click', buyDiamonds);
     }
     
+    // Инициализация системы переключения кейсов
+    const casesLeftArrow = document.getElementById('shop-cases-left-arrow');
+    const casesRightArrow = document.getElementById('shop-cases-right-arrow');
+    const buyCasesBtn = document.getElementById('shop-buy-cases-btn');
+    
+    if (casesLeftArrow) {
+        casesLeftArrow.addEventListener('click', () => switchCases('prev'));
+    }
+    
+    if (casesRightArrow) {
+        casesRightArrow.addEventListener('click', () => switchCases('next'));
+    }
+    
+    if (buyCasesBtn) {
+        buyCasesBtn.addEventListener('click', buyCases);
+    }
+    
+    // Инициализация кнопки шансов
+    const oddsBtn = document.getElementById('shop-cases-odds-btn');
+    if (oddsBtn) {
+        oddsBtn.addEventListener('click', showCaseOdds);
+    }
+    
+    // Инициализация закрытия панели шансов
+    const oddsCloseBtn = document.getElementById('case-odds-close');
+    const oddsPanel = document.getElementById('case-odds-panel');
+    if (oddsCloseBtn) {
+        oddsCloseBtn.addEventListener('click', () => {
+            if (oddsPanel) {
+                oddsPanel.style.display = 'none';
+            }
+        });
+    }
+    // Закрытие при клике на фон
+    if (oddsPanel) {
+        oddsPanel.addEventListener('click', (e) => {
+            if (e.target === oddsPanel) {
+                oddsPanel.style.display = 'none';
+            }
+        });
+    }
+    
     // Устанавливаем начальные изображения
     updateMoneyDisplay();
     updateDiamondsDisplay();
+    updateCasesDisplay();
 }
 
 function switchMoney(direction) {
@@ -3439,6 +3490,470 @@ function buyDiamonds() {
             const currentCredits = getCredits();
             setCredits(currentCredits + item.amount);
         });
+    });
+}
+
+// Функции для кейсов
+function switchCases(direction) {
+    if (direction === 'next') {
+        currentCasesIndex = (currentCasesIndex + 1) % casesItems.length;
+    } else {
+        currentCasesIndex = (currentCasesIndex - 1 + casesItems.length) % casesItems.length;
+    }
+    
+    updateCasesDisplay();
+}
+
+function updateCasesDisplay() {
+    const casesImage = document.getElementById('shop-cases-image');
+    
+    if (casesImage && casesItems[currentCasesIndex]) {
+        casesImage.style.opacity = '0';
+        
+        setTimeout(() => {
+            const item = casesItems[currentCasesIndex];
+            
+            casesImage.src = item.image;
+            casesImage.alt = item.name;
+            
+            // Настройка размера изображения
+            casesImage.style.maxWidth = '90%';
+            casesImage.style.maxHeight = '120px';
+            casesImage.style.marginTop = '-15px';
+            
+            // Обновляем цену на кнопке
+            const buyPrice = document.getElementById('shop-cases-price');
+            if (buyPrice && item.cost) {
+                buyPrice.textContent = item.cost.toLocaleString('ru-RU');
+            }
+            
+            // Обновляем значение выгоды
+            const discountValue = document.getElementById('shop-cases-discount-value');
+            if (discountValue && item.discount) {
+                discountValue.textContent = item.discount + '%';
+            }
+            
+            casesImage.style.opacity = '1';
+        }, 150);
+    }
+}
+
+// Награды для кейсов (в порядке от меньшей к большей)
+// Система весов: чем больше сумма, тем меньше вес (меньше шанс выпадения)
+const caseRewards = [
+    { amount: 1500, weight: 35 },      // Очень высокий шанс (35%)
+    { amount: 4000, weight: 28 },       // Высокий шанс (28%)
+    { amount: 7000, weight: 18 },       // Средний шанс (18%)
+    { amount: 15000, weight: 10 },     // Средний шанс (10%)
+    { amount: 20000, weight: 5 },       // Низкий шанс (5%)
+    { amount: 35000, weight: 2.5 },     // Низкий шанс (2.5%)
+    { amount: 50000, weight: 1 },       // Очень низкий шанс (1%)
+    { amount: 75000, weight: 0.4 },     // Редкий шанс (0.4%)
+    { amount: 100000, weight: 0.08 },   // Очень редкий шанс (0.08%)
+    { amount: 250000, weight: 0.02 }    // Экстремально редкий шанс (0.02%)
+];
+
+// Награды для Money case (в порядке от меньшей к большей)
+const moneyCaseRewards = [
+    { amount: 400000, weight: 35 },      // Очень высокий шанс (35%)
+    { amount: 900000, weight: 28 },      // Высокий шанс (28%)
+    { amount: 1500000, weight: 18 },     // Средний шанс (18%)
+    { amount: 2000000, weight: 10 },     // Средний шанс (10%)
+    { amount: 3000000, weight: 5 },     // Низкий шанс (5%)
+    { amount: 4500000, weight: 2.5 },    // Низкий шанс (2.5%)
+    { amount: 6000000, weight: 1 },      // Очень низкий шанс (1%)
+    { amount: 8000000, weight: 0.4 },    // Редкий шанс (0.4%)
+    { amount: 10000000, weight: 0.08 },  // Очень редкий шанс (0.08%)
+    { amount: 15000000, weight: 0.02 }   // Экстремально редкий шанс (0.02%)
+];
+
+// Награды для Legendary case (RBC и деньги смешаны)
+const legendaryCaseRewards = [
+    { amount: 150000, type: 'rbc', weight: 20 },      // Высокий шанс (20%)
+    { amount: 300000, type: 'rbc', weight: 18 },      // Высокий шанс (18%)
+    { amount: 450000, type: 'rbc', weight: 15 },      // Средний шанс (15%)
+    { amount: 500000, type: 'rbc', weight: 12 },      // Средний шанс (12%)
+    { amount: 750000, type: 'rbc', weight: 8 },       // Низкий шанс (8%)
+    { amount: 10000000, type: 'money', weight: 10 },   // Средний шанс (10%)
+    { amount: 15000000, type: 'money', weight: 7 },    // Низкий шанс (7%)
+    { amount: 20000000, type: 'money', weight: 4 },   // Низкий шанс (4%)
+    { amount: 30000000, type: 'money', weight: 3 },   // Очень низкий шанс (3%)
+    { amount: 50000000, type: 'money', weight: 1 }    // Экстремально редкий шанс (1%)
+];
+
+// Функция взвешенного рандома
+function getWeightedRandomReward(rewards) {
+    const totalWeight = rewards.reduce((sum, reward) => sum + reward.weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (let i = 0; i < rewards.length; i++) {
+        random -= rewards[i].weight;
+        if (random <= 0) {
+            return i; // Возвращаем индекс награды
+        }
+    }
+    
+    return 0; // Fallback на первую награду
+}
+
+// Функция форматирования суммы для Money case
+function formatMoneyAmount(amount) {
+    if (amount >= 1000000) {
+        const millions = amount / 1000000;
+        return millions.toFixed(millions % 1 === 0 ? 0 : 1) + ' млн';
+    }
+    return amount.toLocaleString('ru-RU');
+}
+
+// Функция показа панели шансов
+function showCaseOdds() {
+    const oddsPanel = document.getElementById('case-odds-panel');
+    const oddsList = document.getElementById('case-odds-list');
+    const oddsTitle = document.getElementById('case-odds-title');
+    
+    if (!oddsPanel || !oddsList) return;
+    
+    // Определяем текущий кейс
+    const currentCase = casesItems[currentCasesIndex];
+    if (!currentCase) return;
+    
+    // Выбираем соответствующие награды
+    let rewards;
+    let caseName;
+    if (currentCase.name === 'Money case') {
+        rewards = moneyCaseRewards;
+        caseName = 'Money case';
+    } else if (currentCase.name === 'Legendary case') {
+        rewards = legendaryCaseRewards;
+        caseName = 'Legendary case';
+    } else {
+        rewards = caseRewards;
+        caseName = 'Diamond case';
+    }
+    
+    // Обновляем заголовок
+    if (oddsTitle) {
+        oddsTitle.textContent = `Шансы наград - ${caseName}`;
+    }
+    
+    // Вычисляем общий вес для расчета процентов
+    const totalWeight = rewards.reduce((sum, reward) => sum + reward.weight, 0);
+    
+    // Очищаем список
+    oddsList.innerHTML = '';
+    
+    // Создаем элементы списка
+    rewards.forEach((reward) => {
+        const percentage = ((reward.weight / totalWeight) * 100).toFixed(2);
+        const rewardType = reward.type || (currentCase.name === 'Money case' ? 'money' : 'rbc');
+        const iconSrc = rewardType === 'money' ? 'assets/svg/bc-icon.svg' : 'assets/svg/rbc-icon.svg';
+        const iconAlt = rewardType === 'money' ? 'Money' : 'RBC';
+        
+        const rewardItem = document.createElement('div');
+        rewardItem.style.cssText = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;transition:all 0.2s ease;';
+        rewardItem.onmouseover = function() {
+            this.style.background = 'rgba(255,255,255,0.12)';
+            this.style.borderColor = 'rgba(255,255,255,0.25)';
+        };
+        rewardItem.onmouseout = function() {
+            this.style.background = 'rgba(255,255,255,0.08)';
+            this.style.borderColor = 'rgba(255,255,255,0.15)';
+        };
+        
+        // Иконка
+        const icon = document.createElement('img');
+        icon.src = iconSrc;
+        icon.alt = iconAlt;
+        icon.style.cssText = 'width:32px;height:32px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(255,255,255,0.3));';
+        
+        // Информация о награде
+        const info = document.createElement('div');
+        info.style.cssText = 'flex:1;display:flex;flex-direction:column;gap:4px;';
+        
+        const amount = document.createElement('div');
+        amount.style.cssText = 'color:#fff;font-size:14px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif;';
+        amount.textContent = rewardType === 'money' ? formatMoneyAmount(reward.amount) : reward.amount.toLocaleString('ru-RU');
+        
+        const chance = document.createElement('div');
+        chance.style.cssText = 'color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;font-family:"Segoe UI",Arial,sans-serif;';
+        chance.textContent = `Шанс: ${percentage}%`;
+        
+        info.appendChild(amount);
+        info.appendChild(chance);
+        
+        rewardItem.appendChild(icon);
+        rewardItem.appendChild(info);
+        oddsList.appendChild(rewardItem);
+    });
+    
+    // Показываем панель
+    oddsPanel.style.display = 'flex';
+}
+
+// Функция открытия кейса с анимацией прокрутки наград
+function openCase() {
+    const panel = document.getElementById('case-opening-panel');
+    const track = document.getElementById('case-rewards-track');
+    const selectedReward = document.getElementById('case-selected-reward');
+    const claimBtn = document.getElementById('case-claim-btn');
+    
+    if (!panel || !track) return;
+    
+    // Определяем тип кейса
+    const currentCase = casesItems[currentCasesIndex];
+    const isMoneyCase = currentCase && currentCase.name === 'Money case';
+    const isLegendaryCase = currentCase && currentCase.name === 'Legendary case';
+    
+    // Выбираем соответствующие награды
+    let rewards;
+    if (isMoneyCase) {
+        rewards = moneyCaseRewards;
+    } else if (isLegendaryCase) {
+        rewards = legendaryCaseRewards;
+    } else {
+        rewards = caseRewards;
+    }
+    
+    const rewardIndex = getWeightedRandomReward(rewards);
+    const selectedRewardData = rewards[rewardIndex];
+    const selectedAmount = selectedRewardData.amount;
+    const rewardType = selectedRewardData.type || (isMoneyCase ? 'money' : 'rbc');
+    
+    // Очищаем трек и сбрасываем стили
+    track.innerHTML = '';
+    track.style.transform = 'translateX(0)';
+    track.style.transition = 'none';
+    
+    // Скрываем выбранную награду и кнопку
+    selectedReward.style.display = 'none';
+    claimBtn.style.display = 'none';
+    claimBtn.style.opacity = '0';
+    claimBtn.style.transform = 'translateY(10px)';
+    
+    // Скрываем панель шансов если открыта
+    const oddsPanel = document.getElementById('case-odds-panel');
+    if (oddsPanel) {
+        oddsPanel.style.display = 'none';
+    }
+    
+    // Показываем панель
+    panel.style.display = 'flex';
+    
+    // Показываем контейнер с прокруткой (круги)
+    const rewardsContainer = document.getElementById('case-rewards-container');
+    if (rewardsContainer) {
+        rewardsContainer.style.display = 'flex';
+    }
+    
+    // Создаем ячейки с наградами
+    const totalRewards = rewards.length;
+    const copiesCount = 15; // Количество копий для бесшовной прокрутки
+    
+    // Создаем ячейки
+    for (let copy = 0; copy < copiesCount; copy++) {
+        rewards.forEach((reward, index) => {
+            const rewardCell = document.createElement('div');
+            rewardCell.className = 'case-reward-cell';
+            rewardCell.dataset.rewardIndex = index;
+            rewardCell.style.cssText = 'min-width:100px;width:100px;height:148px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:all 0.3s ease;';
+            
+            // Определяем тип награды и иконку
+            const rewardTypeForCell = reward.type || (isMoneyCase ? 'money' : 'rbc');
+            const iconSrc = rewardTypeForCell === 'money' ? 'assets/svg/bc-icon.svg' : 'assets/svg/rbc-icon.svg';
+            const iconAlt = rewardTypeForCell === 'money' ? 'Money' : 'RBC';
+            
+            const icon = document.createElement('img');
+            icon.src = iconSrc;
+            icon.alt = iconAlt;
+            icon.style.cssText = 'width:44px;height:44px;margin-bottom:8px;filter:drop-shadow(0 0 6px rgba(255,255,255,0.3));';
+            
+            const amount = document.createElement('div');
+            if (rewardTypeForCell === 'money') {
+                amount.textContent = formatMoneyAmount(reward.amount);
+            } else {
+                amount.textContent = reward.amount.toLocaleString('ru-RU');
+            }
+            amount.style.cssText = 'color:#fff;font-size:13px;font-weight:700;text-align:center;text-shadow:0 2px 4px rgba(0,0,0,0.5);font-family:"Segoe UI",Arial,sans-serif;line-height:1.2;';
+            
+            rewardCell.appendChild(icon);
+            rewardCell.appendChild(amount);
+            track.appendChild(rewardCell);
+        });
+    }
+    
+    // Ждем, пока элементы отрисуются
+    setTimeout(() => {
+        const container = track.parentElement;
+        const containerWidth = container.offsetWidth;
+        const containerCenter = containerWidth / 2;
+        
+        // Получаем размеры первой ячейки
+        const firstCell = track.querySelector('.case-reward-cell');
+        if (!firstCell) return;
+        
+        const cellRect = firstCell.getBoundingClientRect();
+        const cellWidth = cellRect.width;
+        const cellGap = 12; // gap из CSS
+        const cellTotalWidth = cellWidth + cellGap;
+        const cycleWidth = totalRewards * cellTotalWidth;
+        
+        // Вычисляем целевую позицию (в среднем цикле)
+        const targetCycle = Math.floor(copiesCount / 2);
+        const targetOffset = rewardIndex * cellTotalWidth;
+        const targetPosition = -(targetCycle * cycleWidth + targetOffset - containerCenter + cellWidth / 2);
+        
+        // Вычисляем начальную позицию (далеко справа)
+        const scrollCycles = 5 + Math.random() * 2; // 5-7 полных циклов
+        const startPosition = targetPosition - (scrollCycles * cycleWidth);
+        
+        // Устанавливаем начальную позицию
+        track.style.transform = `translateX(${startPosition}px)`;
+        track.style.transition = 'none';
+        
+        // Принудительный reflow
+        track.offsetHeight;
+        
+        // Запускаем анимацию
+        setTimeout(() => {
+            // Переключаемся на CSS transition для плавности
+            track.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            track.style.transform = `translateX(${targetPosition}px)`;
+            
+            // Ждем завершения анимации
+            const handleTransitionEnd = () => {
+                track.removeEventListener('transitionend', handleTransitionEnd);
+                
+                // Находим и подсвечиваем выбранную ячейку
+                const cells = track.querySelectorAll('.case-reward-cell');
+                let selectedCell = null;
+                let minDistance = Infinity;
+                
+                cells.forEach((cell) => {
+                    if (parseInt(cell.dataset.rewardIndex) === rewardIndex) {
+                        const rect = cell.getBoundingClientRect();
+                        const cellCenter = rect.left + rect.width / 2;
+                        const containerRect = container.getBoundingClientRect();
+                        const containerCenterX = containerRect.left + containerRect.width / 2;
+                        const distance = Math.abs(cellCenter - containerCenterX);
+                        
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            selectedCell = cell;
+                        }
+                    }
+                });
+                
+                // Подсвечиваем выбранную ячейку
+                if (selectedCell) {
+                    selectedCell.style.background = 'rgba(255,255,255,0.15)';
+                    selectedCell.style.borderColor = 'rgba(255,255,255,0.6)';
+                    selectedCell.style.transform = 'scale(1.05)';
+                    selectedCell.style.boxShadow = '0 0 20px rgba(255,255,255,0.5)';
+                }
+                
+                // Затемняем остальные
+                cells.forEach((cell) => {
+                    if (cell !== selectedCell) {
+                        cell.style.opacity = '0.25';
+                    }
+                });
+                
+                // Показываем результат
+                setTimeout(() => {
+                    const rewardAmount = document.getElementById('case-reward-amount');
+                    if (rewardAmount) {
+                        if (rewardType === 'money') {
+                            rewardAmount.textContent = formatMoneyAmount(selectedAmount);
+                        } else {
+                            rewardAmount.textContent = selectedAmount.toLocaleString('ru-RU');
+                        }
+                    }
+                    // Обновляем иконку в финальной панели
+                    const rewardIcon = selectedReward.querySelector('img');
+                    if (rewardIcon) {
+                        const finalIconSrc = rewardType === 'money' ? 'assets/svg/bc-icon.svg' : 'assets/svg/rbc-icon.svg';
+                        const finalIconAlt = rewardType === 'money' ? 'Money' : 'RBC';
+                        rewardIcon.src = finalIconSrc;
+                        rewardIcon.alt = finalIconAlt;
+                    }
+                    selectedReward.style.display = 'flex';
+                    claimBtn.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        claimBtn.style.opacity = '1';
+                        claimBtn.style.transform = 'translateY(0)';
+                    }, 200);
+                }, 400);
+            };
+            
+            track.addEventListener('transitionend', handleTransitionEnd);
+        }, 100);
+    }, 100);
+    
+    // Обработчик кнопки "Забрать"
+    let claimHandler = null;
+    claimHandler = () => {
+        // Начисляем награду в зависимости от типа
+        if (rewardType === 'money') {
+            const currentBalance = getBalance();
+            setBalance(currentBalance + selectedAmount);
+        } else {
+            const currentCredits = getCredits();
+            setCredits(currentCredits + selectedAmount);
+        }
+        
+        // Закрываем панель
+        panel.style.display = 'none';
+        if (claimHandler) {
+            claimBtn.removeEventListener('click', claimHandler);
+        }
+        
+        // Скрываем контейнер с прокруткой (круги)
+        const rewardsContainer = document.getElementById('case-rewards-container');
+        if (rewardsContainer) {
+            rewardsContainer.style.display = 'none';
+        }
+        
+        // Сбрасываем стили ячеек
+        const cells = track.querySelectorAll('.case-reward-cell');
+        cells.forEach((cell) => {
+            cell.style.opacity = '1';
+            cell.style.background = 'rgba(255,255,255,0.06)';
+            cell.style.borderColor = 'rgba(255,255,255,0.12)';
+            cell.style.transform = 'scale(1)';
+            cell.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        });
+        
+        // Сбрасываем трек
+        track.innerHTML = '';
+        track.style.transform = 'translateX(0)';
+        track.style.transition = 'none';
+    };
+    
+    claimBtn.addEventListener('click', claimHandler);
+}
+
+function buyCases() {
+    const item = casesItems[currentCasesIndex];
+    if (!item) return;
+    
+    const currentCredits = getCredits();
+    
+    // Проверяем баланс RBC
+    if (currentCredits < item.cost) {
+        alert('Недостаточно RBC!');
+        return;
+    }
+    
+    // Списываем RBC
+    setCredits(currentCredits - item.cost);
+    
+    // Закрываем панель магазина и открываем панель открытия кейса
+    hidePanelWithAnimation('shop-panel', () => {
+        // Запускаем анимацию открытия кейса
+        setTimeout(() => {
+            openCase();
+        }, 300);
     });
 }
 

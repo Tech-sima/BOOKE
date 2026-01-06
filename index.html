@@ -10,6 +10,19 @@
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
     <link rel="preload" href="assets/png/map-full.png" as="image" type="image/png">
+    <!-- Предзагрузка всех SVG элементов панели магазина -->
+    <link rel="preload" href="assets/svg/shop/Some money.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/Lots of money.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/Money Mountain.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/A few diamonds.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/Lots of diamonds.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/Mountain of diamonds.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/Diamond case.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/Money case.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/shop/legendary case.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/XTR.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/rbc-icon.svg" as="image" type="image/svg+xml">
+    <link rel="preload" href="assets/svg/bc-icon.svg" as="image" type="image/svg+xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
@@ -230,7 +243,7 @@
         .building-panel.show{opacity:1;transform:translateX(-50%) scale(1);}
         .building-panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:2px;}
         .building-panel-title{display:flex;align-items:center;gap:4px;}
-        .building-icon{font-size:20px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));}
+        .building-icon{font-size:20px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));}
         .building-panel-title h2{margin:0;font-size:14px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);}
         .building-panel-close{background:rgba(255,255,255,0.1);border:none;color:white;font-size:16px;cursor:pointer;
             width:32px;height:32px;display:flex;align-items:center;justify-content:center;
@@ -291,16 +304,6 @@
             position: fixed !important;
         }
         .profit-indicator.show{opacity:1;transform:scale(1);}
-        
-        /* Скрытие кругов когда открыта панель кейса */
-        .case-panel-open .profit-indicator,
-        .case-panel-open .profit-indicator-wrapper {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
-            z-index: -1 !important;
-        }
 
         .profit-indicator:hover .profit-indicator-wrapper{
             transform:scale(1.1);
@@ -2152,7 +2155,7 @@
                 <!-- Три ячейки (вертикально) -->
                 <div style="display:flex;flex-direction:column;gap:12px;width:100%;margin-bottom:12px;">
                     <!-- Ячейка 1 с системой переключения -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">1</div>
                         <!-- Ячейка выгоды в правом верхнем углу -->
@@ -2170,7 +2173,7 @@
                         
                         <!-- Изображение и информация -->
                         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:20px;width:100%;max-width:320px;">
-                            <img id="shop-money-image" src="assets/svg/shop/Some money.svg" alt="Money" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));margin-top:0;">
+                            <img id="shop-money-image" src="assets/svg/shop/Some money.svg" alt="Money" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));margin-top:0;">
                             
                             <!-- Ячейки в стиле панели инвестиций -->
                             <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
@@ -2201,7 +2204,7 @@
                     </div>
                     
                     <!-- Ячейка 2 с системой переключения алмазов -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">2</div>
                         
@@ -2220,7 +2223,7 @@
                         
                         <!-- Изображение и информация -->
                         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:20px;width:100%;max-width:320px;">
-                            <img id="shop-diamonds-image" src="assets/svg/shop/A few diamonds.svg" alt="Diamonds" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));margin-top:0;">
+                            <img id="shop-diamonds-image" src="assets/svg/shop/A few diamonds.svg" alt="Diamonds" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));margin-top:0;">
                             
                             <!-- Ячейки в стиле панели инвестиций -->
                             <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
@@ -2251,7 +2254,7 @@
                     </div>
                     
                     <!-- Ячейка 3 с системой переключения кейсов -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">3</div>
                         
@@ -2277,7 +2280,7 @@
                         
                         <!-- Изображение и информация -->
                         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:20px;width:100%;max-width:320px;">
-                            <img id="shop-cases-image" src="assets/svg/shop/Diamond case.svg" alt="Case" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));margin-top:0;">
+                            <img id="shop-cases-image" src="assets/svg/shop/Diamond case.svg" alt="Case" style="max-width:90%;max-height:120px;object-fit:contain;transition:opacity 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));margin-top:0;">
                             
                             <!-- Кнопка купить -->
                             <div style="display:flex;flex-direction:column;gap:6px;width:100%;margin-top:10px;">
@@ -2300,28 +2303,28 @@
                 <!-- Сетка 2x2 из 4 ячеек -->
                 <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;">
                     <!-- Ячейка 4 -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">4</div>
                         <!-- Пустая ячейка -->
                     </div>
                     
                     <!-- Ячейка 5 -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">5</div>
                         <!-- Пустая ячейка -->
                     </div>
                     
                     <!-- Ячейка 6 -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">6</div>
                         <!-- Пустая ячейка -->
                     </div>
                     
                     <!-- Ячейка 7 -->
-                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:120px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
                         <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">7</div>
                         <!-- Пустая ячейка -->
@@ -2409,7 +2412,7 @@
                     <div style="font-size:14px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8);margin-bottom:8px;letter-spacing:0.5px;">Вы выиграли!</div>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <div id="case-reward-amount" style="font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 12px rgba(255,255,255,0.8);"></div>
-                        <img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:32px;height:32px;filter:drop-shadow(0 0 12px rgba(255,255,255,0.9));">
+                        <img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:32px;height:32px;filter:drop-shadow(0 0 24px rgba(255,255,255,0.9));">
                     </div>
                 </div>
                 

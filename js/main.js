@@ -3358,6 +3358,9 @@ function updateMoneyDisplay() {
             // Сдвигаем все изображения выше
             moneyImage.style.marginTop = '-15px';
             
+            // Увеличиваем подсветку SVG в 2 раза
+            moneyImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
+            
             // Обновляем количество
             if (moneyAmount && item.amount) {
                 moneyAmount.textContent = item.amount.toLocaleString('ru-RU');
@@ -3444,6 +3447,9 @@ function updateDiamondsDisplay() {
             
             diamondsImage.style.marginTop = '-15px';
             
+            // Увеличиваем подсветку SVG в 2 раза
+            diamondsImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
+            
             // Обновляем количество
             if (diamondsAmount && item.amount) {
                 diamondsAmount.textContent = item.amount.toLocaleString('ru-RU');
@@ -3522,18 +3528,26 @@ function updateCasesDisplay() {
             casesImage.style.maxHeight = '120px';
             casesImage.style.marginTop = '-15px';
             
+            // Увеличиваем подсветку SVG в 2 раза
+            casesImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
+            
             // Обновляем цену на кнопке (в звездах Telegram)
             const buyPrice = document.getElementById('shop-cases-price');
             if (buyPrice && item.starsPrice) {
                 buyPrice.textContent = item.starsPrice;
-                // Добавляем иконку звезды, если её нет
+                // Добавляем иконку XTR, если её нет
                 const priceParent = buyPrice.parentElement;
-                if (priceParent && !priceParent.querySelector('.star-icon')) {
-                    const starIcon = document.createElement('span');
-                    starIcon.className = 'star-icon';
-                    starIcon.innerHTML = '⭐';
-                    starIcon.style.marginLeft = '2px';
-                    priceParent.appendChild(starIcon);
+                if (priceParent && !priceParent.querySelector('.xtr-icon')) {
+                    const xtrIcon = document.createElement('img');
+                    xtrIcon.className = 'xtr-icon';
+                    xtrIcon.src = 'assets/svg/XTR.svg';
+                    xtrIcon.alt = 'XTR';
+                    xtrIcon.style.width = '24px';
+                    xtrIcon.style.height = '24px';
+                    xtrIcon.style.marginLeft = '2px';
+                    xtrIcon.style.objectFit = 'contain';
+                    xtrIcon.style.flexShrink = '0';
+                    priceParent.appendChild(xtrIcon);
                 }
             }
             
@@ -3674,7 +3688,7 @@ function showCaseOdds() {
         const icon = document.createElement('img');
         icon.src = iconSrc;
         icon.alt = iconAlt;
-        icon.style.cssText = 'width:32px;height:32px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(255,255,255,0.3));';
+        icon.style.cssText = 'width:32px;height:32px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,255,255,0.3));';
         
         // Информация о награде
         const info = document.createElement('div');
@@ -3698,89 +3712,6 @@ function showCaseOdds() {
     
     // Показываем панель
     oddsPanel.style.display = 'flex';
-}
-
-// Функции для скрытия/показа кругов зданий
-function hideBuildingCircles() {
-    // Скрываем profit-indicator (круги с индикаторами прибыли) - более агрессивно
-    const profitIndicators = document.querySelectorAll('.profit-indicator');
-    profitIndicators.forEach(indicator => {
-        if (indicator) {
-            indicator.style.display = 'none';
-            indicator.style.visibility = 'hidden';
-            indicator.style.opacity = '0';
-            indicator.style.pointerEvents = 'none';
-            indicator.style.zIndex = '-1';
-        }
-    });
-    
-    // Скрываем круги из pure-map (ищем все элементы с кругами в pure-map-buildings)
-    const pureMapBuildings = document.getElementById('pure-map-buildings');
-    if (pureMapBuildings) {
-        const circles = pureMapBuildings.querySelectorAll('div');
-        circles.forEach(circle => {
-            const borderRadius = window.getComputedStyle(circle).borderRadius;
-            if (borderRadius === '50%' || borderRadius.includes('50%')) {
-                circle.style.display = 'none';
-                circle.style.visibility = 'hidden';
-                circle.style.opacity = '0';
-                circle.style.pointerEvents = 'none';
-                circle.style.zIndex = '-1';
-            }
-        });
-    }
-    
-    // Также скрываем все элементы с классом profit-indicator-wrapper
-    const profitWrappers = document.querySelectorAll('.profit-indicator-wrapper');
-    profitWrappers.forEach(wrapper => {
-        if (wrapper) {
-            wrapper.style.display = 'none';
-            wrapper.style.visibility = 'hidden';
-            wrapper.style.opacity = '0';
-            wrapper.style.pointerEvents = 'none';
-        }
-    });
-}
-
-function showBuildingCircles() {
-    // Показываем profit-indicator обратно
-    const profitIndicators = document.querySelectorAll('.profit-indicator');
-    profitIndicators.forEach(indicator => {
-        if (indicator) {
-            indicator.style.display = '';
-            indicator.style.visibility = '';
-            indicator.style.opacity = '';
-            indicator.style.pointerEvents = '';
-            indicator.style.zIndex = '';
-        }
-    });
-    
-    // Показываем круги из pure-map обратно
-    const pureMapBuildings = document.getElementById('pure-map-buildings');
-    if (pureMapBuildings) {
-        const circles = pureMapBuildings.querySelectorAll('div');
-        circles.forEach(circle => {
-            const borderRadius = window.getComputedStyle(circle).borderRadius;
-            if (borderRadius === '50%' || borderRadius.includes('50%')) {
-                circle.style.display = '';
-                circle.style.visibility = '';
-                circle.style.opacity = '';
-                circle.style.pointerEvents = '';
-                circle.style.zIndex = '';
-            }
-        });
-    }
-    
-    // Показываем profit-indicator-wrapper обратно
-    const profitWrappers = document.querySelectorAll('.profit-indicator-wrapper');
-    profitWrappers.forEach(wrapper => {
-        if (wrapper) {
-            wrapper.style.display = '';
-            wrapper.style.visibility = '';
-            wrapper.style.opacity = '';
-            wrapper.style.pointerEvents = '';
-        }
-    });
 }
 
 // Функция открытия кейса с анимацией прокрутки наград
@@ -3829,12 +3760,6 @@ function openCase() {
         oddsPanel.style.display = 'none';
     }
     
-    // Скрываем круги зданий перед показом панели
-    hideBuildingCircles();
-    
-    // Добавляем класс на body для CSS скрытия
-    document.body.classList.add('case-panel-open');
-    
     // Показываем панель
     panel.style.display = 'flex';
     
@@ -3864,7 +3789,7 @@ function openCase() {
             const icon = document.createElement('img');
             icon.src = iconSrc;
             icon.alt = iconAlt;
-            icon.style.cssText = 'width:44px;height:44px;margin-bottom:8px;filter:drop-shadow(0 0 6px rgba(255,255,255,0.3));';
+            icon.style.cssText = 'width:44px;height:44px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(255,255,255,0.3));';
             
             const amount = document.createElement('div');
             if (rewardTypeForCell === 'money') {
@@ -4006,12 +3931,6 @@ function openCase() {
         if (claimHandler) {
             claimBtn.removeEventListener('click', claimHandler);
         }
-        
-        // Убираем класс с body
-        document.body.classList.remove('case-panel-open');
-        
-        // Показываем круги зданий обратно после закрытия панели
-        showBuildingCircles();
         
         // Скрываем контейнер с прокруткой (круги)
         const rewardsContainer = document.getElementById('case-rewards-container');
@@ -4417,7 +4336,7 @@ function animateShopRBCCollection(amount, callback) {
     centerDiamonds.style.opacity = '0';
     centerDiamonds.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     centerDiamonds.style.zIndex = '10000';
-    centerDiamonds.style.filter = 'drop-shadow(0 0 15px rgba(255,255,255,0.8)) drop-shadow(0 0 2px rgba(0,0,0,1)) drop-shadow(0 0 0px rgba(0,0,0,0.9))';
+    centerDiamonds.style.filter = 'drop-shadow(0 0 30px rgba(255,255,255,0.8)) drop-shadow(0 0 4px rgba(0,0,0,1)) drop-shadow(0 0 0px rgba(0,0,0,0.9))';
     container.appendChild(centerDiamonds);
     
     // Показываем центральный SVG
@@ -4687,7 +4606,7 @@ function animateShopMoneyCollection(amount, callback) {
     centerMoney.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     centerMoney.style.zIndex = '10000';
     // Оптимизированная подсветка и черный контур по форме SVG (не квадрат)
-    centerMoney.style.filter = 'drop-shadow(0 0 20px rgba(255,255,255,0.9)) drop-shadow(0 0 2px rgba(0,0,0,1)) drop-shadow(0 0 0px rgba(0,0,0,0.9))';
+    centerMoney.style.filter = 'drop-shadow(0 0 40px rgba(255,255,255,0.9)) drop-shadow(0 0 4px rgba(0,0,0,1)) drop-shadow(0 0 0px rgba(0,0,0,0.9))';
     container.appendChild(centerMoney);
     
     // Показываем центральный SVG

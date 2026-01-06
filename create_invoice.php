@@ -45,9 +45,9 @@ $payload = json_encode([
     'timestamp' => time()
 ]);
 
-// Данные для создания invoice
+// Данные для создания invoice link
+// createInvoiceLink не требует chat_id, так как создает ссылку, а не отправляет сообщение
 $invoiceData = [
-    'chat_id' => $userId,
     'title' => "Покупка {$caseName}",
     'description' => "{$caseName} за {$starsPrice} звезд Telegram",
     'payload' => $payload,
@@ -59,8 +59,9 @@ $invoiceData = [
     ]])
 ];
 
-// Отправляем запрос к Telegram Bot API
-$url = "https://api.telegram.org/bot{$BOT_TOKEN}/sendInvoice";
+// Отправляем запрос к Telegram Bot API для создания invoice link (не sendInvoice!)
+// createInvoiceLink создает ссылку, которую можно открыть в Mini App
+$url = "https://api.telegram.org/bot{$BOT_TOKEN}/createInvoiceLink";
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($invoiceData));

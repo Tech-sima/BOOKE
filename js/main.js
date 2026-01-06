@@ -3962,67 +3962,48 @@ async function buyCases() {
         return;
     }
     
-    // Создаем invoice через Bot API
+    // Создаем invoice link и открываем его прямо в Mini App
     try {
-        // URL endpoint для создания invoice (замените на ваш)
-        // Если у вас нет сервера, можно использовать прямой вызов Bot API (см. комментарий ниже)
-        const INVOICE_ENDPOINT = 'create_invoice.php'; // Замените на полный URL, например: 'https://yourdomain.com/create_invoice.php'
+        // Создаем invoice link через Bot API
+        const invoiceUrl = await createInvoiceLink(userId, item, currentCasesIndex);
         
-        // Данные для создания invoice
-        const invoiceRequest = {
-            caseIndex: currentCasesIndex,
-            caseName: item.name,
-            starsPrice: item.starsPrice,
-            userId: userId
-        };
-        
-        // Отправляем запрос на создание invoice
-        const response = await fetch(INVOICE_ENDPOINT, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(invoiceRequest)
-        });
-        
-        const result = await response.json();
-        
-        if (result.ok) {
-            // Invoice создан успешно
-            // Telegram автоматически покажет окно подтверждения оплаты
-            // После успешной оплаты обработаем через invoice_closed событие
-            console.log('Invoice создан успешно, ожидаем подтверждения оплаты...');
-        } else {
-            console.error('Ошибка при создании invoice:', result);
-            
-            // Fallback: прямой вызов Bot API (если нет сервера)
-            // ВНИМАНИЕ: Токен в клиентском коде - небезопасно, используйте только для тестирования!
-            if (result.error && result.error.includes('404') || result.error.includes('Not Found')) {
-                console.log('Пробуем прямой вызов Bot API...');
-                await createInvoiceDirectly(userId, item, currentCasesIndex);
+        if (invoiceUrl) {
+            // Открываем invoice прямо в Mini App (не как сообщение от бота)
+            if (webApp.openInvoice) {
+                webApp.openInvoice(invoiceUrl, (status) => {
+                    if (status === 'paid') {
+                        // Платеж успешен - открываем кейс
+                        handleSuccessfulCasePurchase(item);
+                    } else if (status === 'cancelled') {
+                        console.log('Платеж отменен пользователем');
+                    } else if (status === 'failed') {
+                        alert('Ошибка при оплате. Попробуйте еще раз.');
+                    }
+                });
             } else {
-                alert('Ошибка при создании платежа: ' + (result.description || result.error || 'Неизвестная ошибка'));
+                // Fallback: открываем через ссылку
+                if (webApp.openLink) {
+                    webApp.openLink(invoiceUrl);
+                } else {
+                    alert('Ваша версия Telegram не поддерживает прямую оплату. Обновите приложение.');
+                }
             }
+        } else {
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
         }
         
     } catch (error) {
         console.error('Ошибка при покупке:', error);
-        // Fallback: прямой вызов Bot API
-        try {
-            await createInvoiceDirectly(userId, item, currentCasesIndex);
-        } catch (fallbackError) {
-            console.error('Ошибка при fallback:', fallbackError);
-            alert('Ошибка при обработке платежа. Попробуйте еще раз.');
-        }
+        alert('Ошибка при обработке платежа. Попробуйте еще раз.');
     }
 }
 
-// Функция прямого создания invoice через Bot API (fallback, если нет сервера)
-async function createInvoiceDirectly(userId, item, caseIndex) {
-    // ВНИМАНИЕ: Токен в клиентском коде - небезопасно!
-    // Используйте только если нет возможности использовать сервер
+// Функция создания invoice link для открытия в Mini App
+async function createInvoiceLink(userId, item, caseIndex) {
+    // Токен бота
     const BOT_TOKEN = '8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU';
     
+    // Создаем payload для invoice
     const payload = JSON.stringify({
         type: 'case_purchase',
         caseIndex: caseIndex,
@@ -4031,33 +4012,42 @@ async function createInvoiceDirectly(userId, item, caseIndex) {
         timestamp: Date.now()
     });
     
+    // Используем createInvoiceLink вместо sendInvoice
+    // createInvoiceLink создает ссылку, которую можно открыть в Mini App
     const invoiceData = {
-        chat_id: userId,
         title: `Покупка ${item.name}`,
         description: `${item.name} за ${item.starsPrice} звезд Telegram`,
         payload: payload,
-        provider_token: '',
-        currency: 'XTR',
+        provider_token: '', // Для Telegram Stars оставляем пустым
+        currency: 'XTR',    // XTR - валюта Telegram Stars
         prices: JSON.stringify([{
             label: item.name,
             amount: item.starsPrice
         }])
     };
     
-    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendInvoice`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(invoiceData)
-    });
-    
-    const result = await response.json();
-    
-    if (result.ok) {
-        console.log('Invoice создан успешно через прямой вызов');
-    } else {
-        throw new Error(result.description || 'Ошибка при создании invoice');
+    try {
+        // Создаем invoice link через Bot API
+        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(invoiceData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.ok && result.result) {
+            // Возвращаем ссылку на invoice
+            return result.result;
+        } else {
+            console.error('Ошибка при создании invoice link:', result);
+            return null;
+        }
+    } catch (error) {
+        console.error('Ошибка при создании invoice link:', error);
+        return null;
     }
 }
 

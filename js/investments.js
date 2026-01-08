@@ -265,7 +265,7 @@ function purchaseBuilding(buildingId) {
     } else {
         localStorage.setItem('credits', (currentRBC - cost).toString());
         const rbcValue = document.getElementById('rbc-value');
-        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+        if (rbcValue) rbcValue.textContent = typeof formatNumber === 'function' ? formatNumber(currentRBC - cost) : (currentRBC - cost).toString();
     }
     
     // Покупаем здание
@@ -316,7 +316,7 @@ function upgradeBuilding(buildingId) {
     } else {
         localStorage.setItem('credits', (currentRBC - cost).toString());
         const rbcValue = document.getElementById('rbc-value');
-        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+        if (rbcValue) rbcValue.textContent = typeof formatNumber === 'function' ? formatNumber(currentRBC - cost) : (currentRBC - cost).toString();
     }
     
     // Улучшаем здание
@@ -389,7 +389,7 @@ function purchaseTransport(vehicleId) {
     } else {
         localStorage.setItem('credits', (currentRBC - cost).toString());
         const rbcValue = document.getElementById('rbc-value');
-        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+        if (rbcValue) rbcValue.textContent = typeof formatNumber === 'function' ? formatNumber(currentRBC - cost) : (currentRBC - cost).toString();
     }
     
     // Покупаем транспорт
@@ -429,7 +429,7 @@ function upgradeTransport(vehicleId) {
     } else {
         localStorage.setItem('credits', (currentRBC - cost).toString());
         const rbcValue = document.getElementById('rbc-value');
-        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+        if (rbcValue) rbcValue.textContent = typeof formatNumber === 'function' ? formatNumber(currentRBC - cost) : (currentRBC - cost).toString();
     }
     
     // Улучшаем транспорт
@@ -490,7 +490,7 @@ function purchaseJewelry(itemId) {
     } else {
         localStorage.setItem('credits', (currentRBC - cost).toString());
         const rbcValue = document.getElementById('rbc-value');
-        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+        if (rbcValue) rbcValue.textContent = typeof formatNumber === 'function' ? formatNumber(currentRBC - cost) : (currentRBC - cost).toString();
     }
     
     // Покупаем драгоценность
@@ -530,7 +530,7 @@ function upgradeJewelry(itemId) {
     } else {
         localStorage.setItem('credits', (currentRBC - cost).toString());
         const rbcValue = document.getElementById('rbc-value');
-        if (rbcValue) rbcValue.textContent = (currentRBC - cost).toString();
+        if (rbcValue) rbcValue.textContent = typeof formatNumber === 'function' ? formatNumber(currentRBC - cost) : (currentRBC - cost).toString();
     }
     
     // Улучшаем драгоценность
@@ -1104,6 +1104,8 @@ function setupInvestments() {
     initInvestments();
     initInvestmentsEvents();
     setupCreditsInterceptor();
+    // Начисляем накопленную прибыль при загрузке страницы
+    processInvestmentsIncome();
     updateInvestmentsUI();
     updateTotalProfit();
     startInvestmentsIncome();
@@ -1126,6 +1128,8 @@ function setupInvestments() {
         const observer = new MutationObserver(() => {
             const isOpen = panel.style.display !== 'none';
             if (isOpen) {
+                // Начисляем накопленную прибыль при открытии панели
+                processInvestmentsIncome();
                 updateInvestmentsUI();
                 
                 // Показываем кнопку "назад" в Telegram Mini App
@@ -1149,6 +1153,8 @@ function setupInvestments() {
         if (bottomBanner) {
             bottomBanner.addEventListener('click', () => {
                 setTimeout(() => {
+                    // Начисляем накопленную прибыль при открытии панели
+                    processInvestmentsIncome();
                     updateInvestmentsUI();
                     // Показываем кнопку "назад" в Telegram Mini App
                     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {

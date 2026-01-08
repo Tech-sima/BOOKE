@@ -1186,10 +1186,10 @@ function setCredits(v){
         }
     }
     if(creditsAmount) {
-        creditsAmount.textContent=v;
+        creditsAmount.textContent=formatNumber(v);
     }
     if(rbcValue) {
-        rbcValue.textContent=v;
+        rbcValue.textContent=formatNumber(v);
     }
 }
 
@@ -1940,9 +1940,12 @@ function getCharactersCount(){
     // Базовые персонажи всегда доступны: blumy, redjy, grinni, purpe (4 персонажа)
     let count = 4;
     
-    // Проверяем, есть ли robo-blumy в списке доступных персонажей
+    // Проверяем, есть ли robo-blumy и pinky в списке доступных персонажей
     const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
     if(availableCharacters.includes('robo-blumy')){
+        count++;
+    }
+    if(availableCharacters.includes('pinky')){
         count++;
     }
     
@@ -1954,7 +1957,7 @@ function updateCharactersCount(){
     const refValue = document.getElementById('ref-value');
     if(refValue) {
         const count = getCharactersCount();
-        refValue.textContent = count + '/5';
+        refValue.textContent = count + '/6';
     }
 }
 
@@ -1964,7 +1967,7 @@ const rbcValue = document.getElementById('rbc-value');
 const refValue = document.getElementById('ref-value');
 
 if(bcValue) bcValue.textContent=formatNumber(getBalance());
-if(rbcValue) rbcValue.textContent=getCredits();
+if(rbcValue) rbcValue.textContent=formatNumber(getCredits());
 updateCharactersCount();
 
 // === PHONE PANEL ===
@@ -2806,8 +2809,8 @@ function renderCharacters(filter = 'all'){
     // Получаем данные о нанятых персонажах
     const hiredEmployees = JSON.parse(localStorage.getItem('hiredEmployees')) || {};
     
-    // Данные персонажей (4 основных + robo-blumy если получен)
-    // ID должны соответствовать ключам в hiredEmployees: 'grinni', 'purpe', 'redjy', 'blumy', 'robo-blumy'
+    // Данные персонажей (4 основных + robo-blumy и pinky если получены)
+    // ID должны соответствовать ключам в hiredEmployees: 'grinni', 'purpe', 'redjy', 'blumy', 'robo-blumy', 'pinky'
     const baseCharacters = [
         {
             id: 'blumy',
@@ -2843,7 +2846,7 @@ function renderCharacters(filter = 'all'){
         }
     ];
     
-    // Проверяем, получен ли robo-blumy из ультра подарка
+    // Проверяем, получен ли robo-blumy из ультра подарка и pinky из Rare кейса
     const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
     const charactersData = [...baseCharacters];
     
@@ -2855,6 +2858,17 @@ function renderCharacters(filter = 'all'){
             level: 1,
             skill: 'Программист',
             rarity: 5
+        });
+    }
+    
+    if(availableCharacters.includes('pinky')){
+        charactersData.push({
+            id: 'pinky',
+            name: 'Пинки',
+            image: 'assets/svg/characters-panel/pinky.svg',
+            level: 1,
+            skill: 'Обаяние',
+            rarity: 4
         });
     }
     
@@ -2872,11 +2886,14 @@ function renderCharacters(filter = 'all'){
     // Создаем карточки персонажей
     charactersToShow.forEach(char => {
         const isRoboBlumy = char.id === 'robo-blumy';
+        const isPinky = char.id === 'pinky';
         
         // Стили карточки
         let cardStyle = 'background:rgba(60,60,60,0.95);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);';
         if(isRoboBlumy){
             cardStyle = 'background:linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,193,7,0.2) 100%);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(255,215,0,0.3);border:2px solid rgba(255,215,0,0.5);';
+        } else if(isPinky){
+            cardStyle = 'background:linear-gradient(135deg, rgba(138,43,226,0.2) 0%, rgba(75,0,130,0.2) 100%);border-radius:12px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(138,43,226,0.3);border:2px solid rgba(138,43,226,0.5);';
         }
         
         const card = document.createElement('div');
@@ -2884,7 +2901,7 @@ function renderCharacters(filter = 'all'){
         
         // Изображение персонажа
         const imageDiv = document.createElement('div');
-        if(isRoboBlumy){
+        if(isRoboBlumy || isPinky){
             imageDiv.style.cssText = 'flex-shrink:0;width:80px;height:80px;border-radius:8px;overflow:visible;display:flex;align-items:center;justify-content:center;';
         } else {
             imageDiv.style.cssText = 'flex-shrink:0;width:80px;height:80px;border-radius:8px;overflow:hidden;';
@@ -2894,6 +2911,8 @@ function renderCharacters(filter = 'all'){
         img.alt = char.name;
         if(isRoboBlumy){
             img.style.cssText = 'width:120%;height:120%;object-fit:contain;transform:scale(1.2);';
+        } else if(isPinky){
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
         } else {
             img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
         }
@@ -2928,6 +2947,9 @@ function renderCharacters(filter = 'all'){
         if(isRoboBlumy){
             rarityText.textContent = 'Уникальный';
             rarityText.style.cssText = 'color:#fff;font-size:11px;font-weight:700;';
+        } else if(isPinky){
+            rarityText.textContent = 'Epic';
+            rarityText.style.cssText = 'color:#fff;font-size:11px;font-weight:700;';
         } else {
             rarityText.textContent = 'Базовая';
             rarityText.style.cssText = 'color:#fff;font-size:11px;';
@@ -2935,7 +2957,7 @@ function renderCharacters(filter = 'all'){
         rarityDiv.appendChild(rarityLabel);
         rarityDiv.appendChild(rarityText);
         
-        // Бонус для robo-blumy
+        // Бонус для robo-blumy и pinky
         if(isRoboBlumy){
             const bonusDiv = document.createElement('div');
             bonusDiv.style.cssText = 'font-size:11px;color:rgba(255,215,0,0.9);display:flex;justify-content:space-between;align-items:center;margin-top:4px;';
@@ -2944,6 +2966,17 @@ function renderCharacters(filter = 'all'){
             const bonusText = document.createElement('span');
             bonusText.textContent = 'x15 к прибыли';
             bonusText.style.cssText = 'color:#ffd700;font-size:11px;font-weight:700;text-shadow:0 0 4px rgba(255,215,0,0.5);';
+            bonusDiv.appendChild(bonusLabel);
+            bonusDiv.appendChild(bonusText);
+            infoDiv.appendChild(bonusDiv);
+        } else if(isPinky){
+            const bonusDiv = document.createElement('div');
+            bonusDiv.style.cssText = 'font-size:11px;color:rgba(138,43,226,0.9);display:flex;justify-content:space-between;align-items:center;margin-top:4px;';
+            const bonusLabel = document.createElement('span');
+            bonusLabel.textContent = 'Бонус';
+            const bonusText = document.createElement('span');
+            bonusText.textContent = 'x5 к прибыли';
+            bonusText.style.cssText = 'color:#8a2be2;font-size:11px;font-weight:700;text-shadow:0 0 4px rgba(138,43,226,0.5);';
             bonusDiv.appendChild(bonusLabel);
             bonusDiv.appendChild(bonusText);
             infoDiv.appendChild(bonusDiv);
@@ -3233,9 +3266,12 @@ const diamondsItems = [
 
 // Система переключения кейсов в третьей ячейке
 let currentCasesIndex = 0;
+let isLegendCaseFromCell6 = false; // Флаг для определения Legend case из ячейки 6
+let isUltimaCaseFromCell7 = false; // Флаг для определения Ultima case из ячейки 7
+let currentCaseItem = null; // Текущий открываемый кейс (для Rare, Epic, Legend, Ultima cases)
 const casesItems = [
-    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, starsPrice: 1, discount: 10 },
     { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, starsPrice: 1, discount: 15 },
+    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, starsPrice: 1, discount: 10 },
     { name: 'Legendary case', image: 'assets/svg/shop/legendary case.svg', amount: 1, cost: 500, starsPrice: 1, discount: 20 }
 ];
 
@@ -3291,10 +3327,102 @@ function initializeShop() {
         buyCasesBtn.addEventListener('click', buyCases);
     }
     
+    // Инициализация кнопки покупки Rare кейса
+    const buyRareCaseBtn = document.getElementById('shop-buy-rare-case-btn');
+    if (buyRareCaseBtn) {
+        buyRareCaseBtn.addEventListener('click', () => {
+            // Rare case пока бесплатный
+            handleRareCasePurchase();
+        });
+    }
+    
+    // Обработчик кнопки покупки Epic case
+    const buyEpicCaseBtn = document.getElementById('shop-buy-epic-case-btn');
+    if (buyEpicCaseBtn) {
+        buyEpicCaseBtn.addEventListener('click', () => {
+            // Epic case пока бесплатный (как Rare case)
+            handleEpicCasePurchase();
+        });
+    }
+    
+    // Инициализация кнопки покупки Legend case
+    const buyLegendCaseBtn = document.getElementById('shop-buy-legend-case-btn');
+    if (buyLegendCaseBtn) {
+        buyLegendCaseBtn.addEventListener('click', () => {
+            // Legend case пока бесплатный
+            handleLegendCasePurchase();
+        });
+    }
+    
+    // Инициализация кнопки покупки Ultima case
+    const buyUltimaCaseBtn = document.getElementById('shop-buy-ultima-case-btn');
+    if (buyUltimaCaseBtn) {
+        buyUltimaCaseBtn.addEventListener('click', () => {
+            // Ultima case пока бесплатный
+            handleUltimaCasePurchase();
+        });
+    }
+    
     // Инициализация кнопки шансов
     const oddsBtn = document.getElementById('shop-cases-odds-btn');
     if (oddsBtn) {
         oddsBtn.addEventListener('click', showCaseOdds);
+    }
+    
+    // Инициализация кнопки шансов для Rare case
+    const rareCaseOddsBtn = document.getElementById('shop-rare-case-odds-btn');
+    if (rareCaseOddsBtn) {
+        rareCaseOddsBtn.addEventListener('click', () => {
+            // Устанавливаем индекс на Rare case
+            const rareCaseIndex = casesItems.findIndex(item => item.name === 'Rare case');
+            if (rareCaseIndex !== -1) {
+                currentCasesIndex = rareCaseIndex;
+                showCaseOdds();
+            }
+        });
+    }
+    
+    // Инициализация кнопки шансов для Epic case
+    const epicCaseOddsBtn = document.getElementById('shop-epic-case-odds-btn');
+    if (epicCaseOddsBtn) {
+        epicCaseOddsBtn.addEventListener('click', () => {
+            // Устанавливаем индекс на Epic case
+            const epicCaseIndex = casesItems.findIndex(item => item.name === 'Epic case');
+            if (epicCaseIndex !== -1) {
+                currentCasesIndex = epicCaseIndex;
+                showCaseOdds();
+            }
+        });
+    }
+    
+    // Инициализация кнопки шансов для Legend case
+    const legendCaseOddsBtn = document.getElementById('shop-legend-case-odds-btn');
+    if (legendCaseOddsBtn) {
+        legendCaseOddsBtn.addEventListener('click', () => {
+            // Устанавливаем флаг, что это Legend case из ячейки 6
+            isLegendCaseFromCell6 = true;
+            // Устанавливаем индекс на Legendary case
+            const legendCaseIndex = casesItems.findIndex(item => item.name === 'Legendary case');
+            if (legendCaseIndex !== -1) {
+                currentCasesIndex = legendCaseIndex;
+                showCaseOdds();
+            }
+        });
+    }
+    
+    // Инициализация кнопки шансов для Ultima case
+    const ultimaCaseOddsBtn = document.getElementById('shop-ultima-case-odds-btn');
+    if (ultimaCaseOddsBtn) {
+        ultimaCaseOddsBtn.addEventListener('click', () => {
+            // Устанавливаем флаг, что это Ultima case из ячейки 7
+            isUltimaCaseFromCell7 = true;
+            // Устанавливаем индекс на Legendary case (используем тот же элемент)
+            const ultimaCaseIndex = casesItems.findIndex(item => item.name === 'Legendary case');
+            if (ultimaCaseIndex !== -1) {
+                currentCasesIndex = ultimaCaseIndex;
+                showCaseOdds();
+            }
+        });
     }
     
     // Инициализация закрытия панели шансов
@@ -3334,11 +3462,10 @@ function switchMoney(direction) {
 
 function updateMoneyDisplay() {
     const moneyImage = document.getElementById('shop-money-image');
-    const moneyAmount = document.getElementById('shop-money-amount');
+    const moneyTitle = document.getElementById('shop-money-title');
     
     if (moneyImage && moneyItems[currentMoneyIndex]) {
         moneyImage.style.opacity = '0';
-        if (moneyAmount) moneyAmount.style.opacity = '0';
         
         setTimeout(() => {
             const item = moneyItems[currentMoneyIndex];
@@ -3346,40 +3473,27 @@ function updateMoneyDisplay() {
             moneyImage.src = item.image;
             moneyImage.alt = item.name;
             
-            // Делаем Money Mountain немного больше, но не слишком
-            if (currentMoneyIndex === 2) { // Money Mountain - третий элемент (индекс 2)
-                moneyImage.style.maxWidth = '90%';
-                moneyImage.style.maxHeight = '130px';
-            } else {
-                moneyImage.style.maxWidth = '90%';
-                moneyImage.style.maxHeight = '120px';
-            }
-            
-            // Сдвигаем все изображения выше
-            moneyImage.style.marginTop = '-15px';
-            
             // Увеличиваем подсветку SVG в 2 раза
             moneyImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
             
-            // Обновляем количество
-            if (moneyAmount && item.amount) {
-                moneyAmount.textContent = item.amount.toLocaleString('ru-RU');
+            // Обновляем заголовок
+            if (moneyTitle) {
+                moneyTitle.textContent = item.name;
             }
             
-            // Обновляем цену на кнопке
+            // Обновляем цену на кнопке (стоимость в RBC с SVG)
             const buyPrice = document.getElementById('shop-buy-price');
             if (buyPrice && item.cost) {
-                buyPrice.textContent = item.cost;
+                buyPrice.innerHTML = `${item.cost}<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:12px;height:12px;object-fit:contain;">`;
             }
             
-            // Обновляем значение выгоды
-            const discountValue = document.getElementById('shop-discount-value');
-            if (discountValue && item.discount) {
-                discountValue.textContent = item.discount + '%';
+            // Обновляем получаемую сумму (количество денег с SVG)
+            const amountDisplay = document.getElementById('shop-money-amount-display');
+            if (amountDisplay && item.amount) {
+                amountDisplay.innerHTML = `${item.amount.toLocaleString('ru-RU')}<img src="assets/svg/bc-icon.svg" alt="Money" style="width:14px;height:14px;object-fit:contain;">`;
             }
             
             moneyImage.style.opacity = '1';
-            if (moneyAmount) moneyAmount.style.opacity = '1';
         }, 150);
     }
 }
@@ -3424,11 +3538,10 @@ function switchDiamonds(direction) {
 
 function updateDiamondsDisplay() {
     const diamondsImage = document.getElementById('shop-diamonds-image');
-    const diamondsAmount = document.getElementById('shop-diamonds-amount');
+    const diamondsTitle = document.getElementById('shop-diamonds-title');
     
     if (diamondsImage && diamondsItems[currentDiamondsIndex]) {
         diamondsImage.style.opacity = '0';
-        if (diamondsAmount) diamondsAmount.style.opacity = '0';
         
         setTimeout(() => {
             const item = diamondsItems[currentDiamondsIndex];
@@ -3436,39 +3549,27 @@ function updateDiamondsDisplay() {
             diamondsImage.src = item.image;
             diamondsImage.alt = item.name;
             
-            // Делаем Mountain of diamonds немного больше
-            if (currentDiamondsIndex === 2) {
-                diamondsImage.style.maxWidth = '100%';
-                diamondsImage.style.maxHeight = '160px';
-            } else {
-                diamondsImage.style.maxWidth = '100%';
-                diamondsImage.style.maxHeight = '150px';
-            }
-            
-            diamondsImage.style.marginTop = '-15px';
-            
             // Увеличиваем подсветку SVG в 2 раза
             diamondsImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
             
-            // Обновляем количество
-            if (diamondsAmount && item.amount) {
-                diamondsAmount.textContent = item.amount.toLocaleString('ru-RU');
+            // Обновляем заголовок
+            if (diamondsTitle) {
+                diamondsTitle.textContent = item.name;
             }
             
-            // Обновляем цену на кнопке
+            // Обновляем цену на кнопке (стоимость в деньгах с SVG)
             const buyPrice = document.getElementById('shop-diamonds-price');
             if (buyPrice && item.cost) {
-                buyPrice.textContent = item.cost.toLocaleString('ru-RU');
+                buyPrice.innerHTML = `${item.cost.toLocaleString('ru-RU')}<img src="assets/svg/bc-icon.svg" alt="Money" style="width:12px;height:12px;object-fit:contain;">`;
             }
             
-            // Обновляем значение выгоды
-            const discountValue = document.getElementById('shop-diamonds-discount-value');
-            if (discountValue && item.discount) {
-                discountValue.textContent = item.discount + '%';
+            // Обновляем получаемую сумму (количество RBC с SVG)
+            const amountDisplay = document.getElementById('shop-diamonds-amount-display');
+            if (amountDisplay && item.amount) {
+                amountDisplay.innerHTML = `${formatNumber(item.amount)}<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:14px;height:14px;object-fit:contain;">`;
             }
             
             diamondsImage.style.opacity = '1';
-            if (diamondsAmount) diamondsAmount.style.opacity = '1';
         }, 150);
     }
 }
@@ -3513,6 +3614,7 @@ function switchCases(direction) {
 
 function updateCasesDisplay() {
     const casesImage = document.getElementById('shop-cases-image');
+    const casesTitle = document.getElementById('shop-cases-title');
     
     if (casesImage && casesItems[currentCasesIndex]) {
         casesImage.style.opacity = '0';
@@ -3523,38 +3625,52 @@ function updateCasesDisplay() {
             casesImage.src = item.image;
             casesImage.alt = item.name;
             
-            // Настройка размера изображения
-            casesImage.style.maxWidth = '90%';
-            casesImage.style.maxHeight = '120px';
-            casesImage.style.marginTop = '-15px';
-            
             // Увеличиваем подсветку SVG в 2 раза
             casesImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
             
+            // Обновляем заголовок
+            if (casesTitle) {
+                casesTitle.textContent = item.name;
+            }
+            
+            // Обновляем процент выгоды
+            const discountValue = document.getElementById('shop-cases-discount-value');
+            if (discountValue) {
+                if (item.name === 'Money case') {
+                    discountValue.textContent = '40%';
+                } else if (item.name === 'Diamond case') {
+                    discountValue.textContent = '40%';
+                } else if (item.name === 'Legendary case') {
+                    discountValue.textContent = '60%';
+                }
+            }
+            
             // Обновляем цену на кнопке (в звездах Telegram)
             const buyPrice = document.getElementById('shop-cases-price');
+            const buyButton = document.getElementById('shop-buy-cases-btn');
             if (buyPrice && item.starsPrice) {
                 buyPrice.textContent = item.starsPrice;
-                // Добавляем иконку XTR, если её нет
-                const priceParent = buyPrice.parentElement;
-                if (priceParent && !priceParent.querySelector('.xtr-icon')) {
+                // Удаляем старую иконку XTR, если есть
+                const oldIcon = buyButton.querySelector('.xtr-icon');
+                if (oldIcon) {
+                    oldIcon.remove();
+                }
+                // Добавляем иконку XTR абсолютно позиционированную (не влияет на layout)
+                if (buyButton) {
                     const xtrIcon = document.createElement('img');
                     xtrIcon.className = 'xtr-icon';
                     xtrIcon.src = 'assets/svg/XTR.svg';
                     xtrIcon.alt = 'XTR';
-                    xtrIcon.style.width = '24px';
-                    xtrIcon.style.height = '24px';
-                    xtrIcon.style.marginLeft = '2px';
+                    xtrIcon.style.position = 'absolute';
+                    xtrIcon.style.width = '40px';
+                    xtrIcon.style.height = '40px';
                     xtrIcon.style.objectFit = 'contain';
-                    xtrIcon.style.flexShrink = '0';
-                    priceParent.appendChild(xtrIcon);
+                    xtrIcon.style.left = '50%';
+                    xtrIcon.style.top = '50%';
+                    xtrIcon.style.transform = 'translate(8px, -50%)';
+                    xtrIcon.style.pointerEvents = 'none';
+                    buyButton.appendChild(xtrIcon);
                 }
-            }
-            
-            // Обновляем значение выгоды
-            const discountValue = document.getElementById('shop-cases-discount-value');
-            if (discountValue && item.discount) {
-                discountValue.textContent = item.discount + '%';
             }
             
             casesImage.style.opacity = '1';
@@ -3605,6 +3721,89 @@ const legendaryCaseRewards = [
     { amount: 50000000, type: 'money', weight: 1 }    // Экстремально редкий шанс (1%)
 ];
 
+// Награды для Rare case (бонусы х3/х5, деньги, RBC и персонаж PINKY)
+const rareCaseRewards = [
+    // Бонусы - средний шанс
+    { type: 'bonus', multiplier: 3, weight: 20 },      // Средний шанс (20%)
+    { type: 'bonus', multiplier: 5, weight: 20 },      // Средний шанс (20%)
+    
+    // Деньги - средний/низкий шанс
+    { type: 'money', amount: 1000000, weight: 12 },    // Средний шанс (12%)
+    { type: 'money', amount: 2000000, weight: 10 },     // Низкий шанс (10%)
+    { type: 'money', amount: 4500000, weight: 8 },     // Низкий шанс (8%)
+    
+    // RBC - низкий шанс
+    { type: 'rbc', amount: 15000, weight: 10 },        // Низкий шанс (10%)
+    { type: 'rbc', amount: 20000, weight: 8 },         // Низкий шанс (8%)
+    { type: 'rbc', amount: 30000, weight: 7 },          // Низкий шанс (7%)
+    
+    // Персонаж - самый маленький шанс
+    { type: 'character', characterId: 'pinky', weight: 5 }  // Самый маленький шанс (5%)
+];
+
+// Награды для Epic case
+const epicCaseRewards = [
+    // Деньги (средние/высокие шансы)
+    { type: 'money', amount: 7500000, weight: 16 },        // 7.5 млн (~16%)
+    { type: 'money', amount: 9000000, weight: 13 },        // 9 млн (~13%)
+    { type: 'money', amount: 15000000, weight: 10 },      // 15 млн (~10%)
+    
+    // RBC (маленькие проценты)
+    { type: 'rbc', amount: 30000, weight: 5 },            // 30к RBC (5%)
+    { type: 'rbc', amount: 50000, weight: 4 },            // 50к RBC (4%)
+    { type: 'rbc', amount: 90000, weight: 3 },            // 90к RBC (3%)
+    
+    // Бонусы
+    { type: 'bonus', multiplier: 5, weight: 22 },          // х5 (22% - средний шанс)
+    { type: 'bonus', multiplier: 8, weight: 16 },          // х8 (16% - чуть ниже х5)
+    
+    // Персонажи (самые редкие)
+    { type: 'character', characterId: 'pinky', weight: 6 },            // Пинки (6% - немного больше чем в Rare case)
+    { type: 'character', characterId: 'robo-blumy', weight: 0.2 }    // Робо-Блуми (0.2% - предельно мал, меньше 0.5%)
+];
+
+// Награды для Legend case
+const legendCaseRewards = [
+    // Персонажи (самые редкие)
+    { type: 'character', characterId: 'pinky', weight: 10 },          // Пинки (10% - самый маленький, но больше чем Робо-блуми)
+    { type: 'character', characterId: 'robo-blumy', weight: 2 },     // Робо-блуми (2% - самый маленький)
+    
+    // Бонусы (средний шанс, х12 чуть меньше х8)
+    { type: 'bonus', multiplier: 8, weight: 18 },                     // х8 (18% - средний шанс)
+    { type: 'bonus', multiplier: 12, weight: 15 },                     // х12 (15% - чуть меньше х8)
+    
+    // Деньги (чем больше сумма - тем меньше процент)
+    { type: 'money', amount: 10000000, weight: 12 },                   // 10млн (12%)
+    { type: 'money', amount: 15000000, weight: 10 },                   // 15млн (10%)
+    { type: 'money', amount: 25000000, weight: 8 },                    // 25млн (8%)
+    
+    // RBC (чем больше сумма - тем меньше процент)
+    { type: 'rbc', amount: 55000, weight: 12 },                       // 55тыс RBC (12%)
+    { type: 'rbc', amount: 70000, weight: 10 },                       // 70тыс RBC (10%)
+    { type: 'rbc', amount: 90000, weight: 8 }                          // 90тыс RBC (8%)
+];
+
+// Награды для Ultima case
+const ultimaCaseRewards = [
+    // Персонажи (высокие шансы)
+    { type: 'character', characterId: 'pinky', weight: 20 },          // Пинки (20%)
+    { type: 'character', characterId: 'robo-blumy', weight: 15 },   // Робо-блуми (15%)
+    
+    // Бонусы (средние шансы, х15 чуть меньше х12)
+    { type: 'bonus', multiplier: 12, weight: 18 },                    // х12 (18% - средний шанс)
+    { type: 'bonus', multiplier: 15, weight: 15 },                    // х15 (15% - чуть меньше х12)
+    
+    // Деньги (маленькие шансы на большие суммы)
+    { type: 'money', amount: 30000000, weight: 10 },                  // 30млн (10%)
+    { type: 'money', amount: 45000000, weight: 6 },                   // 45млн (6% - маленький шанс)
+    { type: 'money', amount: 60000000, weight: 4 },                   // 60млн (4% - маленький шанс)
+    
+    // RBC (маленькие шансы на 300к/500к)
+    { type: 'rbc', amount: 100000, weight: 8 },                       // 100к RBC (8%)
+    { type: 'rbc', amount: 300000, weight: 3 },                      // 300к RBC (3% - маленький шанс)
+    { type: 'rbc', amount: 500000, weight: 1 }                       // 500к RBC (1% - маленький шанс)
+];
+
 // Функция взвешенного рандома
 function getWeightedRandomReward(rewards) {
     const totalWeight = rewards.reduce((sum, reward) => sum + reward.weight, 0);
@@ -3647,9 +3846,25 @@ function showCaseOdds() {
     if (currentCase.name === 'Money case') {
         rewards = moneyCaseRewards;
         caseName = 'Money case';
+    } else if (currentCase.name === 'Legendary case' && isUltimaCaseFromCell7) {
+        rewards = ultimaCaseRewards;
+        caseName = 'Ultima case';
+        // Сбрасываем флаг после использования
+        isUltimaCaseFromCell7 = false;
+    } else if (currentCase.name === 'Legendary case' && isLegendCaseFromCell6) {
+        rewards = legendCaseRewards;
+        caseName = 'Legend case';
+        // Сбрасываем флаг после использования
+        isLegendCaseFromCell6 = false;
     } else if (currentCase.name === 'Legendary case') {
         rewards = legendaryCaseRewards;
         caseName = 'Legendary case';
+    } else if (currentCase.name === 'Rare case') {
+        rewards = rareCaseRewards;
+        caseName = 'Rare case';
+    } else if (currentCase.name === 'Epic case') {
+        rewards = epicCaseRewards;
+        caseName = 'Epic case';
     } else {
         rewards = caseRewards;
         caseName = 'Diamond case';
@@ -3669,9 +3884,49 @@ function showCaseOdds() {
     // Создаем элементы списка
     rewards.forEach((reward) => {
         const percentage = ((reward.weight / totalWeight) * 100).toFixed(2);
-        const rewardType = reward.type || (currentCase.name === 'Money case' ? 'money' : 'rbc');
-        const iconSrc = rewardType === 'money' ? 'assets/svg/bc-icon.svg' : 'assets/svg/rbc-icon.svg';
-        const iconAlt = rewardType === 'money' ? 'Money' : 'RBC';
+        let rewardType = reward.type;
+        if (!rewardType) {
+            if (currentCase.name === 'Money case') {
+                rewardType = 'money';
+            } else if (currentCase.name === 'Rare case') {
+                // Для Rare case тип определяется из самой награды
+                rewardType = reward.type || 'bonus';
+            } else if (currentCase.name === 'Epic case') {
+                // Для Epic case тип определяется из самой награды
+                rewardType = reward.type || 'character';
+            } else {
+                rewardType = 'rbc';
+            }
+        }
+        
+        let iconSrc, iconAlt, rewardText;
+        if (rewardType === 'money') {
+            iconSrc = 'assets/svg/bc-icon.svg';
+            iconAlt = 'Money';
+            rewardText = formatMoneyAmount(reward.amount);
+        } else if (rewardType === 'bonus') {
+            iconSrc = `assets/svg/widgets/x${reward.multiplier}.svg`;
+            iconAlt = `x${reward.multiplier} Bonus`;
+            rewardText = `x${reward.multiplier} к заработку`;
+        } else if (rewardType === 'character') {
+            if (reward.characterId === 'pinky') {
+                iconSrc = 'assets/svg/characters-panel/pinky.svg';
+                iconAlt = 'Пинки';
+                rewardText = 'Пинки';
+            } else if (reward.characterId === 'robo-blumy') {
+                iconSrc = 'assets/svg/characters-panel/robo-blumy.svg';
+                iconAlt = 'Робо-Блуми';
+                rewardText = 'Робо-Блуми';
+            } else {
+                iconSrc = 'assets/svg/characters-panel/pinky.svg';
+                iconAlt = 'Персонаж';
+                rewardText = 'Персонаж';
+            }
+        } else {
+            iconSrc = 'assets/svg/rbc-icon.svg';
+            iconAlt = 'RBC';
+            rewardText = reward.amount.toLocaleString('ru-RU');
+        }
         
         const rewardItem = document.createElement('div');
         rewardItem.style.cssText = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px;transition:all 0.2s ease;';
@@ -3696,7 +3951,7 @@ function showCaseOdds() {
         
         const amount = document.createElement('div');
         amount.style.cssText = 'color:#fff;font-size:14px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif;';
-        amount.textContent = rewardType === 'money' ? formatMoneyAmount(reward.amount) : reward.amount.toLocaleString('ru-RU');
+        amount.textContent = rewardText;
         
         const chance = document.createElement('div');
         chance.style.cssText = 'color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;font-family:"Segoe UI",Arial,sans-serif;';
@@ -3724,24 +3979,74 @@ function openCase() {
     if (!panel || !track) return;
     
     // Определяем тип кейса
-    const currentCase = casesItems[currentCasesIndex];
+    // Используем currentCaseItem если он установлен (для Rare, Epic, Legend, Ultima cases)
+    // Иначе используем casesItems[currentCasesIndex]
+    const currentCase = currentCaseItem || casesItems[currentCasesIndex];
     const isMoneyCase = currentCase && currentCase.name === 'Money case';
     const isLegendaryCase = currentCase && currentCase.name === 'Legendary case';
+    const isRareCase = currentCase && currentCase.name === 'Rare case';
+    const isEpicCase = currentCase && currentCase.name === 'Epic case';
     
     // Выбираем соответствующие награды
     let rewards;
+    const isLegendCaseFromCell6Now = isLegendCaseFromCell6;
+    const isUltimaCaseFromCell7Now = isUltimaCaseFromCell7;
     if (isMoneyCase) {
         rewards = moneyCaseRewards;
+    } else if (isLegendaryCase && isUltimaCaseFromCell7Now) {
+        // Ultima case (7-я ячейка)
+        rewards = ultimaCaseRewards;
+    } else if (isLegendaryCase && isLegendCaseFromCell6Now) {
+        // Legend case (6-я ячейка)
+        rewards = legendCaseRewards;
     } else if (isLegendaryCase) {
+        // Старый Legendary case (3-я ячейка)
         rewards = legendaryCaseRewards;
+    } else if (isRareCase) {
+        rewards = rareCaseRewards;
+    } else if (isEpicCase) {
+        rewards = epicCaseRewards;
     } else {
         rewards = caseRewards;
     }
     
+    // Сбрасываем флаги после использования
+    if (isLegendCaseFromCell6Now) {
+        isLegendCaseFromCell6 = false;
+    }
+    if (isUltimaCaseFromCell7Now) {
+        isUltimaCaseFromCell7 = false;
+    }
+    // Сбрасываем currentCaseItem после использования
+    currentCaseItem = null;
+    
     const rewardIndex = getWeightedRandomReward(rewards);
     const selectedRewardData = rewards[rewardIndex];
-    const selectedAmount = selectedRewardData.amount;
-    const rewardType = selectedRewardData.type || (isMoneyCase ? 'money' : 'rbc');
+    let selectedAmount = selectedRewardData.amount;
+    let rewardType = selectedRewardData.type || (isMoneyCase ? 'money' : (isRareCase ? 'bonus' : (isEpicCase ? 'character' : 'rbc')));
+    
+    // Если выпал персонаж Пинки, но он уже есть, меняем на альтернативную награду
+    if (rewardType === 'character' && selectedRewardData.characterId === 'pinky') {
+        const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+        if (availableCharacters.includes('pinky')) {
+            rewardType = 'money';
+            selectedAmount = 5000000; // 5 млн денег
+        }
+    }
+    
+    // Если выпал персонаж Robo blumy, но он уже есть, меняем на альтернативную награду
+    if (rewardType === 'character' && selectedRewardData.characterId === 'robo-blumy') {
+        const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+        if (availableCharacters.includes('robo-blumy')) {
+            rewardType = 'rbc';
+            selectedAmount = 100000; // 100000 RBC
+        }
+    }
+    
+    // Для Rare case убеждаемся, что selectedAmount установлен для всех типов наград
+    if (isRareCase && !selectedAmount && rewardType !== 'bonus' && rewardType !== 'character') {
+        selectedAmount = selectedRewardData.amount || 0;
+    }
     
     // Очищаем трек и сбрасываем стили
     track.innerHTML = '';
@@ -3782,21 +4087,65 @@ function openCase() {
             rewardCell.style.cssText = 'min-width:100px;width:100px;height:148px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:all 0.3s ease;';
             
             // Определяем тип награды и иконку
-            const rewardTypeForCell = reward.type || (isMoneyCase ? 'money' : 'rbc');
-            const iconSrc = rewardTypeForCell === 'money' ? 'assets/svg/bc-icon.svg' : 'assets/svg/rbc-icon.svg';
-            const iconAlt = rewardTypeForCell === 'money' ? 'Money' : 'RBC';
+            const isLegendCaseFromCell6InOpen = isLegendCaseFromCell6;
+            const isUltimaCaseFromCell7InOpen = isUltimaCaseFromCell7;
+            const rewardTypeForCell = reward.type || (isMoneyCase ? 'money' : (isRareCase ? 'bonus' : (isEpicCase ? 'character' : (isUltimaCaseFromCell7InOpen ? 'bonus' : (isLegendCaseFromCell6InOpen ? 'bonus' : 'rbc')))));
+            let iconSrc, iconAlt, displayText;
+            
+            if (rewardTypeForCell === 'money') {
+                iconSrc = 'assets/svg/bc-icon.svg';
+                iconAlt = 'Money';
+                displayText = formatMoneyAmount(reward.amount);
+            } else if (rewardTypeForCell === 'bonus') {
+                iconSrc = `assets/svg/widgets/x${reward.multiplier}.svg`;
+                iconAlt = `x${reward.multiplier} Bonus`;
+                displayText = `x${reward.multiplier}`;
+            } else if (rewardTypeForCell === 'character') {
+                // Проверяем, какой персонаж
+                if (reward.characterId === 'pinky') {
+                    // Проверяем, есть ли уже Пинки
+                    const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+                    if (availableCharacters.includes('pinky')) {
+                        // Если Пинки уже есть, показываем альтернативную награду
+                        iconSrc = 'assets/svg/bc-icon.svg';
+                        iconAlt = 'Money';
+                        displayText = '5 млн';
+                    } else {
+                        iconSrc = 'assets/svg/characters-panel/pinky.svg';
+                        iconAlt = 'Пинки';
+                        displayText = 'Пинки';
+                    }
+                } else if (reward.characterId === 'robo-blumy') {
+                    // Проверяем, есть ли уже Robo blumy
+                    const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+                    if (availableCharacters.includes('robo-blumy')) {
+                        // Если Robo blumy уже есть, показываем альтернативную награду
+                        iconSrc = 'assets/svg/rbc-icon.svg';
+                        iconAlt = 'RBC';
+                        displayText = '100k';
+                    } else {
+                        iconSrc = 'assets/svg/characters-panel/robo-blumy.svg';
+                        iconAlt = 'Робо-Блуми';
+                        displayText = 'Робо-Блуми';
+                    }
+                } else {
+                    iconSrc = 'assets/svg/characters-panel/pinky.svg';
+                    iconAlt = 'Персонаж';
+                    displayText = 'Персонаж';
+                }
+            } else {
+                iconSrc = 'assets/svg/rbc-icon.svg';
+                iconAlt = 'RBC';
+                displayText = reward.amount.toLocaleString('ru-RU');
+            }
             
             const icon = document.createElement('img');
             icon.src = iconSrc;
             icon.alt = iconAlt;
-            icon.style.cssText = 'width:44px;height:44px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(255,255,255,0.3));';
+            icon.style.cssText = 'width:88px;height:88px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(255,255,255,0.3));';
             
             const amount = document.createElement('div');
-            if (rewardTypeForCell === 'money') {
-                amount.textContent = formatMoneyAmount(reward.amount);
-            } else {
-                amount.textContent = reward.amount.toLocaleString('ru-RU');
-            }
+            amount.textContent = displayText;
             amount.style.cssText = 'color:#fff;font-size:13px;font-weight:700;text-align:center;text-shadow:0 2px 4px rgba(0,0,0,0.5);font-family:"Segoe UI",Arial,sans-serif;line-height:1.2;';
             
             rewardCell.appendChild(icon);
@@ -3888,17 +4237,77 @@ function openCase() {
                     if (rewardAmount) {
                         if (rewardType === 'money') {
                             rewardAmount.textContent = formatMoneyAmount(selectedAmount);
+                        } else if (rewardType === 'bonus') {
+                            rewardAmount.textContent = `x${selectedRewardData.multiplier} к заработку`;
+                        } else if (rewardType === 'character') {
+                            // Проверяем, какой персонаж
+                            const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+                            if (selectedRewardData.characterId === 'pinky') {
+                                if (availableCharacters.includes('pinky')) {
+                                    rewardAmount.textContent = '5 млн (альтернативная награда)';
                         } else {
+                                    rewardAmount.textContent = 'Пинки';
+                                }
+                            } else if (selectedRewardData.characterId === 'robo-blumy') {
+                                if (availableCharacters.includes('robo-blumy')) {
+                                    rewardAmount.textContent = '100k RBC (альтернативная награда)';
+                                } else {
+                                    rewardAmount.textContent = 'Робо-Блуми';
+                                }
+                            } else {
+                                rewardAmount.textContent = 'Персонаж';
+                            }
+                        } else if (rewardType === 'rbc') {
                             rewardAmount.textContent = selectedAmount.toLocaleString('ru-RU');
+                        } else {
+                            rewardAmount.textContent = selectedAmount ? selectedAmount.toLocaleString('ru-RU') : '0';
                         }
                     }
                     // Обновляем иконку в финальной панели
                     const rewardIcon = selectedReward.querySelector('img');
                     if (rewardIcon) {
-                        const finalIconSrc = rewardType === 'money' ? 'assets/svg/bc-icon.svg' : 'assets/svg/rbc-icon.svg';
-                        const finalIconAlt = rewardType === 'money' ? 'Money' : 'RBC';
+                        if (rewardType === 'bonus') {
+                            // Для бонусов скрываем SVG иконку
+                            rewardIcon.style.display = 'none';
+                        } else {
+                            // Для остальных типов показываем иконку
+                            rewardIcon.style.display = '';
+                            let finalIconSrc, finalIconAlt;
+                            if (rewardType === 'money') {
+                                finalIconSrc = 'assets/svg/bc-icon.svg';
+                                finalIconAlt = 'Money';
+                            } else if (rewardType === 'character') {
+                                // Проверяем, какой персонаж
+                                const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+                                if (selectedRewardData.characterId === 'pinky') {
+                                    if (availableCharacters.includes('pinky')) {
+                                        // Если Пинки уже есть, показываем альтернативную награду
+                                        finalIconSrc = 'assets/svg/bc-icon.svg';
+                                        finalIconAlt = 'Money';
+                                    } else {
+                                        finalIconSrc = 'assets/svg/characters-panel/pinky.svg';
+                                        finalIconAlt = 'Пинки';
+                                    }
+                                } else if (selectedRewardData.characterId === 'robo-blumy') {
+                                    if (availableCharacters.includes('robo-blumy')) {
+                                        // Если Robo blumy уже есть, показываем альтернативную награду
+                                        finalIconSrc = 'assets/svg/rbc-icon.svg';
+                                        finalIconAlt = 'RBC';
+                                    } else {
+                                        finalIconSrc = 'assets/svg/characters-panel/robo-blumy.svg';
+                                        finalIconAlt = 'Робо-Блуми';
+                                    }
+                                } else {
+                                    finalIconSrc = 'assets/svg/characters-panel/pinky.svg';
+                                    finalIconAlt = 'Персонаж';
+                                }
+                            } else {
+                                finalIconSrc = 'assets/svg/rbc-icon.svg';
+                                finalIconAlt = 'RBC';
+                            }
                         rewardIcon.src = finalIconSrc;
                         rewardIcon.alt = finalIconAlt;
+                        }
                     }
                     selectedReward.style.display = 'flex';
                     claimBtn.style.display = 'block';
@@ -3921,12 +4330,55 @@ function openCase() {
         if (rewardType === 'money') {
             const currentBalance = getBalance();
             setBalance(currentBalance + selectedAmount);
+        } else if (rewardType === 'bonus') {
+            // Активируем бонус х3 или х5
+            const multiplier = selectedRewardData.multiplier;
+            activateEarningBonus(multiplier);
+        } else if (rewardType === 'character') {
+            // Добавляем персонажа или даем альтернативную награду
+            const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
+            
+            if (selectedRewardData.characterId === 'pinky') {
+                if (!availableCharacters.includes('pinky')) {
+                    availableCharacters.push('pinky');
+                    localStorage.setItem('availableCharacters', JSON.stringify(availableCharacters));
+                    // Обновляем счетчик персонажей
+                    if (window.updateCharactersCount) {
+                        window.updateCharactersCount();
+                    }
+                    // Обновляем список доступных сотрудников
+                    if (window.updateAvailableEmployees) {
+                        window.updateAvailableEmployees();
+                    }
+                } else {
+                    // Если Пинки уже есть, даем альтернативную награду - 5 млн денег
+                    const currentBalance = getBalance();
+                    setBalance(currentBalance + 5000000);
+                }
+            } else if (selectedRewardData.characterId === 'robo-blumy') {
+                if (!availableCharacters.includes('robo-blumy')) {
+                    availableCharacters.push('robo-blumy');
+                    localStorage.setItem('availableCharacters', JSON.stringify(availableCharacters));
+                    // Обновляем счетчик персонажей
+                    if (window.updateCharactersCount) {
+                        window.updateCharactersCount();
+                    }
+                    // Обновляем список доступных сотрудников
+                    if (window.updateAvailableEmployees) {
+                        window.updateAvailableEmployees();
+                    }
+                } else {
+                    // Если Robo blumy уже есть, даем альтернативную награду - 100000 RBC
+                    const currentCredits = getCredits();
+                    setCredits(currentCredits + 100000);
+                }
+            }
         } else {
             const currentCredits = getCredits();
             setCredits(currentCredits + selectedAmount);
         }
         
-        // Закрываем панель
+        // Закрываем панель открытия кейса
         panel.style.display = 'none';
         if (claimHandler) {
             claimBtn.removeEventListener('click', claimHandler);
@@ -3952,15 +4404,208 @@ function openCase() {
         track.innerHTML = '';
         track.style.transform = 'translateX(0)';
         track.style.transition = 'none';
+        
+        // Показываем панель магазина обратно (она была скрыта только визуально)
+        const shopPanel = document.getElementById('shop-panel');
+        if (shopPanel) {
+            shopPanel.style.opacity = '1';
+            shopPanel.style.pointerEvents = 'auto';
+            shopPanel.style.transition = 'opacity 0.3s ease';
+        }
     };
     
     claimBtn.addEventListener('click', claimHandler);
+}
+
+// === СИСТЕМА БОНУСОВ К ЗАРАБОТКУ ===
+let activeEarningBonus = null;
+let bonusTimer = null;
+
+// Функция активации бонуса к заработку
+function activateEarningBonus(multiplier) {
+    // Отменяем предыдущий бонус если есть
+    if (bonusTimer) {
+        clearInterval(bonusTimer);
+    }
+    
+    // Устанавливаем новый бонус
+    activeEarningBonus = {
+        multiplier: multiplier,
+        endTime: Date.now() + 3600000 // 1 час = 3600000 мс
+    };
+    
+    // Сохраняем в localStorage
+    localStorage.setItem('activeEarningBonus', JSON.stringify(activeEarningBonus));
+    
+    // Показываем визуальный индикатор бонуса
+    showBonusIndicator(multiplier);
+    
+    // Запускаем таймер
+    startBonusTimer();
+}
+
+// Функция получения текущего множителя бонуса
+function getEarningBonusMultiplier() {
+    if (!activeEarningBonus) {
+        // Пытаемся восстановить из localStorage
+        const saved = localStorage.getItem('activeEarningBonus');
+        if (saved) {
+            try {
+                activeEarningBonus = JSON.parse(saved);
+                // Проверяем, не истек ли бонус
+                if (Date.now() >= activeEarningBonus.endTime) {
+                    activeEarningBonus = null;
+                    localStorage.removeItem('activeEarningBonus');
+                    return 1;
+                }
+                // Восстанавливаем таймер
+                startBonusTimer();
+                showBonusIndicator(activeEarningBonus.multiplier);
+            } catch (e) {
+                activeEarningBonus = null;
+                localStorage.removeItem('activeEarningBonus');
+            }
+        }
+    }
+    
+    if (!activeEarningBonus) return 1;
+    
+    // Проверяем, не истек ли бонус
+    if (Date.now() >= activeEarningBonus.endTime) {
+        deactivateEarningBonus();
+        return 1;
+    }
+    
+    return activeEarningBonus.multiplier;
+}
+
+// Функция деактивации бонуса
+function deactivateEarningBonus() {
+    activeEarningBonus = null;
+    localStorage.removeItem('activeEarningBonus');
+    hideBonusIndicator();
+    if (bonusTimer) {
+        clearInterval(bonusTimer);
+        bonusTimer = null;
+    }
+}
+
+// Функция запуска таймера бонуса
+function startBonusTimer() {
+    if (bonusTimer) {
+        clearInterval(bonusTimer);
+    }
+    
+    bonusTimer = setInterval(() => {
+        if (!activeEarningBonus) {
+            clearInterval(bonusTimer);
+            bonusTimer = null;
+            return;
+        }
+        
+        const remaining = activeEarningBonus.endTime - Date.now();
+        if (remaining <= 0) {
+            deactivateEarningBonus();
+        } else {
+            updateBonusTimer(remaining);
+        }
+    }, 100); // Обновляем каждые 100мс для плавности
+}
+
+// Функция показа индикатора бонуса
+function showBonusIndicator(multiplier) {
+    // Удаляем старый индикатор если есть
+    const oldIndicator = document.getElementById('earning-bonus-indicator');
+    if (oldIndicator) {
+        oldIndicator.remove();
+    }
+    
+    // Получаем четкие координаты панели денег для размещения бонуса справа от неё
+    const moneyPanel = document.getElementById('money-panel');
+    let leftPosition = 200; // Значение по умолчанию
+    let topPosition = 10; // Значение по умолчанию
+    if (moneyPanel) {
+        const rect = moneyPanel.getBoundingClientRect();
+        // Панель денег имеет position:fixed, поэтому используем getBoundingClientRect() напрямую
+        leftPosition = rect.right + 10; // 10px отступ справа от панели денег
+        // Центрируем по вертикали относительно панели денег
+        // Используем центр панели как точку отсчета, затем применяем transform для центрирования
+        topPosition = rect.top + (rect.height / 2); // Центр панели
+    }
+    
+    // Создаем новый индикатор
+    const indicator = document.createElement('div');
+    indicator.id = 'earning-bonus-indicator';
+    indicator.style.cssText = `position:fixed;top:${topPosition}px;left:${leftPosition}px;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translateY(-50%);`;
+    
+    // SVG иконка (увеличена в 2 раза, без контейнера)
+    const icon = document.createElement('img');
+    icon.src = `assets/svg/widgets/x${multiplier}.svg`;
+    icon.alt = `x${multiplier}`;
+    icon.style.cssText = 'width:80px;height:80px;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));';
+    
+    // Таймер в овальной ячейке (увеличен, без контейнера)
+    const timer = document.createElement('div');
+    timer.id = 'bonus-timer';
+    timer.style.cssText = 'background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 12px;color:white;font-size:13px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif;text-shadow:0 2px 4px rgba(0,0,0,0.5);line-height:1;display:flex;align-items:center;justify-content:center;';
+    timer.textContent = '1:00';
+    
+    indicator.appendChild(icon);
+    indicator.appendChild(timer);
+    document.body.appendChild(indicator);
+}
+
+// Функция обновления таймера
+function updateBonusTimer(remainingMs) {
+    const timer = document.getElementById('bonus-timer');
+    if (!timer) return;
+    
+    const totalSeconds = Math.ceil(remainingMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    
+    // Форматируем время: часы:минуты:секунды
+    if (hours > 0) {
+        timer.textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        timer.textContent = `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+}
+
+// Функция скрытия индикатора бонуса
+function hideBonusIndicator() {
+    const indicator = document.getElementById('earning-bonus-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Экспортируем функцию для использования в других модулях
+if (typeof window !== 'undefined') {
+    window.getEarningBonusMultiplier = getEarningBonusMultiplier;
+    
+    window.addEventListener('load', () => {
+        // Восстанавливаем бонус если он был активен
+        getEarningBonusMultiplier();
+    });
 }
 
 // Функция покупки кейсов через Telegram Stars (прямая покупка из игры)
 async function buyCases() {
     const item = casesItems[currentCasesIndex];
     if (!item) return;
+    
+    // Проверяем, является ли это Rare кейсом (бесплатный)
+    if (item.name === 'Rare case') {
+        // Бесплатный кейс - сразу открываем
+        hidePanelWithAnimation('shop-panel', () => {
+            setTimeout(() => {
+                openCase();
+            }, 300);
+        });
+        return;
+    }
     
     // Проверяем, запущено ли приложение в Telegram
     if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
@@ -4119,13 +4764,19 @@ async function createInvoiceLinkForMiniApp(userId, item, caseIndex) {
 
 // Обработка успешной покупки кейса (вызывается ботом через webApp.sendData)
 function handleSuccessfulCasePurchase(item) {
-    // Закрываем панель магазина и открываем панель открытия кейса
-    hidePanelWithAnimation('shop-panel', () => {
-        // Запускаем анимацию открытия кейса
-        setTimeout(() => {
-            openCase();
-        }, 300);
-    });
+    // Скрываем панель магазина только визуально (не закрываем полностью)
+    // window.isShopPanelOpen остается true, чтобы круги не появлялись
+    const shopPanel = document.getElementById('shop-panel');
+    if (shopPanel) {
+        shopPanel.style.opacity = '0';
+        shopPanel.style.pointerEvents = 'none';
+        shopPanel.style.transition = 'opacity 0.3s ease';
+    }
+    
+    // Запускаем анимацию открытия кейса
+    setTimeout(() => {
+        openCase();
+    }, 300);
     
     // Отслеживание покупки в аналитике (если есть)
     if (window.posthogService && window.posthogService.isReady()) {
@@ -4135,6 +4786,91 @@ function handleSuccessfulCasePurchase(item) {
             case_index: currentCasesIndex
         });
     }
+}
+
+// Функция обработки покупки Epic case
+function handleRareCasePurchase() {
+    // Rare case пока бесплатный
+    // Создаем временный объект для Rare case
+    const rareCaseItem = {
+        name: 'Rare case',
+        image: 'assets/svg/shop/Rare-case.svg',
+        amount: 1,
+        cost: 0,
+        starsPrice: 0,
+        discount: 0
+    };
+    
+    // Сохраняем текущий кейс для использования в openCase
+    currentCaseItem = rareCaseItem;
+    
+    // Открываем кейс напрямую
+    handleSuccessfulCasePurchase(rareCaseItem);
+}
+
+function handleEpicCasePurchase() {
+    // Epic case пока бесплатный
+    // Создаем временный объект для Epic case
+    const epicCaseItem = {
+        name: 'Epic case',
+        image: 'assets/svg/shop/Epic-case.svg',
+        amount: 1,
+        cost: 0,
+        starsPrice: 0,
+        discount: 0
+    };
+    
+    // Сохраняем текущий кейс для использования в openCase
+    currentCaseItem = epicCaseItem;
+    
+    // Открываем кейс напрямую
+    handleSuccessfulCasePurchase(epicCaseItem);
+}
+
+function handleLegendCasePurchase() {
+    // Legend case пока бесплатный
+    // Находим Legendary case в casesItems
+    const legendCaseIndex = casesItems.findIndex(item => item.name === 'Legendary case');
+    if (legendCaseIndex === -1) {
+        console.error('Legendary case not found in casesItems');
+        return;
+    }
+    
+    // Устанавливаем флаг, что это Legend case из ячейки 6
+    isLegendCaseFromCell6 = true;
+    
+    // Устанавливаем текущий индекс на Legendary case
+    currentCasesIndex = legendCaseIndex;
+    const legendCaseItem = casesItems[legendCaseIndex];
+    
+    // Сохраняем текущий кейс для использования в openCase
+    currentCaseItem = legendCaseItem;
+    
+    // Открываем кейс
+    handleSuccessfulCasePurchase(legendCaseItem);
+}
+
+function handleUltimaCasePurchase() {
+    // Ultima case пока бесплатный
+    // Находим Legendary case в casesItems (используем тот же элемент)
+    const ultimaCaseIndex = casesItems.findIndex(item => item.name === 'Legendary case');
+    if (ultimaCaseIndex === -1) {
+        console.error('Legendary case not found in casesItems');
+        return;
+    }
+    
+    // Устанавливаем флаг, что это Ultima case из ячейки 7
+    isUltimaCaseFromCell7 = true;
+    
+    // Устанавливаем текущий индекс на Legendary case
+    currentCasesIndex = ultimaCaseIndex;
+    const ultimaCaseItem = casesItems[ultimaCaseIndex];
+    
+    // Сохраняем текущий кейс для использования в openCase
+    currentCaseItem = ultimaCaseItem;
+    
+    // Открываем кейс
+    handleSuccessfulCasePurchase(ultimaCaseItem);
 }
 
 // Инициализация обработчика сообщений от бота

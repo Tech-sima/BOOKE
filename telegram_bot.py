@@ -279,9 +279,9 @@ async def successful_payment_callback(
             
             # Отправляем подтверждение пользователю
             await update.message.reply_text(
-                f"✅ **Платеж успешен!**\n\n"
-                f"🎁 Вы купили: **{case_name}**\n"
-                f"⭐ Стоимость: **{stars_price}** звезд\n\n"
+                f"✅ Платеж успешен!\n\n"
+                f"🎁 Вы купили: {case_name}\n"
+                f"⭐ Стоимость: {stars_price} звезд\n\n"
                 f"Кейс будет открыт в игре автоматически."
             )
             

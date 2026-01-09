@@ -605,9 +605,6 @@ function onWindowResize() {
         adaptUIForTelegram();
     }
     
-    // Обновляем размер иконок XTR при изменении размера окна
-    updateXtrIconsSize();
-    
     // Позиционируем круги после изменения размера окна
     setTimeout(initializeCirclePositions, 100);
     
@@ -3427,26 +3424,6 @@ function initializeShop() {
     addXtrIconsToSpecialCases();
 }
 
-// Функция для обновления размера иконок XTR (для адаптивности)
-function updateXtrIconsSize() {
-    const isMobile = window.innerWidth <= 768;
-    const iconSize = isMobile ? '28px' : '36px';
-    
-    // Обновляем иконки в special cases
-    const priceIds = ['shop-rare-case-price', 'shop-epic-case-price', 'shop-legend-case-price', 'shop-ultima-case-price', 'shop-cases-price'];
-    
-    priceIds.forEach(priceId => {
-        const priceElement = document.getElementById(priceId);
-        if (priceElement) {
-            const xtrIcon = priceElement.querySelector('.xtr-icon');
-            if (xtrIcon) {
-                xtrIcon.style.width = iconSize;
-                xtrIcon.style.height = iconSize;
-            }
-        }
-    });
-}
-
 // Функция для добавления XTR иконок в кнопки special cases
 function addXtrIconsToSpecialCases() {
     const cases = [
@@ -3470,20 +3447,10 @@ function addXtrIconsToSpecialCases() {
             
             // Добавляем иконку XTR
             const xtrIcon = document.createElement('img');
-            xtrIcon.className = 'xtr-icon';
             xtrIcon.src = 'assets/svg/XTR.svg';
-            xtrIcon.alt = 'XTR';
-            // Адаптивный размер для мобильных устройств
-            const isMobile = window.innerWidth <= 768;
-            xtrIcon.style.width = isMobile ? '28px' : '36px';
-            xtrIcon.style.height = isMobile ? '28px' : '36px';
-            xtrIcon.style.objectFit = 'contain';
-            xtrIcon.style.pointerEvents = 'none';
-            xtrIcon.style.flexShrink = '0';
+            xtrIcon.style.width = '18px';
+            xtrIcon.style.height = '18px';
             priceElement.appendChild(xtrIcon);
-            
-            // Обновляем gap для правильного центрирования
-            priceElement.style.gap = '2px';
         }
     });
 }
@@ -3699,17 +3666,11 @@ function updateCasesDisplay() {
                     xtrIcon.className = 'xtr-icon';
                     xtrIcon.src = 'assets/svg/XTR.svg';
                     xtrIcon.alt = 'XTR';
-                    // Адаптивный размер для мобильных устройств
-                    const isMobile = window.innerWidth <= 768;
-                    xtrIcon.style.width = isMobile ? '28px' : '36px';
-                    xtrIcon.style.height = isMobile ? '28px' : '36px';
+                    xtrIcon.style.width = '36px';
+                    xtrIcon.style.height = '36px';
                     xtrIcon.style.objectFit = 'contain';
                     xtrIcon.style.pointerEvents = 'none';
-                    xtrIcon.style.flexShrink = '0';
                     buyPrice.appendChild(xtrIcon);
-                    
-                    // Обновляем gap для правильного центрирования
-                    buyPrice.style.gap = '2px';
                 }
             }
             
@@ -4570,22 +4531,34 @@ function showBonusIndicator(multiplier) {
     let topPosition = 'calc(100vh - 100px)'; // Значение по умолчанию
     if (investmentButton) {
         const rect = investmentButton.getBoundingClientRect();
-        // Размещаем по центру кнопки инвестиций по горизонтали, сдвигаем влево на 15px
-        leftPosition = rect.left + (rect.width / 2) - 15;
-        // Размещаем под кнопкой инвестиций, сдвигаем вверх на 8px
-        topPosition = rect.bottom + 10 - 8; // 10px отступ снизу от кнопки минус 8px вверх
+        // Размещаем по центру кнопки инвестиций по горизонтали, сдвигаем влево на 40px
+        leftPosition = rect.left + (rect.width / 2) - 40;
+        // Размещаем под кнопкой инвестиций, сдвигаем вверх на 15px
+        topPosition = rect.bottom + 10 - 15; // 10px отступ снизу от кнопки минус 15px вверх
     }
     
     // Создаем новый индикатор
     const indicator = document.createElement('div');
     indicator.id = 'earning-bonus-indicator';
-    indicator.style.cssText = `position:fixed;top:${topPosition}px;left:${leftPosition}px;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:0px;transform:translateX(-50%);`;
+    indicator.style.cssText = `position:fixed;top:${topPosition}px;left:${leftPosition}px;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:2px;transform:translateX(-50%);`;
     
-    // SVG иконка (без ячейки и контейнера)
-    const icon = document.createElement('img');
-    icon.src = `assets/svg/widgets/x${multiplier}.svg`;
-    icon.alt = `x${multiplier}`;
-    icon.style.cssText = 'width:80px;height:80px;filter:drop-shadow(0 0 8px rgba(255,255,255,0.5));';
+    // Контейнер для текста и SVG денег
+    const textContainer = document.createElement('div');
+    textContainer.style.cssText = 'display:flex;align-items:center;gap:2px;justify-content:center;';
+    
+    // Текст "x(размер)" в жирном белом шрифте
+    const text = document.createElement('span');
+    text.textContent = `x${multiplier}`;
+    text.style.cssText = 'color:white;font-size:24px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif;text-shadow:0 2px 4px rgba(0,0,0,0.5);line-height:1;';
+    
+    // SVG денег
+    const moneyIcon = document.createElement('img');
+    moneyIcon.src = 'assets/svg/money-icon.svg';
+    moneyIcon.alt = 'Money';
+    moneyIcon.style.cssText = 'width:24px;height:24px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(255,255,255,0.5));';
+    
+    textContainer.appendChild(text);
+    textContainer.appendChild(moneyIcon);
     
     // Таймер в овальной ячейке
     const timer = document.createElement('div');
@@ -4593,7 +4566,7 @@ function showBonusIndicator(multiplier) {
     timer.style.cssText = 'background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:3px 12px;color:white;font-size:13px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif;text-shadow:0 2px 4px rgba(0,0,0,0.5);line-height:1;display:flex;align-items:center;justify-content:center;';
     timer.textContent = '1:00';
     
-    indicator.appendChild(icon);
+    indicator.appendChild(textContainer);
     indicator.appendChild(timer);
     document.body.appendChild(indicator);
 }
@@ -4621,6 +4594,13 @@ function hideBonusIndicator() {
     const indicator = document.getElementById('earning-bonus-indicator');
     if (indicator) {
         indicator.remove();
+    }
+}
+
+// Функция показа индикатора бонуса (если он активен)
+function showBonusIndicatorIfActive() {
+    if (activeEarningBonus && Date.now() < activeEarningBonus.endTime) {
+        showBonusIndicator(activeEarningBonus.multiplier);
     }
 }
 
@@ -5861,12 +5841,6 @@ function showPanelWithAnimation(panelId) {
     const panel = document.getElementById(panelId);
     if (!panel) return;
     
-    // Скрываем бонус индикатор при открытии панели
-    const bonusIndicator = document.getElementById('earning-bonus-indicator');
-    if (bonusIndicator) {
-        bonusIndicator.style.display = 'none';
-    }
-    
     // Скрываем индикаторы прибыли при открытии любой панели
     if (window.hideProfitIndicators) {
         window.hideProfitIndicators();
@@ -5876,6 +5850,9 @@ function showPanelWithAnimation(panelId) {
     if (window.clearAllProfitIndicators) {
         window.clearAllProfitIndicators();
     }
+    
+    // Скрываем бонус при открытии панели
+    hideBonusIndicator();
     
     // Устанавливаем глобальные переменные для отслеживания состояния панелей
     if (panelId === 'shop-panel') {
@@ -5989,23 +5966,17 @@ function hidePanelWithAnimation(panelId, callback = null) {
             }
         }
         
-        // Показываем бонус индикатор после закрытия панели (если бонус активен)
-        if (activeEarningBonus && Date.now() < activeEarningBonus.endTime) {
-            const bonusIndicator = document.getElementById('earning-bonus-indicator');
-            if (bonusIndicator) {
-                bonusIndicator.style.display = 'flex';
-            } else {
-                // Восстанавливаем индикатор если он был удален
-                showBonusIndicator(activeEarningBonus.multiplier);
-            }
-        }
-        
         // Показываем индикаторы прибыли после закрытия панели (только если это не панель инвестиций)
         if (panelId !== 'bottom-banner-panel' && window.updateProfitIndicators) {
             setTimeout(() => {
                 window.updateProfitIndicators();
             }, 100);
         }
+        
+        // Показываем бонус после закрытия панели (если он активен)
+        setTimeout(() => {
+            showBonusIndicatorIfActive();
+        }, 100);
         
         // Дополнительная проверка через 200ms для надежности (только если это не панель инвестиций)
         if (panelId !== 'bottom-banner-panel') {

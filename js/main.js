@@ -3434,6 +3434,44 @@ function initializeShop() {
     updateMoneyDisplay();
     updateDiamondsDisplay();
     updateCasesDisplay();
+    
+    // Добавляем XTR иконки в кнопки rare/epic/legend/ultima case
+    addXtrIconsToSpecialCases();
+}
+
+// Функция для добавления XTR иконок в кнопки special cases
+function addXtrIconsToSpecialCases() {
+    const cases = [
+        { priceId: 'shop-rare-case-price', name: 'Rare case' },
+        { priceId: 'shop-epic-case-price', name: 'Epic case' },
+        { priceId: 'shop-legend-case-price', name: 'Legend case' },
+        { priceId: 'shop-ultima-case-price', name: 'Ultima case' }
+    ];
+    
+    cases.forEach(caseInfo => {
+        const priceElement = document.getElementById(caseInfo.priceId);
+        if (priceElement) {
+            // Устанавливаем цену
+            priceElement.textContent = '1';
+            
+            // Удаляем старую иконку XTR, если есть
+            const oldIcon = priceElement.querySelector('.xtr-icon');
+            if (oldIcon) {
+                oldIcon.remove();
+            }
+            
+            // Добавляем иконку XTR
+            const xtrIcon = document.createElement('img');
+            xtrIcon.className = 'xtr-icon';
+            xtrIcon.src = 'assets/svg/XTR.svg';
+            xtrIcon.alt = 'XTR';
+            xtrIcon.style.width = '36px';
+            xtrIcon.style.height = '36px';
+            xtrIcon.style.objectFit = 'contain';
+            xtrIcon.style.pointerEvents = 'none';
+            priceElement.appendChild(xtrIcon);
+        }
+    });
 }
 
 function switchMoney(direction) {
@@ -4582,17 +4620,6 @@ async function buyCases() {
     const item = casesItems[currentCasesIndex];
     if (!item) return;
     
-    // Проверяем, является ли это Rare кейсом (бесплатный)
-    if (item.name === 'Rare case') {
-        // Бесплатный кейс - сразу открываем
-        hidePanelWithAnimation('shop-panel', () => {
-            setTimeout(() => {
-                openCase();
-            }, 300);
-        });
-        return;
-    }
-    
     // Проверяем, запущено ли приложение в Telegram
     if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
         alert('Покупка доступна только в Telegram!');
@@ -4674,20 +4701,25 @@ async function createInvoiceLinkForMiniApp(userId, item, caseIndex) {
     // Токен бота
     const BOT_TOKEN = '8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU';
     
+    // Получаем цену в звездах
+    const starsPrice = parseInt(item.starsPrice, 10) || 1;
+    
     // Создаем простой payload для invoice
-    // Формат: case_index_timestamp
-    const payload = `case_${caseIndex}_${Date.now()}`;
+    // Формат: case_{index}_{price}_{timestamp} или case_{type}_{price}_{timestamp} для special cases
+    const payload = typeof caseIndex === 'string' 
+        ? `case_${caseIndex}_${starsPrice}_${Date.now()}`
+        : `case_${caseIndex}_${starsPrice}_${Date.now()}`;
     
     // Для createInvoiceLink prices должен быть JSON строкой
     const prices = JSON.stringify([{
         label: item.name,
-        amount: parseInt(item.starsPrice, 10) || 1
+        amount: starsPrice
     }]);
     
     // Данные для createInvoiceLink
     const invoiceData = {
         title: `Покупка ${item.name}`,
-        description: `${item.name} за ${item.starsPrice} звезд Telegram`,
+        description: `${item.name} за ${item.starsPrice || 1} звезд Telegram`,
         payload: payload,
         provider_token: '', // Для Telegram Stars оставляем пустым
         currency: 'XTR',    // XTR - валюта Telegram Stars
@@ -4774,47 +4806,174 @@ function handleSuccessfulCasePurchase(item) {
     }
 }
 
-// Функция обработки покупки Epic case
-function handleRareCasePurchase() {
-    // Rare case пока бесплатный
-    // Создаем временный объект для Rare case
+// Функция обработки покупки Rare case
+async function handleRareCasePurchase() {
+    // Проверяем, запущено ли приложение в Telegram
+    if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
+        alert('Покупка доступна только в Telegram!');
+        return;
+    }
+    
+    const webApp = window.Telegram.WebApp;
+    const userId = webApp.initDataUnsafe?.user?.id;
+    
+    if (!userId) {
+        alert('Не удалось получить данные пользователя. Попробуйте перезапустить приложение.');
+        return;
+    }
+    
+    // Создаем объект для Rare case
     const rareCaseItem = {
         name: 'Rare case',
         image: 'assets/svg/shop/Rare-case.svg',
         amount: 1,
         cost: 0,
-        starsPrice: 0,
+        starsPrice: 1,
         discount: 0
     };
     
-    // Сохраняем текущий кейс для использования в openCase
-    currentCaseItem = rareCaseItem;
+    // Сохраняем текущий кейс для использования после оплаты
+    window.currentPurchase = {
+        item: rareCaseItem,
+        caseType: 'rare'
+    };
     
-    // Открываем кейс напрямую
-    handleSuccessfulCasePurchase(rareCaseItem);
+    // Создаем invoice link и открываем его
+    try {
+        const invoiceUrl = await createInvoiceLinkForMiniApp(userId, rareCaseItem, 'rare');
+        
+        if (invoiceUrl && typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+            if (!invoiceUrl.startsWith('https://') && !invoiceUrl.startsWith('http://')) {
+                console.error('Invalid invoice URL:', invoiceUrl);
+                window.currentPurchase = null;
+                return;
+            }
+            
+            if (webApp.openInvoice) {
+                webApp.openInvoice(invoiceUrl, (status) => {
+                    if (status === 'paid') {
+                        const purchaseData = window.currentPurchase;
+                        if (purchaseData && purchaseData.item) {
+                            currentCaseItem = purchaseData.item;
+                            handleSuccessfulCasePurchase(purchaseData.item);
+                            window.currentPurchase = null;
+                        }
+                    } else if (status === 'cancelled') {
+                        window.currentPurchase = null;
+                    } else if (status === 'failed') {
+                        window.currentPurchase = null;
+                        alert('Ошибка при оплате. Попробуйте еще раз.');
+                    }
+                });
+            } else {
+                if (webApp.openLink) {
+                    webApp.openLink(invoiceUrl);
+                } else {
+                    alert('Ваша версия Telegram не поддерживает прямую оплату. Обновите приложение.');
+                    window.currentPurchase = null;
+                }
+            }
+        } else {
+            window.currentPurchase = null;
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
+        }
+    } catch (error) {
+        window.currentPurchase = null;
+        alert('Ошибка при обработке платежа. Попробуйте еще раз.');
+    }
 }
 
-function handleEpicCasePurchase() {
-    // Epic case пока бесплатный
-    // Создаем временный объект для Epic case
+async function handleEpicCasePurchase() {
+    // Проверяем, запущено ли приложение в Telegram
+    if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
+        alert('Покупка доступна только в Telegram!');
+        return;
+    }
+    
+    const webApp = window.Telegram.WebApp;
+    const userId = webApp.initDataUnsafe?.user?.id;
+    
+    if (!userId) {
+        alert('Не удалось получить данные пользователя. Попробуйте перезапустить приложение.');
+        return;
+    }
+    
+    // Создаем объект для Epic case
     const epicCaseItem = {
         name: 'Epic case',
         image: 'assets/svg/shop/Epic-case.svg',
         amount: 1,
         cost: 0,
-        starsPrice: 0,
+        starsPrice: 1,
         discount: 0
     };
     
-    // Сохраняем текущий кейс для использования в openCase
-    currentCaseItem = epicCaseItem;
+    // Сохраняем текущий кейс для использования после оплаты
+    window.currentPurchase = {
+        item: epicCaseItem,
+        caseType: 'epic'
+    };
     
-    // Открываем кейс напрямую
-    handleSuccessfulCasePurchase(epicCaseItem);
+    // Создаем invoice link и открываем его
+    try {
+        const invoiceUrl = await createInvoiceLinkForMiniApp(userId, epicCaseItem, 'epic');
+        
+        if (invoiceUrl && typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+            if (!invoiceUrl.startsWith('https://') && !invoiceUrl.startsWith('http://')) {
+                console.error('Invalid invoice URL:', invoiceUrl);
+                window.currentPurchase = null;
+                return;
+            }
+            
+            if (webApp.openInvoice) {
+                webApp.openInvoice(invoiceUrl, (status) => {
+                    if (status === 'paid') {
+                        const purchaseData = window.currentPurchase;
+                        if (purchaseData && purchaseData.item) {
+                            currentCaseItem = purchaseData.item;
+                            handleSuccessfulCasePurchase(purchaseData.item);
+                            window.currentPurchase = null;
+                        }
+                    } else if (status === 'cancelled') {
+                        window.currentPurchase = null;
+                    } else if (status === 'failed') {
+                        window.currentPurchase = null;
+                        alert('Ошибка при оплате. Попробуйте еще раз.');
+                    }
+                });
+            } else {
+                if (webApp.openLink) {
+                    webApp.openLink(invoiceUrl);
+                } else {
+                    alert('Ваша версия Telegram не поддерживает прямую оплату. Обновите приложение.');
+                    window.currentPurchase = null;
+                }
+            }
+        } else {
+            window.currentPurchase = null;
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
+        }
+    } catch (error) {
+        window.currentPurchase = null;
+        alert('Ошибка при обработке платежа. Попробуйте еще раз.');
+    }
 }
 
-function handleLegendCasePurchase() {
-    // Legend case пока бесплатный
+async function handleLegendCasePurchase() {
+    // Проверяем, запущено ли приложение в Telegram
+    if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
+        alert('Покупка доступна только в Telegram!');
+        return;
+    }
+    
+    const webApp = window.Telegram.WebApp;
+    const userId = webApp.initDataUnsafe?.user?.id;
+    
+    if (!userId) {
+        alert('Не удалось получить данные пользователя. Попробуйте перезапустить приложение.');
+        return;
+    }
+    
     // Находим Legendary case в casesItems
     const legendCaseIndex = casesItems.findIndex(item => item.name === 'Legendary case');
     if (legendCaseIndex === -1) {
@@ -4827,17 +4986,78 @@ function handleLegendCasePurchase() {
     
     // Устанавливаем текущий индекс на Legendary case
     currentCasesIndex = legendCaseIndex;
-    const legendCaseItem = casesItems[legendCaseIndex];
+    const legendCaseItem = {
+        ...casesItems[legendCaseIndex],
+        starsPrice: 1
+    };
     
-    // Сохраняем текущий кейс для использования в openCase
-    currentCaseItem = legendCaseItem;
+    // Сохраняем текущий кейс для использования после оплаты
+    window.currentPurchase = {
+        item: legendCaseItem,
+        caseType: 'legend',
+        caseIndex: legendCaseIndex
+    };
     
-    // Открываем кейс
-    handleSuccessfulCasePurchase(legendCaseItem);
+    // Создаем invoice link и открываем его
+    try {
+        const invoiceUrl = await createInvoiceLinkForMiniApp(userId, legendCaseItem, legendCaseIndex);
+        
+        if (invoiceUrl && typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+            if (!invoiceUrl.startsWith('https://') && !invoiceUrl.startsWith('http://')) {
+                console.error('Invalid invoice URL:', invoiceUrl);
+                window.currentPurchase = null;
+                return;
+            }
+            
+            if (webApp.openInvoice) {
+                webApp.openInvoice(invoiceUrl, (status) => {
+                    if (status === 'paid') {
+                        const purchaseData = window.currentPurchase;
+                        if (purchaseData && purchaseData.item) {
+                            currentCaseItem = purchaseData.item;
+                            handleSuccessfulCasePurchase(purchaseData.item);
+                            window.currentPurchase = null;
+                        }
+                    } else if (status === 'cancelled') {
+                        window.currentPurchase = null;
+                    } else if (status === 'failed') {
+                        window.currentPurchase = null;
+                        alert('Ошибка при оплате. Попробуйте еще раз.');
+                    }
+                });
+            } else {
+                if (webApp.openLink) {
+                    webApp.openLink(invoiceUrl);
+                } else {
+                    alert('Ваша версия Telegram не поддерживает прямую оплату. Обновите приложение.');
+                    window.currentPurchase = null;
+                }
+            }
+        } else {
+            window.currentPurchase = null;
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
+        }
+    } catch (error) {
+        window.currentPurchase = null;
+        alert('Ошибка при обработке платежа. Попробуйте еще раз.');
+    }
 }
 
-function handleUltimaCasePurchase() {
-    // Ultima case пока бесплатный
+async function handleUltimaCasePurchase() {
+    // Проверяем, запущено ли приложение в Telegram
+    if (!isTelegramApp || !window.Telegram || !window.Telegram.WebApp) {
+        alert('Покупка доступна только в Telegram!');
+        return;
+    }
+    
+    const webApp = window.Telegram.WebApp;
+    const userId = webApp.initDataUnsafe?.user?.id;
+    
+    if (!userId) {
+        alert('Не удалось получить данные пользователя. Попробуйте перезапустить приложение.');
+        return;
+    }
+    
     // Находим Legendary case в casesItems (используем тот же элемент)
     const ultimaCaseIndex = casesItems.findIndex(item => item.name === 'Legendary case');
     if (ultimaCaseIndex === -1) {
@@ -4850,13 +5070,61 @@ function handleUltimaCasePurchase() {
     
     // Устанавливаем текущий индекс на Legendary case
     currentCasesIndex = ultimaCaseIndex;
-    const ultimaCaseItem = casesItems[ultimaCaseIndex];
+    const ultimaCaseItem = {
+        ...casesItems[ultimaCaseIndex],
+        starsPrice: 1
+    };
     
-    // Сохраняем текущий кейс для использования в openCase
-    currentCaseItem = ultimaCaseItem;
+    // Сохраняем текущий кейс для использования после оплаты
+    window.currentPurchase = {
+        item: ultimaCaseItem,
+        caseType: 'ultima',
+        caseIndex: ultimaCaseIndex
+    };
     
-    // Открываем кейс
-    handleSuccessfulCasePurchase(ultimaCaseItem);
+    // Создаем invoice link и открываем его
+    try {
+        const invoiceUrl = await createInvoiceLinkForMiniApp(userId, ultimaCaseItem, ultimaCaseIndex);
+        
+        if (invoiceUrl && typeof invoiceUrl === 'string' && invoiceUrl.length > 0) {
+            if (!invoiceUrl.startsWith('https://') && !invoiceUrl.startsWith('http://')) {
+                console.error('Invalid invoice URL:', invoiceUrl);
+                window.currentPurchase = null;
+                return;
+            }
+            
+            if (webApp.openInvoice) {
+                webApp.openInvoice(invoiceUrl, (status) => {
+                    if (status === 'paid') {
+                        const purchaseData = window.currentPurchase;
+                        if (purchaseData && purchaseData.item) {
+                            currentCaseItem = purchaseData.item;
+                            handleSuccessfulCasePurchase(purchaseData.item);
+                            window.currentPurchase = null;
+                        }
+                    } else if (status === 'cancelled') {
+                        window.currentPurchase = null;
+                    } else if (status === 'failed') {
+                        window.currentPurchase = null;
+                        alert('Ошибка при оплате. Попробуйте еще раз.');
+                    }
+                });
+            } else {
+                if (webApp.openLink) {
+                    webApp.openLink(invoiceUrl);
+                } else {
+                    alert('Ваша версия Telegram не поддерживает прямую оплату. Обновите приложение.');
+                    window.currentPurchase = null;
+                }
+            }
+        } else {
+            window.currentPurchase = null;
+            alert('Ошибка при создании платежа. Попробуйте еще раз.');
+        }
+    } catch (error) {
+        window.currentPurchase = null;
+        alert('Ошибка при обработке платежа. Попробуйте еще раз.');
+    }
 }
 
 // Инициализация обработчика сообщений от бота

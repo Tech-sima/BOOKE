@@ -2,7 +2,7 @@
 
 ## Описание
 
-`telegram_stars_bot.py` - основной бот для игры BOOKE, через который запускается Telegram Mini App.
+`telegram_bot.py` - основной бот для игры BOOKE, через который запускается Telegram Mini App.
 Этот бот полностью отвечает за:
 - Запуск Mini App игры
 - Обработку покупок через Telegram Stars
@@ -35,7 +35,7 @@ BOT_TOKEN = "8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU"
 ### Через консоль (для тестирования и разработки):
 
 ```bash
-python telegram_stars_bot.py
+python telegram_bot.py
 ```
 
 ### На сервере (рекомендуется использовать systemd или supervisor):
@@ -110,7 +110,7 @@ CASE_NAMES = {
 
 1. Запустите бота через консоль:
 ```bash
-python telegram_stars_bot.py
+python telegram_bot.py
 ```
 
 2. Откройте бота в Telegram и отправьте `/start`

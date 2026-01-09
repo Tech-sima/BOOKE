@@ -41,14 +41,22 @@ BOT_TOKEN = "8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU"
 CASE_PRICES = {
     0: 1,   # Diamond case
     1: 1,   # Money case
-    2: 1    # Legendary case
+    2: 1,   # Legendary case
+    'rare': 1,    # Rare case
+    'epic': 1,    # Epic case
+    'legend': 1,  # Legend case
+    'ultima': 1   # Ultima case
 }
 
 # Названия кейсов
 CASE_NAMES = {
     0: "Diamond case",
     1: "Money case",
-    2: "Legendary case"
+    2: "Legendary case",
+    'rare': "Rare case",
+    'epic': "Epic case",
+    'legend': "Legend case",
+    'ultima': "Ultima case"
 }
 
 
@@ -182,7 +190,14 @@ async def precheckout_callback(update: Update, context: ContextTypes.DEFAULT_TYP
         # Извлекаем данные из payload
         parts = payload.split('_')
         if len(parts) >= 3:
-            case_index = int(parts[1])
+            # Обрабатываем индекс кейса (может быть числом или строкой)
+            case_identifier = parts[1]
+            try:
+                case_index = int(case_identifier)
+            except ValueError:
+                # Если не число, значит это строка (rare, epic, legend, ultima)
+                case_index = case_identifier
+            
             stars_price = int(parts[2])
             
             # Проверяем, что кейс существует
@@ -239,7 +254,14 @@ async def successful_payment_callback(
         parts = payload.split('_')
         
         if len(parts) >= 3:
-            case_index = int(parts[1])
+            # Обрабатываем индекс кейса (может быть числом или строкой)
+            case_identifier = parts[1]
+            try:
+                case_index = int(case_identifier)
+            except ValueError:
+                # Если не число, значит это строка (rare, epic, legend, ultima)
+                case_index = case_identifier
+            
             stars_price = int(parts[2])
             case_name = CASE_NAMES.get(case_index, "Кейс")
             user_id = update.effective_user.id
@@ -250,7 +272,7 @@ async def successful_payment_callback(
             # Логируем успешную транзакцию
             logger.info(
                 f"✅ Платеж успешен: пользователь {user_id}, "
-                f"кейс {case_name} (индекс {case_index}), "
+                f"кейс {case_name} (идентификатор {case_index}), "
                 f"цена {stars_price} звезд, "
                 f"charge_id: {charge_id}"
             )

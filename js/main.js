@@ -1103,25 +1103,11 @@ function startGame(){
             console.error('Error during city panel images preloading:', error);
         }
         
-        // Предзагружаем изображения адвент-панели при запуске игры
-        try {
-            preloadAdventImages();
-        } catch (error) {
-            console.error('Error during advent images preloading:', error);
-        }
-        
         // Предзагружаем изображения магазина при запуске игры
         try {
             preloadShopImages();
         } catch (error) {
             console.error('Error during shop images preloading:', error);
-        }
-        
-        // Инициализируем адвент-панель при запуске игры
-        try {
-            initializeAdventPanel();
-        } catch (error) {
-            console.error('Error during advent panel initialization:', error);
         }
     }catch(e){
         console.error('Error starting game:', e);
@@ -3651,25 +3637,21 @@ function updateCasesDisplay() {
             if (buyPrice && item.starsPrice) {
                 buyPrice.textContent = item.starsPrice;
                 // Удаляем старую иконку XTR, если есть
-                const oldIcon = buyButton.querySelector('.xtr-icon');
+                const oldIcon = buyPrice.querySelector('.xtr-icon');
                 if (oldIcon) {
                     oldIcon.remove();
                 }
-                // Добавляем иконку XTR абсолютно позиционированную (не влияет на layout)
-                if (buyButton) {
+                // Добавляем иконку XTR внутрь span с ценой
+                if (buyPrice) {
                     const xtrIcon = document.createElement('img');
                     xtrIcon.className = 'xtr-icon';
                     xtrIcon.src = 'assets/svg/XTR.svg';
                     xtrIcon.alt = 'XTR';
-                    xtrIcon.style.position = 'absolute';
-                    xtrIcon.style.width = '40px';
-                    xtrIcon.style.height = '40px';
+                    xtrIcon.style.width = '36px';
+                    xtrIcon.style.height = '36px';
                     xtrIcon.style.objectFit = 'contain';
-                    xtrIcon.style.left = '50%';
-                    xtrIcon.style.top = '50%';
-                    xtrIcon.style.transform = 'translate(8px, -50%)';
                     xtrIcon.style.pointerEvents = 'none';
-                    buyButton.appendChild(xtrIcon);
+                    buyPrice.appendChild(xtrIcon);
                 }
             }
             
@@ -4034,10 +4016,11 @@ function openCase() {
         }
     }
     
-    // Если выпал персонаж Robo blumy, но он уже есть, меняем на альтернативную награду
+    // Если выпал персонаж Robo blumy, но он уже выпадал из кейсов, меняем на альтернативную награду
     if (rewardType === 'character' && selectedRewardData.characterId === 'robo-blumy') {
-        const availableCharacters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
-        if (availableCharacters.includes('robo-blumy')) {
+        // Проверяем, выпадал ли робо-блуми из кейсов ранее
+        const roboBlumyDroppedFromCases = localStorage.getItem('roboBlumyDroppedFromCases') === 'true';
+        if (roboBlumyDroppedFromCases) {
             rewardType = 'rbc';
             selectedAmount = 100000; // 100000 RBC
         }
@@ -4356,6 +4339,9 @@ function openCase() {
                     setBalance(currentBalance + 5000000);
                 }
             } else if (selectedRewardData.characterId === 'robo-blumy') {
+                // Отмечаем, что робо-блуми выпал из кейса
+                localStorage.setItem('roboBlumyDroppedFromCases', 'true');
+                
                 if (!availableCharacters.includes('robo-blumy')) {
                     availableCharacters.push('robo-blumy');
                     localStorage.setItem('availableCharacters', JSON.stringify(availableCharacters));
@@ -6021,34 +6007,6 @@ function preloadCharacterImages() {
 
 }
 
-// Предварительная загрузка всех ресурсов адвент-панели
-function preloadAdventImages() {
-    const adventImages = [
-        'assets/svg/advent/advent-book.svg',
-        'assets/svg/advent/advent-background.svg',
-        'assets/svg/advent/advent-uzor.svg',
-        'assets/svg/advent/advent-gift-rare.svg',
-        'assets/svg/advent/advent-gift-rare-opened.svg',
-        'assets/svg/advent/advent-gift-legendery.svg',
-        'assets/svg/advent/advent-gift-legendery-opened.svg',
-        'assets/svg/advent/advent-gift-ultra.svg',
-        'assets/svg/advent/advent-gift-ultra-opened.svg',
-        'assets/svg/characters-panel/robo-blumy.svg',
-        'assets/svg/money-icon.svg',
-        'assets/svg/rbc-icon.svg'
-    ];
-    
-    adventImages.forEach(imagePath => {
-        const img = new Image();
-        img.src = imagePath;
-        img.onload = () => {
-            // Изображение загружено
-        };
-        img.onerror = () => {
-            console.warn(`⚠️ Failed to load advent image: ${imagePath}`);
-        };
-    });
-}
 
 // Предварительная загрузка всех ресурсов магазина
 function preloadShopImages() {
@@ -6108,324 +6066,6 @@ function preloadShopImages() {
     });
 }
 
-// Флаг для отслеживания инициализации адвент-панели
-let adventInitialized = false;
-
-// Инициализация адвент-панели
-function initializeAdventPanel() {
-    if (adventInitialized) {
-        return;
-    }
-    
-    const btn = document.getElementById('advent-btn');
-    const panel = document.getElementById('advent-panel');
-    const panelContent = document.querySelector('.advent-panel-content');
-    
-    if (!btn || !panel) {
-        return;
-    }
-    
-    // Функции для работы с состоянием подарков
-    function getAdventState(){
-        const saved = localStorage.getItem('adventState');
-        if(saved) return JSON.parse(saved);
-        return {
-            opened: [], // Изначально все закрыты
-            rewards: {},
-            timers: {},
-            lastOpened: 0
-        };
-    }
-    function saveAdventState(state){
-        localStorage.setItem('adventState', JSON.stringify(state));
-    }
-    
-    // Функция получения типа подарка
-    function getGiftType(index){
-        if(index === 28) return 'ultra';
-        if(index % 3 === 0) return 'legendary';
-        return 'rare';
-    }
-    
-    // Функция генерации награды
-    function generateReward(type){
-        if(type === 'rare'){
-            return {
-                money: Math.floor(Math.random() * (1500 - 500 + 1)) + 500,
-                diamonds: Math.floor(Math.random() * (100 - 50 + 1)) + 50
-            };
-        } else if(type === 'legendary'){
-            return {
-                money: Math.floor(Math.random() * (15000 - 4000 + 1)) + 4000,
-                diamonds: Math.floor(Math.random() * (700 - 200 + 1)) + 200
-            };
-        } else if(type === 'ultra'){
-            return {
-                character: 'robo-blumy'
-            };
-        }
-        return null;
-    }
-    
-    // Функция проверки доступности подарка
-    function isGiftAvailable(index, state){
-        if(state.opened.includes(index)) return false; // Уже открыт
-        if(index === 1) return true; // Первый всегда доступен
-        const prevIndex = index - 1;
-        if(!state.opened.includes(prevIndex)) return false; // Предыдущий не открыт
-        
-        // Проверяем таймер
-        if(state.timers[index]){
-            const timerEnd = state.timers[index];
-            if(Date.now() < timerEnd) return false; // Таймер еще не истек
-        }
-        return true;
-    }
-    
-    // Функция проверки, заблокирован ли подарок
-    function isGiftLocked(index, state){
-        if(state.opened.includes(index)) return false; // Открыт - не заблокирован
-        if(index === 1) return false; // Первый не заблокирован
-        const prevIndex = index - 1;
-        if(!state.opened.includes(prevIndex)) return true; // Предыдущий не открыт - заблокирован
-        // Проверяем таймер
-        if(state.timers[index]){
-            const timerEnd = state.timers[index];
-            if(Date.now() < timerEnd) return true; // Таймер еще не истек - заблокирован
-        }
-        return false; // Доступен
-    }
-    
-    // Функция открытия подарка
-    function openGift(index){
-        const state = getAdventState();
-        if(!isGiftAvailable(index, state)) return;
-        
-        const type = getGiftType(index);
-        const reward = generateReward(type);
-        
-        // Сохраняем награду
-        state.rewards[index] = reward;
-        state.opened.push(index);
-        state.lastOpened = index;
-        
-        // Устанавливаем таймер для следующего подарка
-        if(index < 28){
-            const nextIndex = index + 1;
-            state.timers[nextIndex] = Date.now() + (12 * 60 * 60 * 1000); // 12 часов
-        }
-        
-        // Если ультра подарок - добавляем персонажа
-        if(type === 'ultra' && reward.character === 'robo-blumy'){
-            // Добавляем персонажа в список доступных
-            const characters = JSON.parse(localStorage.getItem('availableCharacters') || '[]');
-            if(!characters.includes('robo-blumy')){
-                characters.push('robo-blumy');
-                localStorage.setItem('availableCharacters', JSON.stringify(characters));
-                // Обновляем счетчик персонажей в левой панели
-                if(window.updateCharactersCount){
-                    window.updateCharactersCount();
-                }
-            }
-        }
-        
-        // Добавляем награды к балансу
-        if(reward.money && window.setBalance && window.getBalance){
-            window.setBalance(window.getBalance() + reward.money);
-        }
-        if(reward.diamonds && window.setCredits && window.getCredits){
-            window.setCredits(window.getCredits() + reward.diamonds);
-        }
-        
-        saveAdventState(state);
-        renderGifts();
-        updateProgressBar();
-        
-        // Обновляем персонажей если нужно
-        if(type === 'ultra' && window.renderCharacters){
-            setTimeout(() => window.renderCharacters(), 100);
-        }
-    }
-    
-    // Функция рендеринга подарков
-    function renderGifts(){
-        const state = getAdventState();
-        const grid = document.querySelector('.advent-grid');
-        if(!grid) return;
-        
-        // Используем requestAnimationFrame для оптимизации рендеринга
-        requestAnimationFrame(() => {
-            const items = grid.querySelectorAll('.advent-grid-item');
-            items.forEach((item, idx) => {
-            const index = idx + 1;
-            const type = getGiftType(index);
-            const isOpened = state.opened.includes(index);
-            const isAvailable = isGiftAvailable(index, state);
-            const isLocked = isGiftLocked(index, state);
-            const reward = state.rewards[index];
-            
-            // Очищаем содержимое
-            item.innerHTML = '';
-            item.className = 'advent-grid-item';
-            
-            // Устанавливаем тип подарка для правильного фона
-            if(type === 'legendary'){
-                item.classList.add('legendary');
-            } else if(type === 'ultra'){
-                item.classList.add('ultra');
-            }
-            
-            // Устанавливаем состояние
-            if(isOpened){
-                // Для ультра подарка с персонажем не добавляем класс opened (чтобы не показывать открытый подарок)
-                if(type === 'ultra' && reward && reward.character){
-                    item.classList.add('ultra-character');
-                    // Показываем только SVG персонажа
-                    const rewardDiv = document.createElement('div');
-                    rewardDiv.className = 'advent-reward';
-                    rewardDiv.innerHTML = `<div class="advent-reward-character"><img src="assets/svg/characters-panel/robo-blumy.svg" class="advent-reward-character-img" alt="robo-blumy"></div>`;
-                    item.appendChild(rewardDiv);
-                } else {
-                    item.classList.add('opened');
-                    // Показываем награду
-                    if(reward){
-                        const rewardDiv = document.createElement('div');
-                        rewardDiv.className = 'advent-reward';
-                        if(reward.character){
-                            rewardDiv.innerHTML = `<div class="advent-reward-character"><img src="assets/svg/characters-panel/robo-blumy.svg" class="advent-reward-character-img" alt="robo-blumy"></div>`;
-                        } else {
-                            if(reward.money){
-                                rewardDiv.innerHTML += `<div class="advent-reward-item"><img src="assets/svg/money-icon.svg" class="advent-reward-icon" alt="money">${reward.money.toLocaleString()}</div>`;
-                            }
-                            if(reward.diamonds){
-                                rewardDiv.innerHTML += `<div class="advent-reward-item"><img src="assets/svg/rbc-icon.svg" class="advent-reward-icon" alt="diamonds">${reward.diamonds.toLocaleString()}</div>`;
-                            }
-                        }
-                        item.appendChild(rewardDiv);
-                    }
-                }
-            } else if(isLocked){
-                item.classList.add('locked');
-                // Добавляем таймер если есть
-                if(state.timers[index]){
-                    const timerEnd = state.timers[index];
-                    const timerDiv = document.createElement('div');
-                    timerDiv.className = 'advent-timer';
-                    item.appendChild(timerDiv);
-                    
-                    const updateTimer = () => {
-                        const now = Date.now();
-                        const remaining = Math.max(0, timerEnd - now);
-                        if(remaining <= 0){
-                            timerDiv.remove();
-                            renderGifts();
-                            return;
-                        }
-                        // Форматируем время в часы:минуты:секунды
-                        const totalSeconds = Math.floor(remaining / 1000);
-                        const hours = Math.floor(totalSeconds / 3600);
-                        const minutes = Math.floor((totalSeconds % 3600) / 60);
-                        const seconds = totalSeconds % 60;
-                        
-                        // Форматируем с ведущими нулями
-                        const hoursStr = hours.toString().padStart(2, '0');
-                        const minutesStr = minutes.toString().padStart(2, '0');
-                        const secondsStr = seconds.toString().padStart(2, '0');
-                        
-                        timerDiv.textContent = `${hoursStr}:${minutesStr}:${secondsStr}`;
-                    };
-                    updateTimer();
-                    const timerInterval = setInterval(() => {
-                        if(!item.parentNode){
-                            clearInterval(timerInterval);
-                            return;
-                        }
-                        const now = Date.now();
-                        if(now >= timerEnd){
-                            clearInterval(timerInterval);
-                            requestAnimationFrame(() => renderGifts());
-                        } else {
-                            updateTimer();
-                        }
-                    }, 1000);
-                }
-            } else {
-                item.classList.add('available');
-                // Добавляем кнопку "забрать"
-                const claimBtn = document.createElement('button');
-                claimBtn.className = 'advent-claim-btn';
-                claimBtn.textContent = 'Забрать';
-                claimBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    openGift(index);
-                };
-                item.appendChild(claimBtn);
-            }
-            });
-        });
-    }
-    
-    // Функция обновления прогресс-бара
-    function updateProgressBar(){
-        const state = getAdventState();
-        const openedCount = state.opened.length;
-        const totalCount = 28;
-        const percentage = (openedCount / totalCount) * 100;
-        
-        const progressFill = document.getElementById('advent-progress-fill');
-        const progressText = document.getElementById('advent-progress-text');
-        
-        if(progressFill){
-            progressFill.style.width = percentage + '%';
-        }
-        if(progressText){
-            progressText.textContent = `${openedCount} / ${totalCount}`;
-        }
-    }
-    
-    // Делаем renderGifts доступной глобально для обновления при открытии панели
-    window.renderAdventGifts = renderGifts;
-    
-    const open = ()=>{
-        panel.classList.add('show');
-        document.body.classList.add('advent-locked');
-        requestAnimationFrame(() => {
-            renderGifts();
-            updateProgressBar();
-        });
-        if(window.hideProfitIndicators) window.hideProfitIndicators({ suppress: true });
-        
-        // Показываем кнопку "назад" в Telegram Mini App
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
-            window.Telegram.WebApp.BackButton.show();
-            window.Telegram.WebApp.BackButton.onClick(close);
-        }
-    };
-    const close = ()=>{
-        panel.classList.remove('show');
-        document.body.classList.remove('advent-locked');
-        if(window.showProfitIndicators) window.showProfitIndicators({ force: true });
-        
-        // Скрываем кнопку "назад" в Telegram Mini App
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
-            window.Telegram.WebApp.BackButton.hide();
-        }
-    };
-    btn.addEventListener('click', open);
-    ['click','touchstart','touchend'].forEach(evt=>{
-        panel.addEventListener(evt, ev=>ev.stopPropagation());
-        if(panelContent) panelContent.addEventListener(evt, ev=>ev.stopPropagation());
-    });
-    
-    // Инициализация при загрузке - рендерим подарки сразу
-    renderGifts();
-    updateProgressBar();
-    
-    adventInitialized = true;
-}
-
-// Делаем функцию доступной глобально
-window.initializeAdventPanel = initializeAdventPanel;
 
 
 // Флаг для отслеживания инициализации игры
@@ -6464,20 +6104,6 @@ document.addEventListener('DOMContentLoaded', () => {
             preloadCharacterImages();
         } catch (error) {
             console.error('Error during character/employee images preloading:', error);
-        }
-        
-        // Предварительно загружаем изображения адвент-панели
-        try {
-            preloadAdventImages();
-        } catch (error) {
-            console.error('Error during advent images preloading:', error);
-        }
-        
-        // Инициализируем адвент-панель во время загрузки игры
-        try {
-            initializeAdventPanel();
-        } catch (error) {
-            console.error('Error during advent panel initialization:', error);
         }
         
         // Инициализация магазина удалена

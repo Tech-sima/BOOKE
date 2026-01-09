@@ -4,7 +4,6 @@
   --header-h:calc(96px + env(safe-area-inset-top, 0px));
   --info-panel-top:calc(80px + env(safe-area-inset-top, 0px));
   --info-panel-height:140px;
-  --advent-panel-height:80vh;
 }
 
 html,body{margin:0;padding:0;width:100%;height:100%;}
@@ -28,11 +27,10 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Bottom banner above navigation */
 #bottom-banner{
   position:fixed;
-  right:12px;
-  bottom:88px;
-  width:50%;
-  max-width:50vw;
-  height:56px;
+  left:20px;
+  top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 70px);
+  width:140px;
+  height:64px;
   background:rgba(0,0,0,0.3);
   border-radius:12px;
   border:1px solid rgba(255,255,255,0.8);
@@ -656,11 +654,10 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Адаптация для средних экранов (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   #bottom-banner{
-    right:12px;
-    bottom:88px;
-    width:50%;
-    max-width:50vw;
-    height:54px;
+    left:20px;
+    top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 70px);
+    width:140px;
+    height:62px;
     padding:0 11px;
   }
   .banner-item{
@@ -700,11 +697,10 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 /* Адаптация панели инвестиций для мобильных */
 @media (max-width: 480px) {
   #bottom-banner{
-    right:10px;
-    bottom:88px;
-    width:50%;
-    max-width:50vw;
-    height:52px;
+    left:20px;
+    top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 70px);
+    width:140px;
+    height:60px;
     padding:0 10px;
   }
   #bottom-banner-panel{
@@ -729,11 +725,10 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 @media (max-width: 360px) {
   #bottom-banner{
-    right:8px;
-    bottom:88px;
-    width:50%;
-    max-width:50vw;
-    height:50px;
+    left:20px;
+    top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 70px);
+    width:140px;
+    height:58px;
     padding:0 8px;
   }
   #bottom-banner-panel{
@@ -779,11 +774,10 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 
 @media (max-width: 320px) {
   #bottom-banner{
-    right:6px;
-    bottom:88px;
-    width:50%;
-    max-width:50vw;
-    height:48px;
+    left:20px;
+    top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 70px);
+    width:140px;
+    height:56px;
     padding:0 6px;
   }
   #bottom-banner-panel{
@@ -1015,627 +1009,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
 }
 .info-ic{width:14px;height:14px;opacity:0.5;}
 
-/* Advent vibes event */
-.advent-event{
-  position:fixed;
-  left:15px;
-  top:calc(var(--info-panel-top) + var(--info-panel-height) - 3px);
-  width:auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:0px;
-  z-index:19;
-}
-.advent-trigger{
-  padding:0;
-  margin:0;
-  border:none;
-  background:transparent;
-  cursor:pointer;
-}
-.advent-img{
-  width:105px;
-  margin-left:-12px;
-  height:auto;
-  display:block;
-  border-radius:0;
-  box-shadow:none;
-  filter:
-    drop-shadow(0 0 2px rgba(246,217,181,0.45))
-    drop-shadow(0 0 6px rgba(246,217,181,0.5))
-    drop-shadow(0 0 10px rgba(246,217,181,0.35));
-  pointer-events:none;
-}
-.advent-tag{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:max-content;
-  min-width:0;
-  white-space:nowrap;
-  padding:6px 13px;
-  background:#7a1e1b;
-  color:#f6d9b5;
-  font-family:"Cinzel","Playfair Display","Georgia","serif";
-  font-weight:800;
-  font-size:11.5px;
-  line-height:1.1;
-  letter-spacing:0.5px;
-  text-transform:uppercase;
-  font-variant:small-caps;
-  border-radius:12px;
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.24),
-    0 0 0 2px rgba(246,217,181,0.35),
-    0 0 12px rgba(246,217,181,0.4);
-  text-shadow:0 2px 4px rgba(0,0,0,0.32);
-  border:1px solid #c48a6a;
-}
-@media (max-width:480px){
-  .advent-event{width:auto;}
-  .advent-img{
-    width:95px;
-    margin-left:-8px;
-    box-shadow:none;
-    filter:
-      drop-shadow(0 0 2px rgba(246,217,181,0.42))
-      drop-shadow(0 0 6px rgba(246,217,181,0.46))
-      drop-shadow(0 0 9px rgba(246,217,181,0.32));
-  }
-  .advent-tag{font-size:10.9px;padding:6px 11px;}
-}
-
-/* Advent overlay */
-.advent-panel{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  width:100vw;
-  height:100vh;
-  max-width:100vw;
-  background:#000;
-  border:none;
-  box-shadow:none;
-  padding:16px;
-  overflow:hidden;
-  touch-action:none;
-  display:none;
-  z-index:1500;
-  box-sizing:border-box;
-  contain:layout style paint;
-  will-change:contents;
-  transform:translateZ(0);
-}
-
-/* Золотые лучи из центра - оптимизированная версия */
-.advent-panel::before{
-  content:'';
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%) translateZ(0);
-  width:200%;
-  height:200%;
-  background:transparent;
-  pointer-events:none;
-  z-index:-1;
-  will-change:transform;
-  filter:none;
-}
-
-.advent-panel.show{
-  display:block;
-}
-.advent-panel-content{
-  display:flex;
-  flex-direction:column;
-  gap:0;
-  height:100%;
-  max-height:100vh;
-  overflow-y:auto;
-  overflow-x:hidden;
-  padding:0;
-  padding-top:90px;
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
-  touch-action:pan-y;
-  box-sizing:border-box;
-  width:100%;
-  position:relative;
-  z-index:1;
-  contain:layout style;
-  transform:translateZ(0);
-}
-.advent-panel-content::-webkit-scrollbar{width:0;height:0;}
-.advent-panel-content{scrollbar-width:none;}
-body.advent-locked{overflow:hidden;}
-.advent-header-box{
-  flex:0 0 auto;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-  margin:0 0 24px 0;
-  padding:20px 16px;
-  background:rgba(0,0,0,0.4);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  border:2px solid rgba(255,255,255,0.8);
-  border-radius:16px;
-  position:relative;
-  z-index:2;
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.1);
-}
-.advent-title{
-  flex:0 0 auto;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-  margin:0;
-  padding:0 0 12px 0;
-  text-align:center;
-  color:#fff;
-  font-family:"Cinzel","Playfair Display","Georgia","serif";
-  font-weight:800;
-  font-size:48px;
-  line-height:1.2;
-  letter-spacing:1.8px;
-  text-transform:uppercase;
-  white-space:normal;
-  text-shadow:
-    0 0 20px rgba(255,255,255,0.8),
-    0 0 40px rgba(255,255,255,0.6),
-    0 0 60px rgba(255,255,255,0.4),
-    0 2px 4px rgba(0,0,0,0.5);
-  position:relative;
-  transform:translateZ(0);
-  will-change:contents;
-}
-.advent-title::after{
-  content:'';
-  position:absolute;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:60%;
-  height:2px;
-  background:linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(255,255,255,0.3) 10%,
-    rgba(255,255,255,0.8) 20%,
-    rgba(255,255,255,1) 50%,
-    rgba(255,255,255,0.8) 80%,
-    rgba(255,255,255,0.3) 90%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 8px rgba(255,255,255,0.6),
-    0 0 16px rgba(255,255,255,0.4);
-}
-.advent-subtitle{
-  flex:0 0 auto;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  text-align:center;
-  color:#fff;
-  font-family:"Cinzel","Playfair Display","Georgia","serif";
-  font-weight:400;
-  font-size:16px;
-  line-height:1.4;
-  letter-spacing:0.5px;
-  text-transform:none;
-  white-space:normal;
-  text-shadow:
-    0 0 15px rgba(255,255,255,0.8),
-    0 0 30px rgba(255,255,255,0.6),
-    0 0 45px rgba(255,255,255,0.4),
-    0 2px 4px rgba(0,0,0,0.5);
-  transform:translateZ(0);
-  will-change:contents;
-}
-.advent-progress-container{
-  flex:0 0 auto;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-  margin:0;
-  padding:0 16px 20px 16px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  position:relative;
-  z-index:2;
-}
-.advent-progress-label{
-  text-align:center;
-  color:#fff;
-  font-family:"Cinzel","Playfair Display","Georgia","serif";
-  font-weight:700;
-  font-size:14px;
-  letter-spacing:0.5px;
-  text-shadow:
-    0 0 8px rgba(255,255,255,0.8),
-    0 0 16px rgba(255,255,255,0.6),
-    0 2px 4px rgba(0,0,0,0.5);
-}
-.advent-progress-bar{
-  width:100%;
-  height:24px;
-  background:rgba(0,0,0,0.6);
-  border:2px solid rgba(255,255,255,0.5);
-  border-radius:12px;
-  overflow:hidden;
-  position:relative;
-  box-shadow:
-    inset 0 2px 4px rgba(0,0,0,0.3),
-    0 0 8px rgba(255,255,255,0.3);
-}
-.advent-progress-fill{
-  height:100%;
-  background:linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0.9) 100%);
-  border-radius:10px;
-  width:0%;
-  transition:width 0.5s ease;
-  box-shadow:
-    0 0 10px rgba(255,255,255,0.8),
-    0 0 20px rgba(255,255,255,0.6),
-    inset 0 0 10px rgba(255,255,255,0.3);
-}
-.advent-grid{
-  flex:0 0 auto;
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:6px;
-  padding:12px 0 0 0;
-  margin-top:0;
-  counter-reset:grid-item;
-  width:100%;
-  max-width:100%;
-  box-sizing:border-box;
-  position:relative;
-  z-index:2;
-  contain:layout style;
-  transform:translateZ(0);
-}
-.advent-grid-item{
-  aspect-ratio:1/1;
-  background:rgba(0,0,0,0.5) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
-  background-size:160%;
-  border:1px solid rgba(255,255,255,0.6);
-  border-radius:12px;
-  position:relative;
-  counter-increment:grid-item;
-  overflow:hidden;
-  filter:drop-shadow(0 0 2px rgba(255,255,255,0.5));
-  box-sizing:border-box;
-  width:100%;
-  z-index:2;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.1);
-  contain:layout style paint;
-  transform:translateZ(0);
-  will-change:transform;
-}
-.advent-grid-item:nth-child(3n){
-  background-image:url('../assets/svg/advent/advent-gift-legendery.svg');
-  filter:
-    drop-shadow(0 0 1px rgba(255,215,0,0.6))
-    drop-shadow(0 0 3px rgba(255,215,0,0.5));
-}
-.advent-grid-item:last-child{
-  background-image:url('../assets/svg/advent/advent-gift-ultra.svg');
-  filter:
-    drop-shadow(0 0 1px rgba(100,200,255,0.6))
-    drop-shadow(0 0 3px rgba(100,200,255,0.5));
-}
-.advent-grid-item::after{
-  content:counter(grid-item);
-  position:absolute;
-  top:0;
-  right:0;
-  width:20px;
-  height:20px;
-  background:#fff;
-  clip-path:polygon(0 0,100% 0,100% 100%);
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-end;
-  padding:1px 5px 0 2px;
-  color:#000;
-  font-family:"Segoe UI",Arial,sans-serif;
-  font-weight:800;
-  font-size:10px;
-  line-height:1;
-  z-index:1;
-  text-shadow:0 1px 2px rgba(0,0,0,0.3);
-  letter-spacing:0.2px;
-  box-sizing:border-box;
-}
-.advent-grid-item:nth-child(n+10)::after{
-  padding:1px 5px 0 8px;
-  justify-content:flex-start;
-}
-.advent-grid-item:nth-child(3n)::after{
-  background:#ffd700;
-  color:#000;
-  text-shadow:0 1px 2px rgba(0,0,0,0.4);
-}
-.advent-grid-item:last-child::after{
-  background:#64c8ff;
-  color:#000;
-  text-shadow:0 1px 2px rgba(0,0,0,0.4);
-}
-/* Закрытые подарки (серые) */
-.advent-grid-item.locked{
-  filter:grayscale(100%) brightness(0.4);
-  opacity:0.6;
-  pointer-events:none;
-  background:rgba(0,0,0,0.5) url('../assets/svg/advent/advent-gift-rare.svg') no-repeat center center;
-  background-size:160%;
-}
-/* Открытые подарки */
-.advent-grid-item.opened{
-  background-image:url('../assets/svg/advent/advent-gift-rare-opened.svg');
-}
-.advent-grid-item.opened.legendary{
-  background-image:url('../assets/svg/advent/advent-gift-legendery-opened.svg');
-}
-.advent-grid-item.opened.ultra{
-  background-image:url('../assets/svg/advent/advent-gift-ultra-opened.svg');
-}
-/* Ультра подарок с персонажем - только SVG персонажа, без фона открытого подарка */
-.advent-grid-item.ultra-character{
-  background-image:none;
-  background:transparent;
-}
-/* Награды */
-.advent-reward{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-  z-index:10;
-  pointer-events:none;
-}
-.advent-reward-item{
-  font-size:14px;
-  font-weight:700;
-  color:#fff;
-  text-shadow:
-    0 0 4px rgba(0,0,0,0.8),
-    0 2px 4px rgba(0,0,0,0.6);
-  white-space:nowrap;
-  display:flex;
-  align-items:center;
-  gap:5px;
-}
-.advent-reward-icon{
-  width:18px;
-  height:18px;
-  flex-shrink:0;
-}
-.advent-reward-character{
-  font-size:12px;
-  font-weight:700;
-  color:#64c8ff;
-  text-shadow:
-    0 0 4px rgba(100,200,255,0.8),
-    0 2px 4px rgba(0,0,0,0.6);
-  white-space:nowrap;
-  background:transparent;
-  padding:0;
-  border:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.advent-reward-character-img{
-  width:100px;
-  height:100px;
-  object-fit:contain;
-  image-rendering:auto;
-  -ms-interpolation-mode:bicubic;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  transform:translateZ(0) scale(1);
-  will-change:transform;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  filter:contrast(1.05) brightness(1.02);
-}
-/* Увеличенный размер персонажа для последнего подарка */
-.advent-grid-item:last-child .advent-reward-character-img,
-.advent-grid-item.ultra-character .advent-reward-character-img{
-  width:130px;
-  height:130px;
-}
-/* Таймер */
-.advent-timer{
-  position:absolute;
-  bottom:4px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  color:#fff;
-  border:1px solid rgba(255,255,255,0.3);
-  border-radius:8px;
-  padding:4px 10px;
-  font-size:10px;
-  font-weight:700;
-  font-family:"Segoe UI",Arial,sans-serif;
-  z-index:10;
-  pointer-events:none;
-  box-shadow:0 2px 4px rgba(0,0,0,0.2);
-  filter:none !important;
-  opacity:1 !important;
-  white-space:nowrap;
-  letter-spacing:0.5px;
-}
-/* Кнопка "Забрать" */
-.advent-claim-btn{
-  position:absolute;
-  bottom:4px;
-  left:50%;
-  transform:translateX(-50%) translateZ(0);
-  background:rgba(0,0,0,0.6);
-  color:#fff;
-  border:1px solid rgba(255,255,255,0.3);
-  border-radius:8px;
-  padding:3px 8px;
-  font-size:9px;
-  font-weight:700;
-  font-family:"Segoe UI",Arial,sans-serif;
-  cursor:pointer;
-  z-index:10;
-  box-shadow:0 2px 4px rgba(0,0,0,0.2);
-  transition:all 0.2s ease;
-  pointer-events:auto;
-}
-.advent-claim-btn:hover{
-  background:rgba(255,255,255,0.25);
-  border-color:rgba(255,255,255,0.4);
-  transform:translateX(-50%) scale(1.05);
-  box-shadow:0 3px 6px rgba(0,0,0,0.3);
-}
-.advent-claim-btn:active{
-  transform:translateX(-50%) scale(0.95);
-}
-
-/* Адаптивные стили для полноэкранного адвента */
-@media (max-width: 768px) {
-  .advent-panel{
-    padding:12px;
-  }
-  .advent-panel-content{
-    padding-top:80px;
-    padding-bottom:16px;
-  }
-  .advent-header-box{
-    padding:16px 12px;
-    border-radius:14px;
-    margin-bottom:20px;
-  }
-  .advent-title{
-    font-size:40px;
-    padding:0 0 10px 0;
-    letter-spacing:1.4px;
-  }
-  .advent-subtitle{
-    font-size:16px;
-    padding:0;
-    letter-spacing:0.4px;
-  }
-  .advent-progress-container{
-    padding:0 12px 16px 12px;
-    gap:6px;
-  }
-  .advent-progress-label{
-    font-size:13px;
-  }
-  .advent-progress-bar{
-    height:20px;
-  }
-  .advent-grid{
-    grid-template-columns:repeat(5,1fr);
-    gap:5px;
-    padding:10px 0 0 0;
-  }
-  .advent-grid-item{
-    background-size:150%;
-  }
-  .advent-reward-item{
-    font-size:13px;
-  }
-  .advent-reward-icon{
-    width:16px;
-    height:16px;
-  }
-  .advent-reward-character-img{
-    width:90px;
-    height:90px;
-  }
-  .advent-grid-item:last-child .advent-reward-character-img,
-  .advent-grid-item.ultra-character .advent-reward-character-img{
-    width:115px;
-    height:115px;
-  }
-}
-
-@media (max-width: 480px) {
-  .advent-panel{
-    padding:8px;
-  }
-  .advent-panel-content{
-    padding-top:75px;
-    padding-bottom:12px;
-  }
-  .advent-header-box{
-    padding:14px 10px;
-    border-radius:12px;
-    margin-bottom:18px;
-  }
-  .advent-title{
-    font-size:34px;
-    padding:0 0 8px 0;
-    letter-spacing:1.2px;
-  }
-  .advent-subtitle{
-    font-size:14px;
-    padding:0;
-    letter-spacing:0.3px;
-  }
-  .advent-progress-container{
-    padding:0 10px 14px 10px;
-    gap:5px;
-  }
-  .advent-progress-label{
-    font-size:12px;
-  }
-  .advent-progress-bar{
-    height:18px;
-  }
-  .advent-grid{
-    grid-template-columns:repeat(4,1fr);
-    gap:4px;
-    padding:8px 0 0 0;
-  }
-  .advent-grid-item{
-    border-radius:10px;
-    background-size:140%;
-  }
-  .advent-reward-item{
-    font-size:12px;
-  }
-  .advent-reward-icon{
-    width:15px;
-    height:15px;
-  }
-  .advent-reward-character-img{
-    width:85px;
-    height:85px;
-  }
-  .advent-grid-item:last-child .advent-reward-character-img,
-  .advent-grid-item.ultra-character .advent-reward-character-img{
-    width:110px;
-    height:110px;
-  }
-}
-
 @media (max-width: 360px) {
   .advent-panel{
     padding:6px;
@@ -1817,6 +1190,44 @@ body.advent-locked{overflow:hidden;}
 /* Для экранов с высоким разрешением */
 @media (min-width: 769px) and (max-width: 1024px) {
     .telegram-mini-app .info-stack { top: 185px !important; /* Отступ для планшетов */ }
+    .telegram-mini-app #bottom-banner { 
+        left: 20px !important;
+        top: 255px !important; /* 185px + 140px - 70px */
+        width: 140px !important;
+    }
+}
+
+/* Стили для кнопки инвестиций в Telegram Mini App */
+@media (max-width: 360px) {
+    .telegram-mini-app #bottom-banner { 
+        left: 20px !important;
+        top: 225px !important; /* 155px + 140px - 70px */
+        width: 140px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .telegram-mini-app #bottom-banner { 
+        left: 20px !important;
+        top: 235px !important; /* 165px + 140px - 70px */
+        width: 140px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .telegram-mini-app #bottom-banner { 
+        left: 20px !important;
+        top: 245px !important; /* 175px + 140px - 70px */
+        width: 140px !important;
+    }
+}
+
+@media (max-width: 320px) {
+    .telegram-mini-app #bottom-banner { 
+        left: 20px !important;
+        top: 220px !important; /* 150px + 140px - 70px */
+        width: 140px !important; 
+    }
 }
 
 /* bottom nav active dim others */

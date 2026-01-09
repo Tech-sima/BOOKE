@@ -863,78 +863,6 @@
         </div>
     </div>
 
-    <!-- Advent vibes event -->
-    <div id="advent-event" class="advent-event">
-        <button id="advent-btn" class="advent-trigger" aria-label="Advent vibes">
-            <img class="advent-img" src="assets/svg/advent/advent-book.svg" alt="Advent vibes">
-        </button>
-        <div class="advent-tag">Advent vibes</div>
-    </div>
-
-    <div id="advent-panel" class="advent-panel">
-            <div class="advent-panel-content">
-                <div class="advent-header-box">
-                    <h1 class="advent-title">Advent vibes</h1>
-                    <p class="advent-subtitle">Immerse yourself in the world of adventure with BOOKE</p>
-                </div>
-                <div class="advent-progress-container">
-                    <div class="advent-progress-label">
-                        <span id="advent-progress-text">0 / 28</span>
-                    </div>
-                    <div class="advent-progress-bar">
-                        <div class="advent-progress-fill" id="advent-progress-fill"></div>
-                    </div>
-                </div>
-                <div class="advent-grid">
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                    <div class="advent-grid-item"></div>
-                </div>
-            </div>
-        </div>
-
-    <script>
-    // Адвент-панель теперь инициализируется в js/main.js во время загрузки игры
-    // Этот скрипт оставлен как fallback на случай, если main.js еще не загружен
-    document.addEventListener('DOMContentLoaded', function(){
-        // Ждем, пока функция инициализации будет доступна из main.js
-        if(typeof initializeAdventPanel === 'function'){
-            initializeAdventPanel();
-        } else {
-            // Если функция еще не доступна, ждем немного и пробуем снова
-            setTimeout(function(){
-                if(typeof initializeAdventPanel === 'function'){
-                    initializeAdventPanel();
-                }
-            }, 100);
-        }
-    });
-    </script>
 
     <!-- Прямоугольник над нижней навигацией -->
     <div id="bottom-banner" class="panel"></div>
@@ -2175,9 +2103,9 @@
                         <img id="shop-money-image" src="assets/svg/shop/Some money.svg" alt="Money" style="position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:110px;object-fit:contain;transition:opacity 0.3s ease;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:1;">
                         
                         <!-- Прямоугольник с информацией -->
-                        <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;z-index:10;">
+                        <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
                             <div id="shop-money-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Some money</div>
-                            <button id="shop-buy-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:11px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:4px 8px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:4px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-buy-price" style="display:flex;align-items:center;gap:3px;">150<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:12px;height:12px;object-fit:contain;"></span></button>
+                            <button id="shop-buy-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-buy-price" style="display:flex;align-items:center;gap:4px;">150<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->
@@ -2209,9 +2137,9 @@
                         <img id="shop-diamonds-image" src="assets/svg/shop/A few diamonds.svg" alt="Diamonds" style="position:absolute;top:33%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:140px;object-fit:contain;transition:opacity 0.3s ease;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:1;">
                         
                         <!-- Прямоугольник с информацией -->
-                        <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;z-index:10;">
+                        <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
                             <div id="shop-diamonds-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">A few diamonds</div>
-                            <button id="shop-buy-diamonds-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:11px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:4px 8px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:4px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-diamonds-price" style="display:flex;align-items:center;gap:3px;">60000<img src="assets/svg/bc-icon.svg" alt="Money" style="width:12px;height:12px;object-fit:contain;"></span></button>
+                            <button id="shop-buy-diamonds-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-diamonds-price" style="display:flex;align-items:center;gap:4px;">60000<img src="assets/svg/bc-icon.svg" alt="Money" style="width:18px;height:18px;object-fit:contain;"></span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->
@@ -2251,9 +2179,9 @@
                         <img id="shop-cases-image" src="assets/svg/shop/Money case.svg" alt="Case" style="position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:110px;object-fit:contain;transition:opacity 0.3s ease;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:1;">
                         
                         <!-- Прямоугольник с информацией -->
-                        <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;z-index:10;">
+                        <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
                             <div id="shop-cases-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Money case</div>
-                            <button id="shop-buy-cases-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:11px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:4px 8px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:4px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-cases-price" style="display:flex;align-items:center;gap:0px;font-weight:800;">1</span></button>
+                            <button id="shop-buy-cases-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-cases-price" style="display:flex;align-items:center;gap:2px;font-weight:800;justify-content:center;">1</span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->

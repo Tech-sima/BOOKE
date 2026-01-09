@@ -39,13 +39,13 @@ BOT_TOKEN = "8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU"
 
 # Цены кейсов в звездах Telegram
 CASE_PRICES = {
-    0: 1,   # Diamond case
-    1: 1,   # Money case
-    2: 1,   # Legendary case
-    'rare': 1,    # Rare case
-    'epic': 1,    # Epic case
-    'legend': 1,  # Legend case
-    'ultima': 1   # Ultima case
+    0: 39,   # Diamond case
+    1: 20,   # Money case
+    2: 69,   # Legendary case
+    'rare': 25,    # Rare case
+    'epic': 60,    # Epic case
+    'legend': 149,  # Legend case
+    'ultima': 199   # Ultima case
 }
 
 # Названия кейсов

@@ -783,11 +783,6 @@
         <div id="credits-plus"><i class="fa-solid fa-plus" data-no-replace></i></div>
     </div>
 
-    <!-- Кнопка +200к RBC -->
-    <button id="add-rbc-btn" class="panel balance-panel" style="top:10px;right:200px;position:absolute;background:#00c853;border:none;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.background='#00a043';this.style.transform='scale(1.05)'" onmouseout="this.style.background='#00c853';this.style.transform='scale(1)'">
-        <span style="font-weight:700;color:#fff;">+200к RBC</span>
-    </button>
-
     <!-- Панель новостей в правом верхнем углу -->
     <div id="news-panel" class="panel news-corner" style="display: none;">
         <div class="news-header">
@@ -2075,10 +2070,10 @@
             <div id="shop-content" style="width:100%;background:none;border-radius:16px;padding:0;color:#fff;position:relative;">
                 
                 <!-- Заголовок -->
-                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;text-align:center;">
-                    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">МАГАЗИН</h2>
-                    <h3 style="margin:0 0 12px;font-size:24px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Монеты и активы</h3>
-                    <p style="margin:0 0 20px;font-size:9px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
+                <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:8px;text-align:center;">
+                    <h2 style="margin:0 0 8px;font-size:24px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">МАГАЗИН</h2>
+                    <h3 style="margin:0 0 10px;font-size:32px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Монеты и активы</h3>
+                    <p style="margin:0 0 12px;font-size:12px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
                 </div>
                 
                 <!-- Три ячейки (вертикально) -->
@@ -2181,7 +2176,7 @@
                         <!-- Прямоугольник с информацией -->
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
                             <div id="shop-cases-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Money case</div>
-                            <button id="shop-buy-cases-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-cases-price" style="display:flex;align-items:center;gap:1px;font-weight:800;justify-content:center;">1</span></button>
+                            <button id="shop-buy-cases-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-cases-price" style="display:flex;align-items:center;gap:0px;font-weight:800;justify-content:center;">1</span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->
@@ -2207,7 +2202,7 @@
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
                             <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Rare</div>
                             <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Содержит уникального сотрудника</div>
-                            <button id="shop-buy-rare-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-rare-case-price" style="display:flex;align-items:center;gap:1px;font-weight:800;justify-content:center;">1</span></button>
+                            <button id="shop-buy-rare-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-rare-case-price" style="display:flex;align-items:center;gap:0px;font-weight:800;justify-content:center;">1</span></button>
                         </div>
                     </div>
                     
@@ -2223,7 +2218,7 @@
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
                             <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Epic</div>
                             <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Содержит уникальных сотрудников</div>
-                            <button id="shop-buy-epic-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-epic-case-price" style="display:flex;align-items:center;gap:1px;font-weight:800;justify-content:center;">1</span></button>
+                            <button id="shop-buy-epic-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-epic-case-price" style="display:flex;align-items:center;gap:0px;font-weight:800;justify-content:center;">1</span></button>
                         </div>
                     </div>
                     
@@ -2241,7 +2236,7 @@
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
                             <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Legend</div>
                             <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Увеличиные шансы на ценные призы</div>
-                            <button id="shop-buy-legend-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-legend-case-price" style="display:flex;align-items:center;gap:1px;font-weight:800;justify-content:center;">1</span></button>
+                            <button id="shop-buy-legend-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-legend-case-price" style="display:flex;align-items:center;gap:0px;font-weight:800;justify-content:center;">1</span></button>
                         </div>
                     </div>
                     
@@ -2259,7 +2254,7 @@
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
                             <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Ultima</div>
                             <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Максимальные шансы на лучшие призы</div>
-                            <button id="shop-buy-ultima-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-ultima-case-price" style="display:flex;align-items:center;gap:1px;font-weight:800;justify-content:center;">1</span></button>
+                            <button id="shop-buy-ultima-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-ultima-case-price" style="display:flex;align-items:center;gap:0px;font-weight:800;justify-content:center;">1</span></button>
                         </div>
                     </div>
                 </div>

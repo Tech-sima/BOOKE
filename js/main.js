@@ -1128,21 +1128,6 @@ safeAddEventListener('credits-plus', 'click', () => {
     alert('Открыть магазин кредитов');
 }); 
 
-// Обработчик кнопки +200к RBC
-safeAddEventListener('add-rbc-btn', 'click', () => {
-    const currentCredits = typeof getCredits === 'function' ? getCredits() : parseInt(localStorage.getItem('credits') || '0');
-    const newCredits = currentCredits + 200000;
-    
-    if (typeof setCredits === 'function') {
-        setCredits(newCredits);
-    } else {
-        localStorage.setItem('credits', newCredits.toString());
-        const creditsAmount = document.getElementById('credits-amount');
-        if (creditsAmount) {
-            creditsAmount.textContent = typeof formatNumber === 'function' ? formatNumber(newCredits) : newCredits.toLocaleString();
-        }
-    }
-}); 
 
 // Удаляем старый обработчик кнопки магазина (дублирует новый)
 safeAddEventListener('shop-close', 'click', () => {
@@ -3256,9 +3241,9 @@ let isLegendCaseFromCell6 = false; // Флаг для определения Leg
 let isUltimaCaseFromCell7 = false; // Флаг для определения Ultima case из ячейки 7
 let currentCaseItem = null; // Текущий открываемый кейс (для Rare, Epic, Legend, Ultima cases)
 const casesItems = [
-    { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, starsPrice: 1, discount: 15 },
-    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, starsPrice: 1, discount: 10 },
-    { name: 'Legendary case', image: 'assets/svg/shop/legendary case.svg', amount: 1, cost: 500, starsPrice: 1, discount: 20 }
+    { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, starsPrice: 20, discount: 15 },
+    { name: 'Diamond case', image: 'assets/svg/shop/Diamond case.svg', amount: 1, cost: 100, starsPrice: 39, discount: 10 },
+    { name: 'Legendary case', image: 'assets/svg/shop/legendary case.svg', amount: 1, cost: 500, starsPrice: 69, discount: 20 }
 ];
 
 function initializeShop() {
@@ -3442,17 +3427,17 @@ function initializeShop() {
 // Функция для добавления XTR иконок в кнопки special cases
 function addXtrIconsToSpecialCases() {
     const cases = [
-        { priceId: 'shop-rare-case-price', name: 'Rare case' },
-        { priceId: 'shop-epic-case-price', name: 'Epic case' },
-        { priceId: 'shop-legend-case-price', name: 'Legend case' },
-        { priceId: 'shop-ultima-case-price', name: 'Ultima case' }
+        { priceId: 'shop-rare-case-price', name: 'Rare case', price: 25 },
+        { priceId: 'shop-epic-case-price', name: 'Epic case', price: 60 },
+        { priceId: 'shop-legend-case-price', name: 'Legend case', price: 149 },
+        { priceId: 'shop-ultima-case-price', name: 'Ultima case', price: 199 }
     ];
     
     cases.forEach(caseInfo => {
         const priceElement = document.getElementById(caseInfo.priceId);
         if (priceElement) {
             // Устанавливаем цену
-            priceElement.textContent = '1';
+            priceElement.textContent = caseInfo.price;
             
             // Удаляем старую иконку XTR, если есть
             const oldIcon = priceElement.querySelector('.xtr-icon');
@@ -4544,23 +4529,22 @@ function showBonusIndicator(multiplier) {
         oldIndicator.remove();
     }
     
-    // Получаем четкие координаты панели денег для размещения бонуса справа от неё
-    const moneyPanel = document.getElementById('money-panel');
-    let leftPosition = 200; // Значение по умолчанию
-    let topPosition = 10; // Значение по умолчанию
-    if (moneyPanel) {
-        const rect = moneyPanel.getBoundingClientRect();
-        // Панель денег имеет position:fixed, поэтому используем getBoundingClientRect() напрямую
-        leftPosition = rect.right + 10; // 10px отступ справа от панели денег
-        // Центрируем по вертикали относительно панели денег
-        // Используем центр панели как точку отсчета, затем применяем transform для центрирования
-        topPosition = rect.top + (rect.height / 2); // Центр панели
+    // Получаем координаты кнопки инвестиций для размещения бонуса под ней
+    const investmentButton = document.getElementById('bottom-banner');
+    let leftPosition = '50%'; // Значение по умолчанию
+    let topPosition = 'calc(100vh - 100px)'; // Значение по умолчанию
+    if (investmentButton) {
+        const rect = investmentButton.getBoundingClientRect();
+        // Размещаем по центру кнопки инвестиций по горизонтали
+        leftPosition = rect.left + (rect.width / 2);
+        // Размещаем под кнопкой инвестиций
+        topPosition = rect.bottom + 10; // 10px отступ снизу от кнопки
     }
     
     // Создаем новый индикатор
     const indicator = document.createElement('div');
     indicator.id = 'earning-bonus-indicator';
-    indicator.style.cssText = `position:fixed;top:${topPosition}px;left:${leftPosition}px;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translateY(-50%);`;
+    indicator.style.cssText = `position:fixed;top:${topPosition}px;left:${leftPosition}px;z-index:2000;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translateX(-50%);`;
     
     // SVG иконка (увеличена в 2 раза, без контейнера)
     const icon = document.createElement('img');
@@ -4828,7 +4812,7 @@ async function handleRareCasePurchase() {
         image: 'assets/svg/shop/Rare-case.svg',
         amount: 1,
         cost: 0,
-        starsPrice: 1,
+        starsPrice: 25,
         discount: 0
     };
     
@@ -4904,7 +4888,7 @@ async function handleEpicCasePurchase() {
         image: 'assets/svg/shop/Epic-case.svg',
         amount: 1,
         cost: 0,
-        starsPrice: 1,
+        starsPrice: 60,
         discount: 0
     };
     
@@ -4988,7 +4972,7 @@ async function handleLegendCasePurchase() {
     currentCasesIndex = legendCaseIndex;
     const legendCaseItem = {
         ...casesItems[legendCaseIndex],
-        starsPrice: 1
+        starsPrice: 149
     };
     
     // Сохраняем текущий кейс для использования после оплаты
@@ -5072,7 +5056,7 @@ async function handleUltimaCasePurchase() {
     currentCasesIndex = ultimaCaseIndex;
     const ultimaCaseItem = {
         ...casesItems[ultimaCaseIndex],
-        starsPrice: 1
+        starsPrice: 199
     };
     
     // Сохраняем текущий кейс для использования после оплаты

@@ -54,11 +54,8 @@
     // Simple preloader: preload key images and GLTF files via fetch HEAD
     async function preloadAssets() {
         const assets = [
-            'assets/png/main-menu-bg.png',
             'assets/svg/shop-icon.svg',
-            'assets/svg/ref-icon.svg',
-            'models/BOOKE_map.gltf',
-            'models/BOOKE_map.bin'
+            'assets/svg/ref-icon.svg'
         ];
         let loaded = 0;
         const total = assets.length;

@@ -4533,8 +4533,8 @@ function showBonusIndicator(multiplier) {
         const rect = investmentButton.getBoundingClientRect();
         // Размещаем по центру кнопки инвестиций по горизонтали, сдвигаем влево на 40px
         leftPosition = rect.left + (rect.width / 2) - 40;
-        // Размещаем под кнопкой инвестиций, сдвигаем вверх на 15px
-        topPosition = rect.bottom + 10 - 15; // 10px отступ снизу от кнопки минус 15px вверх
+        // Размещаем под кнопкой инвестиций, сдвигаем вверх на 15px и вниз на 8px
+        topPosition = rect.bottom + 10 - 15 + 8; // 10px отступ снизу от кнопки минус 15px вверх плюс 8px вниз
     }
     
     // Создаем новый индикатор
@@ -4546,16 +4546,16 @@ function showBonusIndicator(multiplier) {
     const textContainer = document.createElement('div');
     textContainer.style.cssText = 'display:flex;align-items:center;gap:2px;justify-content:center;';
     
-    // Текст "x(размер)" в жирном белом шрифте
+    // Текст "x(размер)" в самом жирном белом шрифте с подсветкой по контуру
     const text = document.createElement('span');
     text.textContent = `x${multiplier}`;
-    text.style.cssText = 'color:white;font-size:24px;font-weight:700;font-family:"Segoe UI",Arial,sans-serif;text-shadow:0 2px 4px rgba(0,0,0,0.5);line-height:1;';
+    text.style.cssText = 'color:white;font-size:24px;font-weight:900;font-family:"Segoe UI",Arial,sans-serif;text-shadow:0 0 2px rgba(255,255,255,0.8),0 0 4px rgba(255,255,255,0.6),0 0 6px rgba(255,255,255,0.4),0 2px 4px rgba(0,0,0,0.5);line-height:1;';
     
-    // SVG денег
+    // SVG денег с подсветкой
     const moneyIcon = document.createElement('img');
     moneyIcon.src = 'assets/svg/money-icon.svg';
     moneyIcon.alt = 'Money';
-    moneyIcon.style.cssText = 'width:24px;height:24px;object-fit:contain;filter:drop-shadow(0 0 4px rgba(255,255,255,0.5));';
+    moneyIcon.style.cssText = 'width:24px;height:24px;object-fit:contain;filter:drop-shadow(0 0 2px rgba(255,255,255,0.8)) drop-shadow(0 0 4px rgba(255,255,255,0.6)) drop-shadow(0 0 6px rgba(255,255,255,0.4));';
     
     textContainer.appendChild(text);
     textContainer.appendChild(moneyIcon);

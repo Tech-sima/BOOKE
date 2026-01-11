@@ -40,7 +40,7 @@ BOT_TOKEN = "8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU"
 
 # Путь к приветственному фото (абсолютный путь относительно директории скрипта)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-WELCOME_PHOTO_PATH = os.path.join(BASE_DIR, "assets", "bot_media", "welco.jpg")
+WELCOME_PHOTO_PATH = os.path.join(BASE_DIR, "assets", "bot_media", "welcome.jpg")
 
 # Цены кейсов в звездах Telegram
 CASE_PRICES = {
@@ -82,20 +82,27 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
         
         # Проверяем наличие фото и отправляем его с текстом
+        logger.info(f"Проверка пути к фото: {WELCOME_PHOTO_PATH}")
+        logger.info(f"Файл существует: {os.path.exists(WELCOME_PHOTO_PATH)}")
+        
         if os.path.exists(WELCOME_PHOTO_PATH):
             try:
+                logger.info(f"Попытка отправить фото: {WELCOME_PHOTO_PATH}")
                 with open(WELCOME_PHOTO_PATH, 'rb') as photo:
                     await update.message.reply_photo(
                         photo=photo,
                         caption=welcome_text
                     )
+                logger.info("Фото успешно отправлено")
             except Exception as e:
-                logger.error(f"Ошибка при отправке фото: {e}")
+                logger.error(f"Ошибка при отправке фото: {e}", exc_info=True)
                 # Если не удалось отправить фото, отправляем только текст
                 await update.message.reply_text(welcome_text)
         else:
             # Если фото нет, отправляем только текст
             logger.warning(f"Фото не найдено по пути: {WELCOME_PHOTO_PATH}")
+            logger.warning(f"Текущая рабочая директория: {os.getcwd()}")
+            logger.warning(f"BASE_DIR: {BASE_DIR}")
             await update.message.reply_text(welcome_text)
         
         logger.info(f"Пользователь {update.effective_user.id} использовал команду /start")
@@ -136,26 +143,33 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     else:
         # Неизвестный параметр - показываем приветствие с фото
         welcome_text = (
-            "🏠 Добро пожаловать в BOOKE! 💰\n\n"
+            "🏠 Добро пожаловать в BOOKE! 🏠 \n\n"
             "Отправьтесь в захватывающее путешествие, полное инвестиций, роста и открытий. "
             "Постройте свою империю, расширьте свой кругозор и станьте настоящим магнатом."
         )
         
         # Проверяем наличие фото и отправляем его с текстом
+        logger.info(f"Проверка пути к фото: {WELCOME_PHOTO_PATH}")
+        logger.info(f"Файл существует: {os.path.exists(WELCOME_PHOTO_PATH)}")
+        
         if os.path.exists(WELCOME_PHOTO_PATH):
             try:
+                logger.info(f"Попытка отправить фото: {WELCOME_PHOTO_PATH}")
                 with open(WELCOME_PHOTO_PATH, 'rb') as photo:
                     await update.message.reply_photo(
                         photo=photo,
                         caption=welcome_text
                     )
+                logger.info("Фото успешно отправлено")
             except Exception as e:
-                logger.error(f"Ошибка при отправке фото: {e}")
+                logger.error(f"Ошибка при отправке фото: {e}", exc_info=True)
                 # Если не удалось отправить фото, отправляем только текст
                 await update.message.reply_text(welcome_text)
         else:
             # Если фото нет, отправляем только текст
             logger.warning(f"Фото не найдено по пути: {WELCOME_PHOTO_PATH}")
+            logger.warning(f"Текущая рабочая директория: {os.getcwd()}")
+            logger.warning(f"BASE_DIR: {BASE_DIR}")
             await update.message.reply_text(welcome_text)
 
 

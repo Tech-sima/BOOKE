@@ -15,6 +15,7 @@
 
 import logging
 import json
+import os
 import urllib.parse
 from datetime import datetime
 from telegram import Update, LabeledPrice
@@ -36,6 +37,10 @@ logger = logging.getLogger(__name__)
 
 # Токен бота
 BOT_TOKEN = "8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU"
+
+# Путь к приветственному фото (абсолютный путь относительно директории скрипта)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+WELCOME_PHOTO_PATH = os.path.join(BASE_DIR, "assets", "bot_media", "welco.jpg")
 
 # Цены кейсов в звездах Telegram
 CASE_PRICES = {
@@ -69,12 +74,30 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     - /start purchase_{json_data} - покупка кейса через Mini App
     """
     if not context.args:
-        # Обычное приветствие
-        await update.message.reply_text(
-            "Добро пожаловать в BOOKE!\n\n"
+        # Обычное приветствие с фото
+        welcome_text = (
+            "🏠 Добро пожаловать в BOOKE! 💰\n\n"
             "Отправьтесь в захватывающее путешествие, полное инвестиций, роста и открытий. "
             "Постройте свою империю, расширьте свой кругозор и станьте настоящим магнатом."
         )
+        
+        # Проверяем наличие фото и отправляем его с текстом
+        if os.path.exists(WELCOME_PHOTO_PATH):
+            try:
+                with open(WELCOME_PHOTO_PATH, 'rb') as photo:
+                    await update.message.reply_photo(
+                        photo=photo,
+                        caption=welcome_text
+                    )
+            except Exception as e:
+                logger.error(f"Ошибка при отправке фото: {e}")
+                # Если не удалось отправить фото, отправляем только текст
+                await update.message.reply_text(welcome_text)
+        else:
+            # Если фото нет, отправляем только текст
+            logger.warning(f"Фото не найдено по пути: {WELCOME_PHOTO_PATH}")
+            await update.message.reply_text(welcome_text)
+        
         logger.info(f"Пользователь {update.effective_user.id} использовал команду /start")
         return
     
@@ -111,12 +134,29 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                 "❌ Произошла ошибка. Попробуйте еще раз."
             )
     else:
-        # Неизвестный параметр - показываем приветствие
-        await update.message.reply_text(
-            "Добро пожаловать в BOOKE!\n\n"
+        # Неизвестный параметр - показываем приветствие с фото
+        welcome_text = (
+            "🏠 Добро пожаловать в BOOKE! 💰\n\n"
             "Отправьтесь в захватывающее путешествие, полное инвестиций, роста и открытий. "
             "Постройте свою империю, расширьте свой кругозор и станьте настоящим магнатом."
         )
+        
+        # Проверяем наличие фото и отправляем его с текстом
+        if os.path.exists(WELCOME_PHOTO_PATH):
+            try:
+                with open(WELCOME_PHOTO_PATH, 'rb') as photo:
+                    await update.message.reply_photo(
+                        photo=photo,
+                        caption=welcome_text
+                    )
+            except Exception as e:
+                logger.error(f"Ошибка при отправке фото: {e}")
+                # Если не удалось отправить фото, отправляем только текст
+                await update.message.reply_text(welcome_text)
+        else:
+            # Если фото нет, отправляем только текст
+            logger.warning(f"Фото не найдено по пути: {WELCOME_PHOTO_PATH}")
+            await update.message.reply_text(welcome_text)
 
 
 async def send_invoice(

@@ -18,7 +18,7 @@ import json
 import os
 import urllib.parse
 from datetime import datetime
-from telegram import Update, LabeledPrice
+from telegram import Update, LabeledPrice, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -41,6 +41,10 @@ BOT_TOKEN = "8523928444:AAGYolZ4G3fqmjj2YYhyXJpjuFvq8dw_LsU"
 # Путь к приветственному фото (абсолютный путь относительно директории скрипта)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WELCOME_PHOTO_PATH = os.path.join(BASE_DIR, "assets", "bot_media", "welcome.jpg")
+
+# URL Telegram Mini App (настройте в BotFather или укажите здесь)
+# Если не указан, кнопка будет использовать URL из настроек бота в BotFather
+MINI_APP_URL = os.getenv("MINI_APP_URL", "https://booke-coin.vercel.app")  # Можно задать через переменную окружения или указать напрямую
 
 # Цены кейсов в звездах Telegram
 CASE_PRICES = {
@@ -76,10 +80,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     if not context.args:
         # Обычное приветствие с фото
         welcome_text = (
-            "🏠 Добро пожаловать в BOOKE! 💰\n\n"
+            "🏠 Добро пожаловать в BOOKE! 🏠\n\n"
             "Отправьтесь в захватывающее путешествие, полное инвестиций, роста и открытий. "
             "Постройте свою империю, расширьте свой кругозор и станьте настоящим магнатом."
         )
+        
+        # Создаем кнопку "Играть" для открытия Mini App
+        keyboard = [[InlineKeyboardButton("🎮 Играть", web_app={"url": MINI_APP_URL}) if MINI_APP_URL else InlineKeyboardButton("🎮 Играть", web_app={})]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
         
         # Проверяем наличие фото и отправляем его с текстом
         logger.info(f"Проверка пути к фото: {WELCOME_PHOTO_PATH}")
@@ -91,19 +99,20 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                 with open(WELCOME_PHOTO_PATH, 'rb') as photo:
                     await update.message.reply_photo(
                         photo=photo,
-                        caption=welcome_text
+                        caption=welcome_text,
+                        reply_markup=reply_markup
                     )
                 logger.info("Фото успешно отправлено")
             except Exception as e:
                 logger.error(f"Ошибка при отправке фото: {e}", exc_info=True)
                 # Если не удалось отправить фото, отправляем только текст
-                await update.message.reply_text(welcome_text)
+                await update.message.reply_text(welcome_text, reply_markup=reply_markup)
         else:
             # Если фото нет, отправляем только текст
             logger.warning(f"Фото не найдено по пути: {WELCOME_PHOTO_PATH}")
             logger.warning(f"Текущая рабочая директория: {os.getcwd()}")
             logger.warning(f"BASE_DIR: {BASE_DIR}")
-            await update.message.reply_text(welcome_text)
+            await update.message.reply_text(welcome_text, reply_markup=reply_markup)
         
         logger.info(f"Пользователь {update.effective_user.id} использовал команду /start")
         return
@@ -148,6 +157,10 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             "Постройте свою империю, расширьте свой кругозор и станьте настоящим магнатом."
         )
         
+        # Создаем кнопку "Играть" для открытия Mini App
+        keyboard = [[InlineKeyboardButton("🎮 Играть", web_app={"url": MINI_APP_URL}) if MINI_APP_URL else InlineKeyboardButton("🎮 Играть", web_app={})]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
         # Проверяем наличие фото и отправляем его с текстом
         logger.info(f"Проверка пути к фото: {WELCOME_PHOTO_PATH}")
         logger.info(f"Файл существует: {os.path.exists(WELCOME_PHOTO_PATH)}")
@@ -158,19 +171,20 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                 with open(WELCOME_PHOTO_PATH, 'rb') as photo:
                     await update.message.reply_photo(
                         photo=photo,
-                        caption=welcome_text
+                        caption=welcome_text,
+                        reply_markup=reply_markup
                     )
                 logger.info("Фото успешно отправлено")
             except Exception as e:
                 logger.error(f"Ошибка при отправке фото: {e}", exc_info=True)
                 # Если не удалось отправить фото, отправляем только текст
-                await update.message.reply_text(welcome_text)
+                await update.message.reply_text(welcome_text, reply_markup=reply_markup)
         else:
             # Если фото нет, отправляем только текст
             logger.warning(f"Фото не найдено по пути: {WELCOME_PHOTO_PATH}")
             logger.warning(f"Текущая рабочая директория: {os.getcwd()}")
             logger.warning(f"BASE_DIR: {BASE_DIR}")
-            await update.message.reply_text(welcome_text)
+            await update.message.reply_text(welcome_text, reply_markup=reply_markup)
 
 
 async def send_invoice(

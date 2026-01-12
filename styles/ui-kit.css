@@ -40,21 +40,6 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   padding:0;
   box-sizing:border-box;
 }
-#bottom-banner::before{
-  content:'';
-  position:absolute;
-  width:105%;
-  height:90%;
-  background:rgba(35, 30, 30, 0.95);
-  border-radius:10px;
-  z-index:-1;
-  pointer-events:none;
-  top:62%;
-  left:61%;
-  transform:translate(-50%, -50%);
-  box-shadow:0 2px 8px rgba(0,0,0,0.3);
-  filter:drop-shadow(0 0 0.02px rgba(255, 255, 255, 0.7)) drop-shadow(0 0 0.02px rgba(255, 255, 255, 0.7));
-}
 #bottom-banner .bottom-banner-icon{
   width:100%;
   height:100%;

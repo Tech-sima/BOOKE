@@ -4,55 +4,70 @@
 (function(){
     const overlay = document.getElementById('loading-overlay');
     if (!overlay) return;
-    const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
     const progressContainer = document.getElementById('progress-container');
-    const startBtn = document.getElementById('start-button');
+    const progressBar = document.getElementById('progress-bar');
     // Canvas removed - using SVG loading screen instead
 
     // Public API exposed to window for main.js to hook
     // window.GameLoader.show(); window.GameLoader.hide(); window.GameLoader.setProgress(p)
+    let hasStarted = false;
+    let displayProgress = 0;   // то, что видит пользователь
+    let targetProgress = 0;    // целевое значение, которое выставляет логика загрузки
+
     const GameLoader = {
         show: function(){ overlay.style.display = 'flex'; },
         hide: function(){ overlay.style.display = 'none'; },
         setProgress: function(p){
-            const clamped = Math.max(0, Math.min(100, Math.floor(p)));
-            
-            // Update progress bar
-            if (progressFill) {
-                progressFill.style.width = clamped + '%';
-            }
-            if (progressText) {
-                progressText.textContent = clamped + '%';
-            }
-            
-            if (clamped >= 100) {
-                // Hide progress container and show start button
+            // Обновляем только целевое значение, визуалка догоняет его плавно
+            const clamped = Math.max(0, Math.min(100, p));
+            targetProgress = Math.max(targetProgress, clamped);
+
+            if (clamped >= 100 && !hasStarted) {
+                hasStarted = true;
+
+                // Плавно прячем прогресс-бар
                 if (progressContainer) {
                     progressContainer.style.opacity = '0';
                     progressContainer.style.transform = 'translateY(8px)';
                     progressContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                 }
-                
-                if (startBtn) {
-                    // Show start button after progress container fades out
-                    setTimeout(() => {
-                        if (progressContainer) {
-                            progressContainer.style.display = 'none';
-                        }
-                        startBtn.style.display = 'inline-block';
-                        requestAnimationFrame(() => {
-                            startBtn.classList.add('revealed');
-                        });
-                    }, 500);
-                }
+
+                // После анимации автоматически запускаем игру
+                setTimeout(() => {
+                    if (typeof GameLoader.onStart === 'function') {
+                        GameLoader.onStart();
+                    }
+                    GameLoader.hide();
+                }, 600);
             }
         },
         onStart: null
     };
 
+    // Плавное обновление визуального прогресса (0 → 100, по 1%)
+    function animateProgress() {
+        if (targetProgress > displayProgress) {
+            // Скорость: до 60% в секунду, но шагуем по 1%
+            const step = 0.8;
+            displayProgress = Math.min(targetProgress, displayProgress + step);
+            const shown = Math.floor(displayProgress);
+
+            if (progressText) {
+                progressText.textContent = shown + '%';
+            }
+            if (progressBar) {
+                progressBar.style.setProperty('--progress', (displayProgress / 100).toString());
+            }
+        }
+        requestAnimationFrame(animateProgress);
+    }
+
     // Simple preloader: preload key images and GLTF files via fetch HEAD
     async function preloadAssets() {
+        const MIN_LOADING_TIME = 5000; // ms – специальная минимальная длительность загрузки
+        const startTime = performance.now();
+
         const assets = [
             'assets/svg/shop-icon.svg',
             'assets/svg/ref-icon.svg'
@@ -80,28 +95,31 @@
                 // Ignore errors; continue progress
             }
             loaded += 1;
-            GameLoader.setProgress((loaded / total) * 100);
+            // Во время реальной загрузки поднимаем прогресс максимум до 90%,
+            // чтобы финальный рывок до 100% занял оставшееся время
+            const realProgress = (loaded / total) * 90;
+            GameLoader.setProgress(realProgress);
         }
-    }
 
-    // Wire start button
-    if (startBtn) {
-        startBtn.addEventListener('click', () => {
-            if (typeof GameLoader.onStart === 'function') {
-                GameLoader.hide();
-                GameLoader.onStart();
-            } else {
-                GameLoader.hide();
-            }
-        });
+        // Гарантируем, что общая загрузка занимает минимум MIN_LOADING_TIME
+        const elapsed = performance.now() - startTime;
+        const remaining = Math.max(0, MIN_LOADING_TIME - elapsed);
+
+        setTimeout(() => {
+            GameLoader.setProgress(100);
+        }, remaining);
     }
 
     // Canvas animation removed - using SVG loading screen instead
 
-    // Kick off preload after DOM ready
+    // Kick off preload and animation after DOM ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', preloadAssets);
+        document.addEventListener('DOMContentLoaded', () => {
+            animateProgress();
+            preloadAssets();
+        });
     } else {
+        animateProgress();
         preloadAssets();
     }
 

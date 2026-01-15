@@ -69,18 +69,11 @@
             if (isReadyToStart && !hasStarted) {
                 hasStarted = true;
 
-                if (progressContainer) {
-                    progressContainer.style.opacity = '0';
-                    progressContainer.style.transform = 'translateY(8px)';
-                    progressContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                // Без анимаций и задержек: сразу запускаем игру и скрываем оверлей
+                if (typeof GameLoader.onStart === 'function') {
+                    GameLoader.onStart();
                 }
-
-                setTimeout(() => {
-                    if (typeof GameLoader.onStart === 'function') {
-                        GameLoader.onStart();
-                    }
-                    GameLoader.hide();
-                }, 400);
+                GameLoader.hide();
             }
         });
     }

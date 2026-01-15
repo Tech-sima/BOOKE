@@ -11,9 +11,10 @@
 
     // Public API exposed to window for main.js to hook
     // window.GameLoader.show(); window.GameLoader.hide(); window.GameLoader.setProgress(p)
-    let hasStarted = false;
-    let displayProgress = 0;   // то, что видит пользователь
-    let targetProgress = 0;    // целевое значение, которое выставляет логика загрузки
+    let hasStarted = false;      // игра уже была запущена
+    let isReadyToStart = false;  // овал в состоянии "ИГРАТЬ"
+    let displayProgress = 0;     // то, что видит пользователь
+    let targetProgress = 0;      // целевое значение, которое выставляет логика загрузки
 
     const GameLoader = {
         show: function(){ overlay.style.display = 'flex'; },
@@ -22,45 +23,66 @@
             // Обновляем только целевое значение, визуалка догоняет его плавно
             const clamped = Math.max(0, Math.min(100, p));
             targetProgress = Math.max(targetProgress, clamped);
-
-            if (clamped >= 100 && !hasStarted) {
-                hasStarted = true;
-
-                // Плавно прячем прогресс-бар
-                if (progressContainer) {
-                    progressContainer.style.opacity = '0';
-                    progressContainer.style.transform = 'translateY(8px)';
-                    progressContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                }
-
-                // После анимации автоматически запускаем игру
-                setTimeout(() => {
-                    if (typeof GameLoader.onStart === 'function') {
-                        GameLoader.onStart();
-                    }
-                    GameLoader.hide();
-                }, 600);
-            }
         },
         onStart: null
     };
 
-    // Плавное обновление визуального прогресса (0 → 100, по 1%)
+    // Плавное обновление визуального прогресса (0 → 100, по 1)
     function animateProgress() {
-        if (targetProgress > displayProgress) {
+        if (!isReadyToStart && targetProgress > displayProgress) {
             // Скорость: до 60% в секунду, но шагуем по 1%
             const step = 0.8;
             displayProgress = Math.min(targetProgress, displayProgress + step);
             const shown = Math.floor(displayProgress);
 
-            if (progressText) {
+            // Пока не достигли 100% — показываем проценты
+            if (progressText && shown < 100) {
                 progressText.textContent = shown + '%';
             }
             if (progressBar) {
                 progressBar.style.setProperty('--progress', (displayProgress / 100).toString());
             }
         }
+
+        // Когда визуально дошли до 100% — переводим овал в режим кнопки "ИГРАТЬ"
+        if (!isReadyToStart && displayProgress >= 100) {
+            isReadyToStart = true;
+            displayProgress = 100;
+            targetProgress = 100;
+
+            if (progressBar) {
+                progressBar.style.setProperty('--progress', '1');
+                progressBar.classList.add('ready');
+            }
+            if (progressText) {
+                progressText.textContent = 'ИГРАТЬ';
+                progressText.classList.add('play-appear');
+            }
+        }
+
         requestAnimationFrame(animateProgress);
+    }
+
+    // Клик по овалу запускает игру, только когда он в состоянии "ИГРАТЬ"
+    if (progressBar) {
+        progressBar.addEventListener('click', () => {
+            if (isReadyToStart && !hasStarted) {
+                hasStarted = true;
+
+                if (progressContainer) {
+                    progressContainer.style.opacity = '0';
+                    progressContainer.style.transform = 'translateY(8px)';
+                    progressContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                }
+
+                setTimeout(() => {
+                    if (typeof GameLoader.onStart === 'function') {
+                        GameLoader.onStart();
+                    }
+                    GameLoader.hide();
+                }, 400);
+            }
+        });
     }
 
     // Simple preloader: preload key images and GLTF files via fetch HEAD

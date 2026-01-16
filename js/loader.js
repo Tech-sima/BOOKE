@@ -35,8 +35,8 @@
             displayProgress = Math.min(targetProgress, displayProgress + step);
             const shown = Math.floor(displayProgress);
 
-            // Пока не достигли 100% — показываем проценты
-            if (progressText && shown < 100) {
+            // Показываем проценты
+            if (progressText) {
                 progressText.textContent = shown + '%';
             }
             if (progressBar) {
@@ -44,7 +44,7 @@
             }
         }
 
-        // Когда визуально дошли до 100% — переводим овал в режим кнопки "ИГРАТЬ"
+        // Когда визуально дошли до 100% — автоматически запускаем игру
         if (!isReadyToStart && displayProgress >= 100) {
             isReadyToStart = true;
             displayProgress = 100;
@@ -52,30 +52,26 @@
 
             if (progressBar) {
                 progressBar.style.setProperty('--progress', '1');
-                progressBar.classList.add('ready');
             }
             if (progressText) {
-                progressText.textContent = 'ИГРАТЬ';
-                progressText.classList.add('play-appear');
+                progressText.textContent = '100%';
+            }
+
+            // Автоматически запускаем игру без кнопки
+            if (!hasStarted) {
+                hasStarted = true;
+
+                // Небольшая задержка для показа 100%, затем запуск
+                setTimeout(() => {
+                    if (typeof GameLoader.onStart === 'function') {
+                        GameLoader.onStart();
+                    }
+                    GameLoader.hide();
+                }, 300);
             }
         }
 
         requestAnimationFrame(animateProgress);
-    }
-
-    // Клик по овалу запускает игру, только когда он в состоянии "ИГРАТЬ"
-    if (progressBar) {
-        progressBar.addEventListener('click', () => {
-            if (isReadyToStart && !hasStarted) {
-                hasStarted = true;
-
-                // Без анимаций и задержек: сразу запускаем игру и скрываем оверлей
-                if (typeof GameLoader.onStart === 'function') {
-                    GameLoader.onStart();
-                }
-                GameLoader.hide();
-            }
-        });
     }
 
     // Simple preloader: preload key images and GLTF files via fetch HEAD

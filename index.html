@@ -2093,7 +2093,7 @@
     </script>
 
     <!-- Панель магазина -->
-    <div id="shop-panel" class="panel modal" style="display:none;position:fixed;left:0;right:0;bottom:0;height:75vh;z-index:1500;flex-direction:column;background:#1a1a1a;border-top-left-radius:20px;border-top-right-radius:20px;padding:20px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;font-family:'Segoe UI',Arial,sans-serif;">
+    <div id="shop-panel" class="panel modal" style="display:none;position:fixed;left:0;right:0;bottom:0;height:75vh;z-index:1500;flex-direction:column;background:#1a1a1a;border-top-left-radius:20px;border-top-right-radius:20px;padding:20px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
         <style>
             #shop-panel {
                 scrollbar-width: none;
@@ -2126,9 +2126,9 @@
                 
                 <!-- Заголовок -->
                 <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:8px;text-align:center;">
-                    <h2 style="margin:0 0 4px;font-size:24px;font-weight:700;color:rgba(255,255,255,0.8);text-shadow:0 2px 4px rgba(0,0,0,0.5);">МАГАЗИН</h2>
-                    <h3 style="margin:0 0 5px;font-size:32px;font-weight:700;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.5);">Монеты и активы</h3>
-                    <p style="margin:0 0 6px;font-size:12px;color:rgba(255,255,255,0.9);line-height:1.4;max-width:300px;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
+                    <h2 style="margin:0 0 4px;font-size:32px;font-weight:900;color:#ffffff;text-shadow:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;letter-spacing:0.3px;line-height:1.2;">МАГАЗИН</h2>
+                    <h3 style="margin:0 0 5px;font-size:32px;font-weight:900;color:#ffffff;text-shadow:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;letter-spacing:0.3px;line-height:1.2;">Монеты и активы</h3>
+                    <p style="margin:0 0 6px;font-size:12px;font-weight:900;color:#ffffff;line-height:1.4;max-width:300px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">Приобретайте сейфы, монеты и наборы, чтобы получить игровую валюту, здания и персонажей</p>
                 </div>
                 
                 <!-- Три ячейки (вертикально) -->
@@ -2136,10 +2136,10 @@
                     <!-- Ячейка 1 с системой переключения -->
                     <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:160px;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
-                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">1</div>
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:#ffffff;font-size:10px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;z-index:1;display:none;">1</div>
                         <!-- Получаемая сумма в правом верхнем углу -->
                         <div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,rgba(100,100,100,0.6) 0%,rgba(80,80,80,0.55) 100%);backdrop-filter:blur(8px);border-radius:12px;padding:4px 10px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,215,0,0.8);z-index:5;">
-                            <span id="shop-money-amount-display" style="color:white;font-size:11px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;display:flex;align-items:center;gap:3px;">20000<img src="assets/svg/bc-icon.svg" alt="Money" style="width:14px;height:14px;object-fit:contain;"></span>
+                            <span id="shop-money-amount-display" style="color:#ffffff;font-size:11px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;align-items:center;gap:3px;">20000<img src="assets/svg/bc-icon.svg" alt="Money" style="width:14px;height:14px;object-fit:contain;"></span>
                         </div>
                         
                         <!-- Переключатель влево -->
@@ -2154,8 +2154,8 @@
                         
                         <!-- Прямоугольник с информацией -->
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
-                            <div id="shop-money-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Some money</div>
-                            <button id="shop-buy-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-buy-price" style="display:flex;align-items:center;gap:4px;">150<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>
+                            <div id="shop-money-title" style="color:#ffffff;font-size:17px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">Some money</div>
+                            <button id="shop-buy-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-buy-price" style="display:flex;align-items:center;gap:4px;">150<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->
@@ -2169,11 +2169,11 @@
                     <!-- Ячейка 2 с системой переключения алмазов -->
                     <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:160px;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
-                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">2</div>
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:#ffffff;font-size:10px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;z-index:1;display:none;">2</div>
                         
                         <!-- Получаемая сумма в правом верхнем углу -->
                         <div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,rgba(100,100,100,0.6) 0%,rgba(80,80,80,0.55) 100%);backdrop-filter:blur(8px);border-radius:12px;padding:4px 10px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,215,0,0.8);z-index:5;">
-                            <span id="shop-diamonds-amount-display" style="color:white;font-size:11px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;display:flex;align-items:center;gap:3px;">100<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:14px;height:14px;object-fit:contain;"></span>
+                            <span id="shop-diamonds-amount-display" style="color:#ffffff;font-size:11px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;display:flex;align-items:center;gap:3px;">100<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:14px;height:14px;object-fit:contain;"></span>
                         </div>
                         
                         <!-- Переключатель влево -->
@@ -2188,8 +2188,8 @@
                         
                         <!-- Прямоугольник с информацией -->
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
-                            <div id="shop-diamonds-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">A few diamonds</div>
-                            <button id="shop-buy-diamonds-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-diamonds-price" style="display:flex;align-items:center;gap:4px;">60000<img src="assets/svg/bc-icon.svg" alt="Money" style="width:18px;height:18px;object-fit:contain;"></span></button>
+                            <div id="shop-diamonds-title" style="color:#ffffff;font-size:17px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">A few diamonds</div>
+                            <button id="shop-buy-diamonds-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-diamonds-price" style="display:flex;align-items:center;gap:4px;">60000<img src="assets/svg/bc-icon.svg" alt="Money" style="width:18px;height:18px;object-fit:contain;"></span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->
@@ -2203,12 +2203,12 @@
                     <!-- Ячейка 3 с системой переключения кейсов -->
                     <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:160px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
-                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">3</div>
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:#ffffff;font-size:10px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;z-index:1;display:none;">3</div>
                         
                         <!-- Ячейка выгоды в правом верхнем углу -->
                         <div style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,rgba(100,100,100,0.6) 0%,rgba(80,80,80,0.55) 100%);backdrop-filter:blur(8px);border-radius:12px;padding:4px 10px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,215,0,0.8);z-index:5;">
-                            <span style="color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;">Выгода</span>
-                            <span id="shop-cases-discount-value" style="color:white;font-size:11px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;">40%</span>
+                            <span style="color:#ffffff;font-size:10px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">Выгода</span>
+                            <span id="shop-cases-discount-value" style="color:#ffffff;font-size:11px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">40%</span>
                         </div>
                         
                         <!-- Кнопка шансов -->
@@ -2230,8 +2230,8 @@
                         
                         <!-- Прямоугольник с информацией -->
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:60px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;padding-bottom:6px;z-index:10;gap:4px;">
-                            <div id="shop-cases-title" style="color:rgba(180,180,180,1);font-size:17px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Money case</div>
-                            <button id="shop-buy-cases-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-cases-price" style="display:flex;align-items:center;gap:0px;font-weight:800;justify-content:center;margin-left:5px;">1</span></button>
+                            <div id="shop-cases-title" style="color:#ffffff;font-size:17px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">Money case</div>
+                            <button id="shop-buy-cases-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:7px 12px;cursor:pointer;height:36px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-cases-price" style="display:flex;align-items:center;gap:0px;font-weight:900;justify-content:center;margin-left:5px;">1</span></button>
                         </div>
                         
                         <!-- Переключатель вправо -->
@@ -2255,9 +2255,9 @@
                         </button>
                         <img src="assets/svg/shop/Rare-case.svg" alt="Rare Case" style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:180px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
-                            <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Rare</div>
-                            <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Содержит уникального сотрудника</div>
-                            <button id="shop-buy-rare-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-rare-case-price" style="display:flex;align-items:center;gap:4px;font-weight:800;margin-left:5px;">1</span></button>
+                            <div style="color:#ffffff;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">Rare</div>
+                            <div style="color:#ffffff;font-size:9px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Содержит уникального сотрудника</div>
+                            <button id="shop-buy-rare-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-rare-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;margin-left:5px;">1</span></button>
                         </div>
                     </div>
                     
@@ -2271,16 +2271,16 @@
                         </button>
                         <img src="assets/svg/shop/Epic-case.svg" alt="Epic Case" style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:180px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
-                            <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Epic</div>
-                            <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Содержит уникальных сотрудников</div>
-                            <button id="shop-buy-epic-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-epic-case-price" style="display:flex;align-items:center;gap:4px;font-weight:800;margin-left:5px;">1</span></button>
+                            <div style="color:#ffffff;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">Epic</div>
+                            <div style="color:#ffffff;font-size:9px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Содержит уникальных сотрудников</div>
+                            <button id="shop-buy-epic-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-epic-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;margin-left:5px;">1</span></button>
                         </div>
                     </div>
                     
                     <!-- Ячейка 6 -->
                     <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:160px;border:2px solid rgba(255,215,0,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
-                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">6</div>
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:#ffffff;font-size:10px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;z-index:1;display:none;">6</div>
                         <!-- Звездочка для шансов -->
                         <button id="shop-legend-case-odds-btn" style="position:absolute;top:4px;left:4px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:24px;height:24px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;z-index:10;padding:0;" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.transform='scale(1)';" title="Шансы">
                             <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
@@ -2289,16 +2289,16 @@
                         </button>
                         <img src="assets/svg/shop/Legend-case.svg" alt="Legend Case" style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:180px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
-                            <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Legend</div>
-                            <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Увеличиные шансы на ценные призы</div>
-                            <button id="shop-buy-legend-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-legend-case-price" style="display:flex;align-items:center;gap:4px;font-weight:800;margin-left:5px;">1</span></button>
+                            <div style="color:#ffffff;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">Legend</div>
+                            <div style="color:#ffffff;font-size:9px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Увеличиные шансы на ценные призы</div>
+                            <button id="shop-buy-legend-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-legend-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;margin-left:5px;">1</span></button>
                         </div>
                     </div>
                     
                     <!-- Ячейка 7 -->
                     <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(15px);border-radius:12px;padding:20px;min-height:160px;border:2px solid rgba(173,216,230,0.8);display:flex;align-items:center;justify-content:center;position:relative;">
                         <!-- Номер ячейки -->
-                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:white;font-size:10px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;z-index:1;display:none;">7</div>
+                        <div style="position:absolute;top:8px;left:8px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:2px 8px;color:#ffffff;font-size:10px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;z-index:1;display:none;">7</div>
                         <!-- Звездочка для шансов -->
                         <button id="shop-ultima-case-odds-btn" style="position:absolute;top:4px;left:4px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:50%;width:24px;height:24px;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;z-index:10;padding:0;" onmouseover="this.style.background='rgba(255,255,255,0.25)';this.style.transform='scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.15)';this.style.transform='scale(1)';" title="Шансы">
                             <svg width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
@@ -2307,9 +2307,9 @@
                         </button>
                         <img src="assets/svg/shop/Ultima-case.svg" alt="Ultima Case" style="position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:180px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         <div style="position:absolute;bottom:8px;left:8px;right:8px;height:70px;background:rgba(128,128,128,0.3);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding-top:4px;padding-bottom:6px;">
-                            <div style="color:rgba(180,180,180,1);font-size:14px;font-weight:800;font-family:'Segoe UI',Arial,sans-serif;text-align:center;">Ultima</div>
-                            <div style="color:rgba(200,200,200,0.8);font-size:9px;font-weight:500;font-family:'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Максимальные шансы на лучшие призы</div>
-                            <button id="shop-buy-ultima-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:700;font-family:'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-ultima-case-price" style="display:flex;align-items:center;gap:4px;font-weight:800;margin-left:5px;">1</span></button>
+                            <div style="color:#ffffff;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;">Ultima</div>
+                            <div style="color:#ffffff;font-size:9px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;text-align:center;line-height:1.2;">Максимальные шансы на лучшие призы</div>
+                            <button id="shop-buy-ultima-case-btn" style="background:white;border:none;border-radius:20px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:5px 12px;cursor:pointer;height:28px;width:calc(100% - 16px);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;position:relative;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span id="shop-ultima-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;margin-left:5px;">1</span></button>
                         </div>
                     </div>
                 </div>

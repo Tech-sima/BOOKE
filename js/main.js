@@ -3239,6 +3239,8 @@ const diamondsItems = [
 let currentCasesIndex = 0;
 let isLegendCaseFromCell6 = false; // Флаг для определения Legend case из ячейки 6
 let isUltimaCaseFromCell7 = false; // Флаг для определения Ultima case из ячейки 7
+let isRareCaseFromCell4 = false; // Флаг для определения Rare case из ячейки 4
+let isEpicCaseFromCell5 = false; // Флаг для определения Epic case из ячейки 5
 let currentCaseItem = null; // Текущий открываемый кейс (для Rare, Epic, Legend, Ultima cases)
 const casesItems = [
     { name: 'Money case', image: 'assets/svg/shop/Money case.svg', amount: 1, cost: 200, starsPrice: 20, discount: 15 },
@@ -3344,12 +3346,11 @@ function initializeShop() {
     const rareCaseOddsBtn = document.getElementById('shop-rare-case-odds-btn');
     if (rareCaseOddsBtn) {
         rareCaseOddsBtn.addEventListener('click', () => {
-            // Устанавливаем индекс на Rare case
-            const rareCaseIndex = casesItems.findIndex(item => item.name === 'Rare case');
-            if (rareCaseIndex !== -1) {
-                currentCasesIndex = rareCaseIndex;
-                showCaseOdds();
-            }
+            // Устанавливаем флаг, что это Rare case из ячейки 4
+            isRareCaseFromCell4 = true;
+            // Устанавливаем индекс на Diamond case (используем любой существующий элемент для инициализации)
+            currentCasesIndex = 1; // Diamond case
+            showCaseOdds();
         });
     }
     
@@ -3357,12 +3358,11 @@ function initializeShop() {
     const epicCaseOddsBtn = document.getElementById('shop-epic-case-odds-btn');
     if (epicCaseOddsBtn) {
         epicCaseOddsBtn.addEventListener('click', () => {
-            // Устанавливаем индекс на Epic case
-            const epicCaseIndex = casesItems.findIndex(item => item.name === 'Epic case');
-            if (epicCaseIndex !== -1) {
-                currentCasesIndex = epicCaseIndex;
-                showCaseOdds();
-            }
+            // Устанавливаем флаг, что это Epic case из ячейки 5
+            isEpicCaseFromCell5 = true;
+            // Устанавливаем индекс на Diamond case (используем любой существующий элемент для инициализации)
+            currentCasesIndex = 1; // Diamond case
+            showCaseOdds();
         });
     }
     
@@ -3837,38 +3837,46 @@ function showCaseOdds() {
     
     if (!oddsPanel || !oddsList) return;
     
-    // Определяем текущий кейс
-    const currentCase = casesItems[currentCasesIndex];
-    if (!currentCase) return;
-    
     // Выбираем соответствующие награды
     let rewards;
     let caseName;
-    if (currentCase.name === 'Money case') {
-        rewards = moneyCaseRewards;
-        caseName = 'Money case';
-    } else if (currentCase.name === 'Legendary case' && isUltimaCaseFromCell7) {
+    
+    // Проверяем флаги для специальных кейсов (Rare, Epic, Legend, Ultima) в первую очередь
+    if (isRareCaseFromCell4) {
+        rewards = rareCaseRewards;
+        caseName = 'Rare case';
+        // Сбрасываем флаг после использования
+        isRareCaseFromCell4 = false;
+    } else if (isEpicCaseFromCell5) {
+        rewards = epicCaseRewards;
+        caseName = 'Epic case';
+        // Сбрасываем флаг после использования
+        isEpicCaseFromCell5 = false;
+    } else if (isUltimaCaseFromCell7) {
         rewards = ultimaCaseRewards;
         caseName = 'Ultima case';
         // Сбрасываем флаг после использования
         isUltimaCaseFromCell7 = false;
-    } else if (currentCase.name === 'Legendary case' && isLegendCaseFromCell6) {
+    } else if (isLegendCaseFromCell6) {
         rewards = legendCaseRewards;
         caseName = 'Legend case';
         // Сбрасываем флаг после использования
         isLegendCaseFromCell6 = false;
-    } else if (currentCase.name === 'Legendary case') {
-        rewards = legendaryCaseRewards;
-        caseName = 'Legendary case';
-    } else if (currentCase.name === 'Rare case') {
-        rewards = rareCaseRewards;
-        caseName = 'Rare case';
-    } else if (currentCase.name === 'Epic case') {
-        rewards = epicCaseRewards;
-        caseName = 'Epic case';
     } else {
-        rewards = caseRewards;
-        caseName = 'Diamond case';
+        // Определяем текущий кейс из массива
+        const currentCase = casesItems[currentCasesIndex];
+        if (!currentCase) return;
+        
+        if (currentCase.name === 'Money case') {
+            rewards = moneyCaseRewards;
+            caseName = 'Money case';
+        } else if (currentCase.name === 'Legendary case') {
+            rewards = legendaryCaseRewards;
+            caseName = 'Legendary case';
+        } else {
+            rewards = caseRewards;
+            caseName = 'Diamond case';
+        }
     }
     
     // Обновляем заголовок

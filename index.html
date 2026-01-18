@@ -781,6 +781,38 @@
         input[type="range"]:focus {
             outline: none;
         }
+        /* Адаптивные стили для кейсов в сетке 2x2 */
+        .shop-case-2x2-img {
+            max-height: 280px !important;
+        }
+        
+        /* Адаптация для средних экранов (481px - 768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .shop-case-2x2-img {
+                max-height: 240px !important;
+            }
+        }
+        
+        /* Адаптация для мобильных (до 480px) */
+        @media (max-width: 480px) {
+            .shop-case-2x2-img {
+                max-height: 200px !important;
+            }
+        }
+        
+        /* Адаптация для маленьких мобильных (до 360px) */
+        @media (max-width: 360px) {
+            .shop-case-2x2-img {
+                max-height: 180px !important;
+            }
+        }
+        
+        /* Адаптация для очень маленьких мобильных (до 320px) */
+        @media (max-width: 320px) {
+            .shop-case-2x2-img {
+                max-height: 160px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2260,7 +2292,7 @@
                             </svg>
                         </button>
                         
-                        <img src="assets/svg/shop/Rare-case.svg" alt="Rare Case" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:140px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
+                        <img src="assets/svg/shop/Rare-case.svg" alt="Rare Case" class="shop-case-2x2-img" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:280px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         
                         <!-- Кнопка покупки внизу -->
                         <button id="shop-buy-rare-case-btn" style="position:absolute;bottom:8px;left:8px;right:8px;background:white;border:none;border-radius:25px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:6px 12px;cursor:pointer;height:32px;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;z-index:10;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-rare-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;">25<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>
@@ -2280,7 +2312,7 @@
                             </svg>
                         </button>
                         
-                        <img src="assets/svg/shop/Epic-case.svg" alt="Epic Case" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:140px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
+                        <img src="assets/svg/shop/Epic-case.svg" alt="Epic Case" class="shop-case-2x2-img" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:280px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         
                         <!-- Кнопка покупки внизу -->
                         <button id="shop-buy-epic-case-btn" style="position:absolute;bottom:8px;left:8px;right:8px;background:white;border:none;border-radius:25px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:6px 12px;cursor:pointer;height:32px;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;z-index:10;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-epic-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;">60<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>
@@ -2300,7 +2332,7 @@
                             </svg>
                         </button>
                         
-                        <img src="assets/svg/shop/Legend-case.svg" alt="Legend Case" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:140px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
+                        <img src="assets/svg/shop/Legend-case.svg" alt="Legend Case" class="shop-case-2x2-img" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:280px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         
                         <!-- Кнопка покупки внизу -->
                         <button id="shop-buy-legend-case-btn" style="position:absolute;bottom:8px;left:8px;right:8px;background:white;border:none;border-radius:25px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:6px 12px;cursor:pointer;height:32px;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;z-index:10;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-legend-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;">149<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>
@@ -2320,7 +2352,7 @@
                             </svg>
                         </button>
                         
-                        <img src="assets/svg/shop/Ultima-case.svg" alt="Ultima Case" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:140px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
+                        <img src="assets/svg/shop/Ultima-case.svg" alt="Ultima Case" class="shop-case-2x2-img" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:100%;max-height:280px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(255,255,255,0.5));pointer-events:none;z-index:2;">
                         
                         <!-- Кнопка покупки внизу -->
                         <button id="shop-buy-ultima-case-btn" style="position:absolute;bottom:8px;left:8px;right:8px;background:white;border:none;border-radius:25px;color:#1a1a1a;font-size:14px;font-weight:900;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;padding:6px 12px;cursor:pointer;height:32px;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.2s ease;z-index:10;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"><span>Купить</span><span id="shop-ultima-case-price" style="display:flex;align-items:center;gap:4px;font-weight:900;">199<img src="assets/svg/rbc-icon.svg" alt="RBC" style="width:18px;height:18px;object-fit:contain;"></span></button>

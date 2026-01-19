@@ -29,8 +29,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   position:fixed;
   left:5px;
   top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 80px);
-  width:160px;
-  height:72px;
+  width:180px;
+  height:80px;
   background:transparent;
   z-index:9;
   cursor:pointer;
@@ -664,8 +664,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   #bottom-banner{
     left:5px;
     top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 80px);
-    width:160px;
-    height:70px;
+    width:180px;
+    height:78px;
     padding:0 11px;
   }
   .banner-item{
@@ -707,8 +707,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   #bottom-banner{
     left:5px;
     top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 80px);
-    width:160px;
-    height:68px;
+    width:180px;
+    height:76px;
     padding:0 10px;
   }
   #bottom-banner-panel{
@@ -735,8 +735,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   #bottom-banner{
     left:5px;
     top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 80px);
-    width:160px;
-    height:66px;
+    width:175px;
+    height:74px;
     padding:0 8px;
   }
   #bottom-banner-panel{
@@ -784,8 +784,8 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
   #bottom-banner{
     left:5px;
     top:calc(80px + env(safe-area-inset-top, 0px) + 140px - 80px);
-    width:160px;
-    height:64px;
+    width:170px;
+    height:72px;
     padding:0 6px;
   }
   #bottom-banner-panel{
@@ -1201,7 +1201,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     .telegram-mini-app #bottom-banner { 
         left: 5px !important;
         top: 245px !important; /* 185px + 140px - 80px */
-        width: 160px !important;
+        width: 180px !important;
     }
 }
 
@@ -1211,7 +1211,7 @@ body{font:400 var(--font-size-base)/1.4 "Segoe UI",sans-serif;color:#333;backgro
     .telegram-mini-app #bottom-banner { 
         left: 5px !important;
         top: calc(80px + env(safe-area-inset-top, 0px) + 140px - 80px + 75px) !important;
-        width: 160px !important;
+        width: 180px !important;
     }
 }
 

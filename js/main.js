@@ -3350,7 +3350,7 @@ function initializeShop() {
             isRareCaseFromCell4 = true;
             // Устанавливаем индекс на Diamond case (используем любой существующий элемент для инициализации)
             currentCasesIndex = 1; // Diamond case
-            showCaseOdds();
+                showCaseOdds();
         });
     }
     
@@ -3362,7 +3362,7 @@ function initializeShop() {
             isEpicCaseFromCell5 = true;
             // Устанавливаем индекс на Diamond case (используем любой существующий элемент для инициализации)
             currentCasesIndex = 1; // Diamond case
-            showCaseOdds();
+                showCaseOdds();
         });
     }
     
@@ -3478,8 +3478,8 @@ function updateMoneyDisplay() {
             moneyImage.src = item.image;
             moneyImage.alt = item.name;
             
-            // Увеличиваем подсветку SVG в 2 раза
-            moneyImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
+            // Фиолетовая подсветка SVG
+            moneyImage.style.filter = 'drop-shadow(0 0 16px rgba(138,43,226,0.8))';
             
             // Обновляем заголовок
             if (moneyTitle) {
@@ -3554,8 +3554,8 @@ function updateDiamondsDisplay() {
             diamondsImage.src = item.image;
             diamondsImage.alt = item.name;
             
-            // Увеличиваем подсветку SVG в 2 раза
-            diamondsImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
+            // Голубая подсветка SVG
+            diamondsImage.style.filter = 'drop-shadow(0 0 16px rgba(0,191,255,0.8))';
             
             // Обновляем заголовок
             if (diamondsTitle) {
@@ -3630,8 +3630,8 @@ function updateCasesDisplay() {
             casesImage.src = item.image;
             casesImage.alt = item.name;
             
-            // Увеличиваем подсветку SVG в 2 раза
-            casesImage.style.filter = 'drop-shadow(0 0 16px rgba(255,255,255,0.5))';
+            // Розовая подсветка SVG
+            casesImage.style.filter = 'drop-shadow(0 0 16px rgba(255,105,180,0.8))';
             
             // Обновляем заголовок
             if (casesTitle) {
@@ -3870,12 +3870,12 @@ function showCaseOdds() {
         if (currentCase.name === 'Money case') {
             rewards = moneyCaseRewards;
             caseName = 'Money case';
-        } else if (currentCase.name === 'Legendary case') {
-            rewards = legendaryCaseRewards;
-            caseName = 'Legendary case';
-        } else {
-            rewards = caseRewards;
-            caseName = 'Diamond case';
+    } else if (currentCase.name === 'Legendary case') {
+        rewards = legendaryCaseRewards;
+        caseName = 'Legendary case';
+    } else {
+        rewards = caseRewards;
+        caseName = 'Diamond case';
         }
     }
     
